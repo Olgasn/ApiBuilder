@@ -7,21 +7,32 @@ public static class ClassService
 {
     private const string Path = "C:\\D\\Projects\\test";
 
-    private const string EntityTemplatePath = "wwwroot\\templates\\EntityClassTemplate.txt";
-    private const string DtoTemplatePath = "wwwroot\\templates\\DtoClassTemplate.txt";
+    private const string EntityTemplatePath = "wwwroot\\templates\\domain\\EntityClassTemplate.txt";
+    private const string DtoTemplatePath = "wwwroot\\templates\\core\\DtoClassTemplate.txt";
     private const string EntityPropTemplate = "\r\n\tpublic {0} {1} {{ get; set; }}";
 
-    private const string RepositoryInterfaceTemplatePath = "wwwroot\\templates\\RepositoryInterfaceTemplate.txt";
-    private const string RepositoryTemplatePath = "wwwroot\\templates\\RepositoryTemplate.txt";
+    private const string RepositoryInterfaceTemplatePath = "wwwroot\\templates\\domain\\RepositoryInterfaceTemplate.txt";
+    private const string RepositoryTemplatePath = "wwwroot\\templates\\domain\\RepositoryTemplate.txt";
 
-    private const string DbContextTemplatePath = "wwwroot\\templates\\DbContextTemplate.txt";
+    private const string DbContextTemplatePath = "wwwroot\\templates\\domain\\DbContextTemplate.txt";
     private const string DbSetTemplate = "\r\n\tpublic DbSet<{0}> {1} {{ get; set; }}";
 
-    private const string BaseRepositoryInterfaceTemplatePath = "wwwroot\\templates\\BaseRepositoryInterfaceTemplate.txt";
-    private const string BaseRepositoryTemplatePath = "wwwroot\\templates\\BaseRepositoryTemplate.txt";
+    private const string BaseRepositoryInterfaceTemplatePath = "wwwroot\\templates\\domain\\BaseRepositoryInterfaceTemplate.txt";
+    private const string BaseRepositoryTemplatePath = "wwwroot\\templates\\domain\\BaseRepositoryTemplate.txt";
 
-    private const string ServiceInterfaceTemplatePath = "wwwroot\\templates\\ServiceInterfaceTemplate.txt";
-    private const string ServiceTemplatePath = "wwwroot\\templates\\ServiceTemplate.txt";
+    private const string ServiceInterfaceTemplatePath = "wwwroot\\templates\\core\\ServiceInterfaceTemplate.txt";
+    private const string ServiceTemplatePath = "wwwroot\\templates\\core\\ServiceTemplate.txt";
+    
+    private const string ControllerTemplatePath = "wwwroot\\templates\\api\\ControllerTemplate.txt";
+    
+    private const string MappingProfileTemplatePath = "wwwroot\\templates\\core\\MappingProfileTemplate.txt";
+    private const string MappingItemTemplate = "\r\n\t\tCreateMap<{0}, {0}Dto>();";
+    
+    private const string ProgramClassTemplatePath = "wwwroot\\templates\\api\\ApiProgramClassTemplate.txt";
+    
+    private const string ServiceExtensionsTemplatePath = "wwwroot\\templates\\api\\ServiceExtensionsTemplate.txt";
+    private const string RepositoryRegTemplate = "\r\n\t\tservices.AddScoped<I{0}Repository, {0}Repository>();";
+    private const string ServiceRegTemplate = "\r\n\t\tservices.AddScoped<I{0}Service, {0}Service>();";
 
     public static void CreateEntityClass(string className, string solutionName, Dictionary<string, string> properties)
     {
@@ -197,13 +208,123 @@ public static class ClassService
         }
     }
 
+    public static void CreateController(string solutionName, EntityClassViewModel entity)
+    {
+        try
+        {
+            var fileContent = TemplateHelper.GetTemplateContent(ControllerTemplatePath);
+
+            StreamWriter sw = new($"{Path}\\{solutionName}\\{solutionName}.API\\Controllers\\{entity.Name}Controller.cs");
+
+            sw.WriteLine(string.Format(fileContent, 
+                $"{solutionName}.BLL.Dtos", 
+                $"{solutionName}.BLL.Services.Abstractions",
+                $"{solutionName}.API.Controllers",
+                $"{entity.PluralName[..1].ToLower()}{entity.PluralName[1..]}",
+                entity.Name,
+                $"{entity.Name[..1].ToLower()}{entity.Name[1..]}",
+                "int"));
+
+            sw.Close();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+    }
+
+    public static void CreateMappingProfile(string solutionName, List<EntityClassViewModel> entities)
+    {
+        try
+        {
+            var fileContent = TemplateHelper.GetTemplateContent(MappingProfileTemplatePath);
+
+            StreamWriter sw = new($"{Path}\\{solutionName}\\{solutionName}.BLL\\MappingProfile.cs");
+
+            var props = string.Empty;
+            foreach (var entity in entities)
+            {
+                props += string.Format(MappingItemTemplate, entity.Name);
+            }
+
+            sw.WriteLine(string.Format(fileContent,
+                $"{solutionName}.DAL.Entities",
+                $"{solutionName}.BLL.Dtos",
+                $"{solutionName}.BLL",
+                props));
+
+            sw.Close();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+    }
+
+    public static void CreateServiceExtensions(string solutionName, List<EntityClassViewModel> entities)
+    {
+        try
+        {
+            var fileContent = TemplateHelper.GetTemplateContent(ServiceExtensionsTemplatePath);
+
+            StreamWriter sw = new($"{Path}\\{solutionName}\\{solutionName}.API\\Extensions\\ServiceExtensions.cs");
+
+            var repositoryProps = string.Empty;
+            var serviceProps = string.Empty;
+            foreach (var entity in entities)
+            {
+                repositoryProps += string.Format(RepositoryRegTemplate, entity.Name);
+                serviceProps += string.Format(ServiceRegTemplate, entity.Name);
+            }
+
+            sw.WriteLine(string.Format(fileContent,
+                $"{solutionName}.DAL",
+                $"{solutionName}.DAL.Repositories",
+                $"{solutionName}.DAL.Repositories.Abstractions",
+                $"{solutionName}.BLL.Services",
+                $"{solutionName}.BLL.Services.Abstractions",
+                $"{solutionName}.API.Extensions",
+                repositoryProps,
+                serviceProps));
+
+            sw.Close();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.InnerException);
+        }
+    }
+
     public static void AddProjectReferences(string solutionName)
     {
         ProcessManager.ExecuteCmdCommands([
             $"cd {Path}\\{solutionName}\\{solutionName}.BLL",
             "dotnet add package AutoMapper",
             $"cd {Path}\\{solutionName}",
-            $"dotnet add {solutionName}.BLL/{solutionName}.BLL.csproj reference {solutionName}.DAL/{solutionName}.DAL.csproj"
+            $"dotnet add {solutionName}.BLL/{solutionName}.BLL.csproj reference {solutionName}.DAL/{solutionName}.DAL.csproj",
+            $"dotnet add {solutionName}.API/{solutionName}.API.csproj reference {solutionName}.BLL/{solutionName}.BLL.csproj",
+            $"cd {Path}\\{solutionName}\\{solutionName}.API",
+            "dotnet add package Microsoft.EntityFrameworkCore.SqlServer",
         ]);
+    }
+
+    public static void UpdateProgramClass(string solutionName)
+    {
+        try
+        {
+            var fileContent = TemplateHelper.GetTemplateContent(ProgramClassTemplatePath);
+
+            StreamWriter sw = new($"{Path}\\{solutionName}\\{solutionName}.API\\Program.cs");
+
+            sw.WriteLine(string.Format(fileContent, 
+                $"{solutionName}.API.Extensions",
+                $"{solutionName}.BLL"));
+
+            sw.Close();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
     }
 }

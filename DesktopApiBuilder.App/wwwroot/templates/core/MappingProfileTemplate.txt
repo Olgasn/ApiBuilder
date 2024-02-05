@@ -1,0 +1,12 @@
+﻿﻿using AutoMapper;
+using {0};
+using {1};
+
+namespace {2};
+
+public class MappingProfile : Profile
+{{
+    public MappingProfile()
+    {{{3}
+    }}
+}}

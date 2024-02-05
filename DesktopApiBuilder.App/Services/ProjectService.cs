@@ -13,7 +13,7 @@ public static class ProjectService
         {
             ProcessManager.ExecuteCmdCommands([
                 $"cd {Path}\\{solutionName}",
-                $"dotnet new {ProjectTemplates.AspNetCoreEmpty} --name {solutionName}.API",
+                $"dotnet new {ProjectTemplates.AspNetWebApi} --name {solutionName}.API",
                 $"dotnet new {ProjectTemplates.ClassLibrary} --name {solutionName}.BLL",
                 $"dotnet new {ProjectTemplates.ClassLibrary} --name {solutionName}.DAL",
                 $"dotnet sln {solutionName}.sln add {solutionName}.API/{solutionName}.API.csproj",
@@ -33,17 +33,25 @@ public static class ProjectService
                 "mkdir Services",
                 $"cd {Path}\\{solutionName}\\{solutionName}.BLL\\Services",
                 "mkdir Abstractions",
+                // API
+                $"cd {Path}\\{solutionName}\\{solutionName}.API",
+                $"del \"{solutionName}.API.http\"",
+                "mkdir Controllers",
+                "mkdir Extensions",
             ]);
 
             var dalPath = $"{Path}/{solutionName}/{solutionName}.DAL/";
             var bllPath = $"{Path}/{solutionName}/{solutionName}.BLL/";
+            var apiPath = $"{Path}/{solutionName}/{solutionName}.API/";
 
             while (!Directory.Exists($"{dalPath}Entities") 
                    || !Directory.Exists($"{dalPath}Repositories")
                    || !Directory.Exists($"{dalPath}Repositories/Abstractions")
                    || !Directory.Exists($"{bllPath}Dtos")
                    || !Directory.Exists($"{bllPath}Services")
-                   || !Directory.Exists($"{bllPath}Services/Abstractions"))
+                   || !Directory.Exists($"{bllPath}Services/Abstractions")
+                   || !Directory.Exists($"{apiPath}Controllers")
+                   || !Directory.Exists($"{apiPath}Extensions"))
             {
                 continue;
             }

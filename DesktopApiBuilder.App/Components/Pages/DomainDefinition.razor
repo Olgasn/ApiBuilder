@@ -1,6 +1,7 @@
 ﻿@page "/domain/{name}"
 @using DesktopApiBuilder.App.Services
 @using DesktopApiBuilder.App.Data.ViewModels
+@inject NavigationManager Navigation
 
 <h3>Domain Definition</h3>
 
@@ -111,6 +112,7 @@
         ClassService.CreateRepository(_currentEntity.Name, Name);
         ClassService.CreateDtoClass(_currentEntity.Name, Name, result.Value);
         ClassService.CreateService(_currentEntity.Name, Name);
+        ClassService.CreateController(Name, _currentEntity);
 
         _message = $"Entity classes for solution \"{Name}\" were succesfully created!";
         _isOverlayOpened = false;
@@ -142,5 +144,10 @@
         ClassService.CreateDbContext(Name, _entities);
         ClassService.CreateBaseRepository(Name);
         ClassService.AddProjectReferences(Name);
+        ClassService.CreateMappingProfile(Name, _entities);
+        ClassService.UpdateProgramClass(Name);
+        ClassService.CreateServiceExtensions(Name, _entities);
+
+        Navigation.NavigateTo($"/sql/{Name}");
     }
 }

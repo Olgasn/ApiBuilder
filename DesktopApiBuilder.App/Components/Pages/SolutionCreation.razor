@@ -1,5 +1,4 @@
 ﻿@page "/"
-@using DesktopApiBuilder.App.Services
 
 <MudTextField @bind-Value=_solutionName Required RequiredError="Solution name is required" Placeholder="Solution Name"/>
 <MudButton OnClick="CreateSolution" Variant="Variant.Outlined" Class="mt-4" Disabled="!string.IsNullOrEmpty(_message)">Create solution</MudButton>
