@@ -22,6 +22,8 @@ public static class ClassService
 
     private const string ServiceInterfaceTemplatePath = "wwwroot\\templates\\ServiceInterfaceTemplate.txt";
     private const string ServiceTemplatePath = "wwwroot\\templates\\ServiceTemplate.txt";
+    
+    private const string ControllerTemplatePath = "wwwroot\\templates\\ControllerTemplate.txt";
 
     public static void CreateEntityClass(string className, string solutionName, Dictionary<string, string> properties)
     {
@@ -197,13 +199,39 @@ public static class ClassService
         }
     }
 
+    public static void CreateController(string solutionName, EntityClassViewModel entity)
+    {
+        try
+        {
+            var fileContent = TemplateHelper.GetTemplateContent(ControllerTemplatePath);
+
+            StreamWriter sw = new($"{Path}\\{solutionName}\\{solutionName}.API\\Controllers\\{entity.Name}Controller.cs");
+
+            sw.WriteLine(string.Format(fileContent, 
+                $"{solutionName}.BLL.Dtos", 
+                $"{solutionName}.BLL.Services.Abstractions",
+                $"{solutionName}.API.Controllers",
+                $"{entity.PluralName[..1].ToLower()}{entity.PluralName[1..]}",
+                entity.Name,
+                $"{entity.Name[..1].ToLower()}{entity.Name[1..]}",
+                "int"));
+
+            sw.Close();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+    }
+
     public static void AddProjectReferences(string solutionName)
     {
         ProcessManager.ExecuteCmdCommands([
             $"cd {Path}\\{solutionName}\\{solutionName}.BLL",
             "dotnet add package AutoMapper",
             $"cd {Path}\\{solutionName}",
-            $"dotnet add {solutionName}.BLL/{solutionName}.BLL.csproj reference {solutionName}.DAL/{solutionName}.DAL.csproj"
+            $"dotnet add {solutionName}.BLL/{solutionName}.BLL.csproj reference {solutionName}.DAL/{solutionName}.DAL.csproj",
+            $"dotnet add {solutionName}.API/{solutionName}.API.csproj reference {solutionName}.BLL/{solutionName}.BLL.csproj"
         ]);
     }
 }

@@ -33,17 +33,23 @@ public static class ProjectService
                 "mkdir Services",
                 $"cd {Path}\\{solutionName}\\{solutionName}.BLL\\Services",
                 "mkdir Abstractions",
+                // API
+                $"cd {Path}\\{solutionName}\\{solutionName}.API",
+                "mkdir Controllers",
             ]);
 
             var dalPath = $"{Path}/{solutionName}/{solutionName}.DAL/";
             var bllPath = $"{Path}/{solutionName}/{solutionName}.BLL/";
+            var apiPath = $"{Path}/{solutionName}/{solutionName}.API/";
 
             while (!Directory.Exists($"{dalPath}Entities") 
                    || !Directory.Exists($"{dalPath}Repositories")
                    || !Directory.Exists($"{dalPath}Repositories/Abstractions")
                    || !Directory.Exists($"{bllPath}Dtos")
                    || !Directory.Exists($"{bllPath}Services")
-                   || !Directory.Exists($"{bllPath}Services/Abstractions"))
+                   || !Directory.Exists($"{bllPath}Services/Abstractions")
+                   || !Directory.Exists($"{apiPath}Controllers")
+                   )
             {
                 continue;
             }
