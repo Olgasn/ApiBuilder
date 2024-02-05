@@ -1,0 +1,26 @@
+﻿@page "/sql/{name}"
+@inject NavigationManager Navigation
+
+<MudTextField @bind-Value=_sqlConnection Required RequiredError="SQL connection string is required" Placeholder="SQL connection string" />
+<MudButton OnClick="SetConnectionString" Variant="Variant.Outlined" Class="mt-4" Disabled="!string.IsNullOrEmpty(_message)">Setup connection string</MudButton>
+
+ @code {
+    private string? _sqlConnection;
+    private string _message = string.Empty;
+
+    [Parameter] public string Name { get; init; }
+
+    private void SetConnectionString()
+    {
+        if (string.IsNullOrEmpty(_sqlConnection))
+        {
+            return;
+        }
+
+        SqlService.SetupSqlConnection(Name, "Server=DESKTOP-0SM65GV\\\\SQLEXPRESS;Database=NciDb;Trusted_Connection=True;");
+
+        Navigation.NavigateTo("/final");
+
+        //_message = $"Solution \"{_sqlConnection}\" was succesfully created!";
+    }
+}

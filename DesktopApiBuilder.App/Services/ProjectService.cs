@@ -35,7 +35,9 @@ public static class ProjectService
                 "mkdir Abstractions",
                 // API
                 $"cd {Path}\\{solutionName}\\{solutionName}.API",
+                $"del \"{solutionName}.API.http\"",
                 "mkdir Controllers",
+                "mkdir Extensions",
             ]);
 
             var dalPath = $"{Path}/{solutionName}/{solutionName}.DAL/";
@@ -49,7 +51,7 @@ public static class ProjectService
                    || !Directory.Exists($"{bllPath}Services")
                    || !Directory.Exists($"{bllPath}Services/Abstractions")
                    || !Directory.Exists($"{apiPath}Controllers")
-                   )
+                   || !Directory.Exists($"{apiPath}Extensions"))
             {
                 continue;
             }

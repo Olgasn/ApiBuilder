@@ -1,0 +1,32 @@
+﻿using Microsoft.EntityFrameworkCore;
+using {0};
+using {1};
+using {2};
+using {3};
+using {4};
+
+namespace {5};
+
+public static class ServiceExtensions
+{{
+    public static void ConfigureCors(this IServiceCollection services) =>
+        services.AddCors(options =>
+        {{
+            options.AddPolicy("CorsPolicy", builder =>
+                builder.AllowAnyOrigin()
+                .AllowAnyMethod()
+                .AllowAnyHeader());
+        }});
+
+    public static void ConfigureDbContext(this IServiceCollection services, IConfiguration configuration)
+    {{
+        services.AddDbContext<AppDbContext>(opts =>
+            opts.UseSqlServer(configuration.GetConnectionString("DbConnection"), b =>
+                b.MigrationsAssembly("{0}")));
+    }}
+
+    public static void ConfigureServices(this IServiceCollection services)
+    {{{6}
+        {7}
+    }}
+}}

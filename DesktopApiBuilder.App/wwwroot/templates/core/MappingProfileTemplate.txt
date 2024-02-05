@@ -7,7 +7,6 @@ namespace {2};
 public class MappingProfile : Profile
 {{
     public MappingProfile()
-    {{
-        {3}
+    {{{3}
     }}
 }}
