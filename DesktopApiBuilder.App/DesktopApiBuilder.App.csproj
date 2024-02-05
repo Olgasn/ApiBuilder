@@ -71,7 +71,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <None Include="wwwroot\templates\EntityClassTemplate.txt">
+      <None Include="wwwroot\templates\domain\EntityClassTemplate.txt">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
     </ItemGroup>

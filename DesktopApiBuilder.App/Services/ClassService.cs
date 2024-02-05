@@ -7,27 +7,27 @@ public static class ClassService
 {
     private const string Path = "C:\\D\\Projects\\test";
 
-    private const string EntityTemplatePath = "wwwroot\\templates\\EntityClassTemplate.txt";
-    private const string DtoTemplatePath = "wwwroot\\templates\\DtoClassTemplate.txt";
+    private const string EntityTemplatePath = "wwwroot\\templates\\domain\\EntityClassTemplate.txt";
+    private const string DtoTemplatePath = "wwwroot\\templates\\core\\DtoClassTemplate.txt";
     private const string EntityPropTemplate = "\r\n\tpublic {0} {1} {{ get; set; }}";
 
-    private const string RepositoryInterfaceTemplatePath = "wwwroot\\templates\\RepositoryInterfaceTemplate.txt";
-    private const string RepositoryTemplatePath = "wwwroot\\templates\\RepositoryTemplate.txt";
+    private const string RepositoryInterfaceTemplatePath = "wwwroot\\templates\\domain\\RepositoryInterfaceTemplate.txt";
+    private const string RepositoryTemplatePath = "wwwroot\\templates\\domain\\RepositoryTemplate.txt";
 
-    private const string DbContextTemplatePath = "wwwroot\\templates\\DbContextTemplate.txt";
+    private const string DbContextTemplatePath = "wwwroot\\templates\\domain\\DbContextTemplate.txt";
     private const string DbSetTemplate = "\r\n\tpublic DbSet<{0}> {1} {{ get; set; }}";
 
-    private const string BaseRepositoryInterfaceTemplatePath = "wwwroot\\templates\\BaseRepositoryInterfaceTemplate.txt";
-    private const string BaseRepositoryTemplatePath = "wwwroot\\templates\\BaseRepositoryTemplate.txt";
+    private const string BaseRepositoryInterfaceTemplatePath = "wwwroot\\templates\\domain\\BaseRepositoryInterfaceTemplate.txt";
+    private const string BaseRepositoryTemplatePath = "wwwroot\\templates\\domain\\BaseRepositoryTemplate.txt";
 
-    private const string ServiceInterfaceTemplatePath = "wwwroot\\templates\\ServiceInterfaceTemplate.txt";
-    private const string ServiceTemplatePath = "wwwroot\\templates\\ServiceTemplate.txt";
+    private const string ServiceInterfaceTemplatePath = "wwwroot\\templates\\core\\ServiceInterfaceTemplate.txt";
+    private const string ServiceTemplatePath = "wwwroot\\templates\\core\\ServiceTemplate.txt";
     
-    private const string ControllerTemplatePath = "wwwroot\\templates\\ControllerTemplate.txt";
+    private const string ControllerTemplatePath = "wwwroot\\templates\\api\\ControllerTemplate.txt";
     
-    private const string MappingProfileTemplatePath = "wwwroot\\templates\\MappingProfileTemplate.txt";
+    private const string MappingProfileTemplatePath = "wwwroot\\templates\\core\\MappingProfileTemplate.txt";
     
-    private const string ProgramClassTemplatePath = "wwwroot\\templates\\ApiProgramClassTemplate.txt";
+    private const string ProgramClassTemplatePath = "wwwroot\\templates\\api\\ApiProgramClassTemplate.txt";
 
     public static void CreateEntityClass(string className, string solutionName, Dictionary<string, string> properties)
     {
