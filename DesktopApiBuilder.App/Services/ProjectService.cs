@@ -1,5 +1,6 @@
-﻿using DesktopApiBuilder.App.Data.Constants;
-using DesktopApiBuilder.App.Data.Enums;
+﻿using DesktopApiBuilder.App.Data.Enums;
+using DesktopApiBuilder.App.Data.Models;
+using DesktopApiBuilder.App.Helpers;
 
 namespace DesktopApiBuilder.App.Services;
 
@@ -7,54 +8,65 @@ public static class ProjectService
 {
     private const string Path = "C:\\D\\Projects\\test";
 
+    private const string ProjectCreationCommandTemplate = "dotnet new {0} --name {1}.{2}";
+    private const string AddProjectToSolutionCommandTemplate = "dotnet sln {0}.sln add {0}.{1}/{0}.{1}.csproj";
+
     public static void CreateProjects(string solutionName, ArchitectureType architectureType)
     {
-        if (architectureType == ArchitectureType.ThreeLayered)
+        SolutionConfig? config = ConfigHelper.GetSolutionConfig($"{Path}\\myconfig.json");
+
+        List<string> commands = [];
+
+        commands.Add($"cd {Path}\\{solutionName}");
+
+        foreach (var project in config.Projects)
         {
-            ProcessManager.ExecuteCmdCommands([
-                $"cd {Path}\\{solutionName}",
-                $"dotnet new {ProjectTemplates.AspNetWebApi} --name {solutionName}.API",
-                $"dotnet new {ProjectTemplates.ClassLibrary} --name {solutionName}.BLL",
-                $"dotnet new {ProjectTemplates.ClassLibrary} --name {solutionName}.DAL",
-                $"dotnet sln {solutionName}.sln add {solutionName}.API/{solutionName}.API.csproj",
-                $"dotnet sln {solutionName}.sln add {solutionName}.BLL/{solutionName}.BLL.csproj",
-                $"dotnet sln {solutionName}.sln add {solutionName}.DAL/{solutionName}.DAL.csproj",
-                // DAL
-                $"cd {Path}\\{solutionName}\\{solutionName}.DAL",
-                "del \"Class1.cs\"",
-                "mkdir Entities",
-                "mkdir Repositories",
-                $"cd {Path}\\{solutionName}\\{solutionName}.DAL\\Repositories",
-                "mkdir Abstractions",
-                // BLL
-                $"cd {Path}\\{solutionName}\\{solutionName}.BLL",
-                "del \"Class1.cs\"",
-                "mkdir Dtos",
-                "mkdir Services",
-                $"cd {Path}\\{solutionName}\\{solutionName}.BLL\\Services",
-                "mkdir Abstractions",
-                // API
-                $"cd {Path}\\{solutionName}\\{solutionName}.API",
-                $"del \"{solutionName}.API.http\"",
-                "mkdir Controllers",
-                "mkdir Extensions",
-            ]);
+            commands.Add(string.Format(ProjectCreationCommandTemplate, 
+                project.Type,
+                solutionName,
+                project.Name));
 
-            var dalPath = $"{Path}/{solutionName}/{solutionName}.DAL/";
-            var bllPath = $"{Path}/{solutionName}/{solutionName}.BLL/";
-            var apiPath = $"{Path}/{solutionName}/{solutionName}.API/";
+            commands.Add(string.Format(AddProjectToSolutionCommandTemplate,
+                solutionName,
+                project.Name));
+        }
 
-            while (!Directory.Exists($"{dalPath}Entities") 
-                   || !Directory.Exists($"{dalPath}Repositories")
-                   || !Directory.Exists($"{dalPath}Repositories/Abstractions")
-                   || !Directory.Exists($"{bllPath}Dtos")
-                   || !Directory.Exists($"{bllPath}Services")
-                   || !Directory.Exists($"{bllPath}Services/Abstractions")
-                   || !Directory.Exists($"{apiPath}Controllers")
-                   || !Directory.Exists($"{apiPath}Extensions"))
-            {
-                continue;
-            }
+        commands.AddRange(
+            [$"cd {Path}\\{solutionName}\\{solutionName}.DAL",
+            "del \"Class1.cs\"",
+            "mkdir Entities",
+            "mkdir Repositories",
+            $"cd {Path}\\{solutionName}\\{solutionName}.DAL\\Repositories",
+            "mkdir Abstractions",
+
+            $"cd {Path}\\{solutionName}\\{solutionName}.BLL",
+            "del \"Class1.cs\"",
+            "mkdir Dtos",
+            "mkdir Services",
+            $"cd {Path}\\{solutionName}\\{solutionName}.BLL\\Services",
+            "mkdir Abstractions",
+
+            $"cd {Path}\\{solutionName}\\{solutionName}.API",
+            $"del \"{solutionName}.API.http\"",
+            "mkdir Controllers",
+            "mkdir Extensions"]);
+
+        ProcessManager.ExecuteCmdCommands([.. commands]);
+
+        var dalPath = $"{Path}/{solutionName}/{solutionName}.DAL/";
+        var bllPath = $"{Path}/{solutionName}/{solutionName}.BLL/";
+        var apiPath = $"{Path}/{solutionName}/{solutionName}.API/";
+
+        while (!Directory.Exists($"{dalPath}Entities")
+               || !Directory.Exists($"{dalPath}Repositories")
+               || !Directory.Exists($"{dalPath}Repositories/Abstractions")
+               || !Directory.Exists($"{bllPath}Dtos")
+               || !Directory.Exists($"{bllPath}Services")
+               || !Directory.Exists($"{bllPath}Services/Abstractions")
+               || !Directory.Exists($"{apiPath}Controllers")
+               || !Directory.Exists($"{apiPath}Extensions"))
+        {
+            continue;
         }
     }
 }
