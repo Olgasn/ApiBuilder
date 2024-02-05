@@ -144,6 +144,8 @@
         ClassService.CreateDbContext(Name, _entities);
         ClassService.CreateBaseRepository(Name);
         ClassService.AddProjectReferences(Name);
+        ClassService.CreateMappingProfile(Name);
+        ClassService.UpdateProgramClass(Name);
 
         Navigation.NavigateTo("/final");
     }

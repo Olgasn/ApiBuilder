@@ -24,6 +24,10 @@ public static class ClassService
     private const string ServiceTemplatePath = "wwwroot\\templates\\ServiceTemplate.txt";
     
     private const string ControllerTemplatePath = "wwwroot\\templates\\ControllerTemplate.txt";
+    
+    private const string MappingProfileTemplatePath = "wwwroot\\templates\\MappingProfileTemplate.txt";
+    
+    private const string ProgramClassTemplatePath = "wwwroot\\templates\\ApiProgramClassTemplate.txt";
 
     public static void CreateEntityClass(string className, string solutionName, Dictionary<string, string> properties)
     {
@@ -224,6 +228,28 @@ public static class ClassService
         }
     }
 
+    public static void CreateMappingProfile(string solutionName)
+    {
+        try
+        {
+            var fileContent = TemplateHelper.GetTemplateContent(MappingProfileTemplatePath);
+
+            StreamWriter sw = new($"{Path}\\{solutionName}\\{solutionName}.BLL\\MappingProfile.cs");
+
+            sw.WriteLine(string.Format(fileContent,
+                $"{solutionName}.DAL.Entities",
+                $"{solutionName}.BLL.Dtos",
+                $"{solutionName}.BLL",
+                string.Empty));
+
+            sw.Close();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+    }
+
     public static void AddProjectReferences(string solutionName)
     {
         ProcessManager.ExecuteCmdCommands([
@@ -233,5 +259,23 @@ public static class ClassService
             $"dotnet add {solutionName}.BLL/{solutionName}.BLL.csproj reference {solutionName}.DAL/{solutionName}.DAL.csproj",
             $"dotnet add {solutionName}.API/{solutionName}.API.csproj reference {solutionName}.BLL/{solutionName}.BLL.csproj"
         ]);
+    }
+
+    public static void UpdateProgramClass(string solutionName)
+    {
+        try
+        {
+            var fileContent = TemplateHelper.GetTemplateContent(ProgramClassTemplatePath);
+
+            StreamWriter sw = new($"{Path}\\{solutionName}\\{solutionName}.API\\Program.cs");
+
+            sw.WriteLine(fileContent);
+
+            sw.Close();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
     }
 }

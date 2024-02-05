@@ -2,6 +2,6 @@
 
 public static class ProjectTemplates
 {
-    public const string AspNetCoreEmpty = "web";
+    public const string AspNetWebApi = "webapi";
     public const string ClassLibrary = "classlib";
 }

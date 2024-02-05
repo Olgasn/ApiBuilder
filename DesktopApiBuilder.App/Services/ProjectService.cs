@@ -13,7 +13,7 @@ public static class ProjectService
         {
             ProcessManager.ExecuteCmdCommands([
                 $"cd {Path}\\{solutionName}",
-                $"dotnet new {ProjectTemplates.AspNetCoreEmpty} --name {solutionName}.API",
+                $"dotnet new {ProjectTemplates.AspNetWebApi} --name {solutionName}.API",
                 $"dotnet new {ProjectTemplates.ClassLibrary} --name {solutionName}.BLL",
                 $"dotnet new {ProjectTemplates.ClassLibrary} --name {solutionName}.DAL",
                 $"dotnet sln {solutionName}.sln add {solutionName}.API/{solutionName}.API.csproj",
