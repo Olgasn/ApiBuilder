@@ -9,4 +9,7 @@ public class ProjectConfig
 
     [JsonPropertyName("type")]
     public string? Type { get; set; }
+
+    [JsonPropertyName("directories")]
+    public IEnumerable<DirectoryConfig>? Directories { get; set; }
 }

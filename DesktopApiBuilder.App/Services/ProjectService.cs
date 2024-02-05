@@ -1,4 +1,5 @@
-﻿using DesktopApiBuilder.App.Data.Enums;
+﻿using DesktopApiBuilder.App.Data.Constants;
+using DesktopApiBuilder.App.Data.Enums;
 using DesktopApiBuilder.App.Data.Models;
 using DesktopApiBuilder.App.Helpers;
 
@@ -10,18 +11,27 @@ public static class ProjectService
 
     private const string ProjectCreationCommandTemplate = "dotnet new {0} --name {1}.{2}";
     private const string AddProjectToSolutionCommandTemplate = "dotnet sln {0}.sln add {0}.{1}/{0}.{1}.csproj";
+    private const string GoToProjectPathCommandTemplate = "cd {0}/{1}/{1}.{2}";
 
     public static void CreateProjects(string solutionName, ArchitectureType architectureType)
     {
         SolutionConfig? config = ConfigHelper.GetSolutionConfig($"{Path}\\myconfig.json");
+        List<string> commands = GenerateExecutionCommands(solutionName, config);
 
+        ProcessManager.ExecuteCmdCommands([.. commands]);
+
+        CheckIfDirectoriesExist(solutionName, config);
+    }
+
+    private static List<string> GenerateExecutionCommands(string solutionName, SolutionConfig? config)
+    {
         List<string> commands = [];
 
         commands.Add($"cd {Path}\\{solutionName}");
 
         foreach (var project in config.Projects)
         {
-            commands.Add(string.Format(ProjectCreationCommandTemplate, 
+            commands.Add(string.Format(ProjectCreationCommandTemplate,
                 project.Type,
                 solutionName,
                 project.Name));
@@ -31,42 +41,62 @@ public static class ProjectService
                 project.Name));
         }
 
-        commands.AddRange(
-            [$"cd {Path}\\{solutionName}\\{solutionName}.DAL",
-            "del \"Class1.cs\"",
-            "mkdir Entities",
-            "mkdir Repositories",
-            $"cd {Path}\\{solutionName}\\{solutionName}.DAL\\Repositories",
-            "mkdir Abstractions",
-
-            $"cd {Path}\\{solutionName}\\{solutionName}.BLL",
-            "del \"Class1.cs\"",
-            "mkdir Dtos",
-            "mkdir Services",
-            $"cd {Path}\\{solutionName}\\{solutionName}.BLL\\Services",
-            "mkdir Abstractions",
-
-            $"cd {Path}\\{solutionName}\\{solutionName}.API",
-            $"del \"{solutionName}.API.http\"",
-            "mkdir Controllers",
-            "mkdir Extensions"]);
-
-        ProcessManager.ExecuteCmdCommands([.. commands]);
-
-        var dalPath = $"{Path}/{solutionName}/{solutionName}.DAL/";
-        var bllPath = $"{Path}/{solutionName}/{solutionName}.BLL/";
-        var apiPath = $"{Path}/{solutionName}/{solutionName}.API/";
-
-        while (!Directory.Exists($"{dalPath}Entities")
-               || !Directory.Exists($"{dalPath}Repositories")
-               || !Directory.Exists($"{dalPath}Repositories/Abstractions")
-               || !Directory.Exists($"{bllPath}Dtos")
-               || !Directory.Exists($"{bllPath}Services")
-               || !Directory.Exists($"{bllPath}Services/Abstractions")
-               || !Directory.Exists($"{apiPath}Controllers")
-               || !Directory.Exists($"{apiPath}Extensions"))
+        foreach (var project in config.Projects)
         {
-            continue;
+            commands.Add(string.Format(GoToProjectPathCommandTemplate,
+                Path,
+                solutionName,
+                project.Name));
+
+            if (project.Type == ProjectTypes.ClassLibrary)
+            {
+                commands.Add("del \"Class1.cs\"");
+            }
+            else if (project.Type == ProjectTypes.AspNetWebApi)
+            {
+                commands.Add($"del \"{solutionName}.{project.Name}.http\"");
+            }
+
+            foreach (var dir in project.Directories)
+            {
+                if (!string.IsNullOrEmpty(dir.ParentPath))
+                {
+                    commands.Add(string.Format(GoToProjectPathCommandTemplate,
+                        Path,
+                        solutionName,
+                        $"{project.Name}{dir.ParentPath}"));
+                }
+
+                commands.Add($"mkdir {dir.Name}");
+            }
+        }
+
+        return commands;
+    }
+
+    private static void CheckIfDirectoriesExist(string solutionName, SolutionConfig? config)
+    {
+        List<string> commonPaths = [];
+
+        config.Projects.ToList()
+            .ForEach(p => commonPaths.AddRange(
+                p.Directories.Where(d => string.IsNullOrEmpty(d.ParentPath))
+                    .Select(d => $"{Path}/{solutionName}/{solutionName}.{p.Name}/{d.Name}")));
+
+        while (true)
+        {
+            bool allExist = true;
+
+            foreach (var path in commonPaths)
+            {
+                if (!Directory.Exists(path))
+                {
+                    allExist = false;
+                    break;
+                }
+            }
+
+            if (allExist) break;
         }
     }
 }
