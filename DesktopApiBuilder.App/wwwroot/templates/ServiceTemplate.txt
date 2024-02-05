@@ -1,0 +1,65 @@
+﻿﻿using AutoMapper;
+using {0};
+using {1};
+using {2};
+using {3};
+
+namespace {4};
+
+public class {5}Service : I{5}Service
+{{
+    private readonly I{5}Repository _repository;
+    private readonly IMapper _mapper;
+
+    public {5}Service(I{5}Repository repository, IMapper mapper)
+    {{
+        _repository = repository;
+        _mapper = mapper;
+    }}
+
+    public async Task Create({5}Dto entityForCreation)
+    {{
+        var entity = _mapper.Map<{5}>(entityForCreation);
+
+        await _repository.Create(entity);
+        await _repository.SaveChanges();
+    }}
+
+    public async Task<bool> Delete({6} id)
+    {{
+        var entity = await _repository.GetById(id, trackChanges: false);
+
+        if (entity is null)
+        {{
+            return false;
+        }}
+
+        _repository.Delete(entity);
+        await _repository.SaveChanges();
+
+        return true;
+    }}
+
+    public async Task<IEnumerable<{5}Dto>> Get() =>
+        _mapper.Map<IEnumerable<{5}Dto>>(await _repository.Get(trackChanges: false));
+
+    public async Task<{5}Dto?> GetById({6} id) =>
+        _mapper.Map<{5}Dto>(await _repository.GetById(id, trackChanges: false));
+
+    public async Task<bool> Update({6} id, {5}Dto entityForUpdate)
+    {{
+        var entity = await _repository.GetById(id, trackChanges: true);
+
+        if (entity is null)
+        {{
+            return false;
+        }}
+
+        _mapper.Map(entityForUpdate, entity);
+
+        _repository.Update(entity);
+        await _repository.SaveChanges();
+
+        return true;
+    }}
+}}

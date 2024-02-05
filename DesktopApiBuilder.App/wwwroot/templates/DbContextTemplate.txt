@@ -1,0 +1,8 @@
+﻿﻿using Microsoft.EntityFrameworkCore;
+using {0};
+
+namespace {1};
+
+public class AppDbContext(DbContextOptions options) : DbContext(options)
+{{{2}
+}}

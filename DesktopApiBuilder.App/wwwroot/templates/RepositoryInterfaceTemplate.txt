@@ -1,0 +1,13 @@
+﻿using {0};
+
+namespace {1};
+
+public interface I{2}Repository 
+{{
+	Task<IEnumerable<{2}>> Get(bool trackChanges);
+	Task<{2}?> GetById({3} id, bool trackChanges);
+    Task Create({2} entity);
+    void Delete({2} entity);
+    void Update({2} entity);
+    Task SaveChanges();
+}}

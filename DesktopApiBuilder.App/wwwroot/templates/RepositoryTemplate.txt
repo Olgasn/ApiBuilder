@@ -1,0 +1,22 @@
+﻿using Microsoft.EntityFrameworkCore;
+using {0};
+using {1};
+
+namespace {2};
+
+public class {3}Repository(AppDbContext dbContext) : BaseRepository<{3}>(dbContext), I{3}Repository
+{{
+    public async Task Create({3} entity) => await CreateEntity(entity);
+
+    public async Task<IEnumerable<{3}>> Get(bool trackChanges) =>
+        await GetAllEntities(trackChanges).ToListAsync();
+
+    public async Task<{3}?> GetById({4} id, bool trackChanges) =>
+        await GetByCondition(x => x.Id.Equals(id), trackChanges).SingleOrDefaultAsync();
+
+    public void Delete({3} entity) => DeleteEntity(entity);
+
+    public void Update({3} entity) => UpdateEntity(entity);
+
+    public async Task SaveChanges() => await dbContext.SaveChangesAsync();
+}}

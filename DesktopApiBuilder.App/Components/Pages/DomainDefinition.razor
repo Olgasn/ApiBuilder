@@ -1,0 +1,146 @@
+﻿@page "/domain/{name}"
+@using DesktopApiBuilder.App.Services
+@using DesktopApiBuilder.App.Data.ViewModels
+
+<h3>Domain Definition</h3>
+
+<div class="d-flex flex-row">
+    <MudButton OnClick="@(() => _isOverlayOpened = true)" Variant="Variant.Outlined" Class="mt-4">Create entity class</MudButton>
+    <MudButton OnClick="CreateDbContext" Variant="Variant.Outlined" Class="mt-4 ml-4">Next</MudButton>
+</div>
+
+<MudText Color="Color.Success" Class="mt-6">@_message</MudText>
+
+<MudTable Items="_entities" Breakpoint="Breakpoint.None">
+    <HeaderContent>
+        <MudTh>Entity name</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd>@context.Name</MudTd>
+    </RowTemplate>
+    <ChildRowContent>
+        <MudTable Items="@context.Properties" Breakpoint="Breakpoint.None" Context="propsContext" Dense>
+            <HeaderContent>
+                <MudTh>Property name</MudTh>
+                <MudTh>Property type</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd>@propsContext.Name</MudTd>
+                <MudTd>@propsContext.Type</MudTd>
+            </RowTemplate>
+        </MudTable>
+    </ChildRowContent>
+</MudTable>
+
+<MudOverlay @bind-Visible=_isOverlayOpened DarkBackground>
+    <div style="background-color: white; padding: 40px; max-height: 500px; overflow-y: scroll;">
+        <div class="d-flex flex-row">
+            <MudTextField @bind-Value=_currentEntity.Name Required RequiredError="Entity name is required" Label="Entity name" />
+            <MudTextField @bind-Value=_currentEntity.PluralName Required RequiredError="Entity plural name is required" Label="Entity plural name" />
+        </div>
+
+         @foreach (var item in _currentEntity.Properties)
+        {
+            <div class="d-flex flex-row">
+                <MudTextField @bind-Value=item.Name Required RequiredError="Property name is required" Placeholder="Property name" />
+                 <MudSelect @bind-Value=item.Type Required RequiredError="Property type is required" Placeholder="Property type">
+                    @foreach (var t in DefaultEntityTypes.Types)
+                    {
+                        <MudSelectItem T=string Value="t"/>
+                    }
+                </MudSelect>
+                 <MudButton OnClick="@(() => RemovePropertyItem(item))" Variant="Variant.Outlined" Color=Color.Error Class="mt-4 ml-4">R</MudButton>
+            </div>
+        }
+
+        <div class="d-flex flex-row">
+             <MudButton OnClick=AddEmptyProperty Variant="Variant.Outlined" Class="mt-4">Add property</MudButton>
+             <MudButton OnClick="@(() => _isOverlayOpened = false)" Variant="Variant.Outlined" Class="mt-4 ml-4">Close</MudButton>
+        </div>
+
+        <MudButton OnClick=CreateEntityClasses Variant="Variant.Outlined" Class="mt-4">Create entity</MudButton>
+    </div>
+</MudOverlay>
+
+@code {
+    private string _message = string.Empty;
+    private bool _isOverlayOpened;
+
+    private EntityClassViewModel _currentEntity = new EntityClassViewModel
+    {
+        Name = string.Empty,
+        PluralName = string.Empty,
+        Properties = new List<EntityPropViewModel>()
+        {
+            new()
+            {
+                Name = "Id",
+                Type = "int"
+            }
+        }
+    };
+
+    private List<EntityClassViewModel> _entities = new();
+
+    [Parameter] public string Name { get; init; }
+
+    private void AddEmptyProperty()
+    {
+        _currentEntity.Properties.Add(new EntityPropViewModel
+        {
+            Name = string.Empty,
+            Type = string.Empty
+        });
+    }
+
+    private void RemovePropertyItem(EntityPropViewModel entity)
+    {
+        _currentEntity.Properties.Remove(entity);
+    }
+
+    private void CreateEntityClasses()
+    {
+        var result = Mapper.EntityPropsToDict(_currentEntity.Properties);
+
+        if (!string.IsNullOrEmpty(result.ErrorMessage))
+        {
+            return;
+        }
+
+        ClassService.CreateEntityClass(_currentEntity.Name, Name, result.Value);
+        ClassService.CreateRepository(_currentEntity.Name, Name);
+        ClassService.CreateDtoClass(_currentEntity.Name, Name, result.Value);
+        ClassService.CreateService(_currentEntity.Name, Name);
+
+        _message = $"Entity classes for solution \"{Name}\" were succesfully created!";
+        _isOverlayOpened = false;
+
+        _entities.Add(new EntityClassViewModel
+        {
+            Name = _currentEntity.Name,
+            PluralName = _currentEntity.PluralName,
+            Properties = _currentEntity.Properties
+        });
+
+        _currentEntity = new EntityClassViewModel
+        {
+            Name = string.Empty,
+            PluralName = string.Empty,
+            Properties = new List<EntityPropViewModel>()
+            {
+                new()
+                {
+                    Name = "Id",
+                    Type = "int"
+                }
+            }
+        };
+    }
+
+    private void CreateDbContext()
+    {
+        ClassService.CreateDbContext(Name, _entities);
+        ClassService.CreateBaseRepository(Name);
+        ClassService.AddProjectReferences(Name);
+    }
+}

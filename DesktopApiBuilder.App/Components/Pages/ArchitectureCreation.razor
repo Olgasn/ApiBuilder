@@ -1,0 +1,57 @@
+﻿@page "/architecture/{name}"
+@using DesktopApiBuilder.App.Services
+
+<h3>Choose an architecture</h3>
+
+<MudSelect @bind-Value=_selectedArc>
+    @foreach (var item in _arcTypes)
+    {
+        <MudSelectItem Value="@item"/>
+    }
+</MudSelect>
+
+<div class="d-flex flex-row mt-4 align-center">
+    <MudButton OnClick="CreateProjects" Variant="Variant.Outlined" Disabled="_isCreateButtonDisabled">Create projects</MudButton>
+
+    @if (_isLoading)
+    {
+        <MudProgressCircular Color="Color.Default" Indeterminate Class="ml-4" Size="Size.Small" />
+    }
+</div>
+
+<MudText Color="Color.Success" Class="mt-6">@_message</MudText>
+
+@if (!string.IsNullOrEmpty(_message))
+{
+    <MudButton Href=@($"/domain/{Name}") Variant="Variant.Outlined" Class="mt-4">Next</MudButton>
+}
+
+@code {
+    private List<string> _arcTypes = new List<string>() { "3-Layered", "Onion" };
+    private string _selectedArc;
+    private string _message = string.Empty;
+    private bool _isCreateButtonDisabled;
+    private bool _isLoading;
+
+    [Parameter] public string Name { get; init; }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+
+        _selectedArc = _arcTypes[0];
+    }
+
+    private async void CreateProjects()
+    {
+        _isCreateButtonDisabled = true;
+        _isLoading = true;
+        StateHasChanged();
+
+        await Task.Run(() => ProjectService.CreateProjects(Name, Data.Enums.ArchitectureType.ThreeLayered));
+
+        _message = $"Projects for solution \"{Name}\" were succesfully created!";
+        _isLoading = false;
+        StateHasChanged();
+    }
+}

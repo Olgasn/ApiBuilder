@@ -1,0 +1,29 @@
+﻿@page "/"
+@using DesktopApiBuilder.App.Services
+
+<MudTextField @bind-Value=_solutionName Required RequiredError="Solution name is required" Placeholder="Solution Name"/>
+<MudButton OnClick="CreateSolution" Variant="Variant.Outlined" Class="mt-4" Disabled="!string.IsNullOrEmpty(_message)">Create solution</MudButton>
+
+<MudText Color="Color.Success" Class="mt-6">@_message</MudText>
+
+@if (!string.IsNullOrEmpty(_message))
+{
+    <MudButton Href=@($"/architecture/{_solutionName}") Variant="Variant.Outlined" Class="mt-4">Next</MudButton>
+}
+
+@code {
+    private string? _solutionName;
+    private string _message = string.Empty;
+
+    private void CreateSolution()
+    {
+        if (string.IsNullOrEmpty(_solutionName))
+        {
+            return;
+        }
+
+        SolutionService.CreateSolution(_solutionName);
+
+        _message = $"Solution \"{_solutionName}\" was succesfully created!";
+    }
+}
