@@ -5,9 +5,13 @@
 
 <h3>Domain Definition</h3>
 
-<div class="d-flex flex-row">
-    <MudButton OnClick="@(() => _isOverlayOpened = true)" Variant="Variant.Outlined" Class="mt-4">Create entity class</MudButton>
-    <MudButton OnClick="CreateDbContext" Variant="Variant.Outlined" Class="mt-4 ml-4">Next</MudButton>
+<div class="d-flex flex-row mt-4 align-center">
+    <MudButton OnClick="@(() => _isOverlayOpened = true)" Variant="Variant.Outlined" Disabled=_isLoading>Create entity class</MudButton>
+    <MudButton OnClick="CreateDbContext" Variant="Variant.Outlined" Class="ml-4" Disabled=_isLoading>Next</MudButton>
+    @if (_isLoading)
+    {
+        <MudProgressCircular Color="Color.Default" Indeterminate Class="ml-4" Size="Size.Small" />
+    }
 </div>
 
 <MudText Color="Color.Success" Class="mt-6">@_message</MudText>
@@ -65,6 +69,7 @@
 
 @code {
     private string _message = string.Empty;
+    private bool _isLoading;
     private bool _isOverlayOpened;
 
     private EntityClassViewModel _currentEntity = new EntityClassViewModel
@@ -84,6 +89,13 @@
     private List<EntityClassViewModel> _entities = new();
 
     [Parameter] public string Name { get; init; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        await Task.Run(() => ClassService.AddProjectReferences(Name));
+    }
 
     private void AddEmptyProperty()
     {
@@ -139,14 +151,21 @@
         };
     }
 
-    private void CreateDbContext()
+    private async Task CreateDbContext()
     {
         ClassService.CreateDbContext(Name, _entities);
         ClassService.CreateBaseRepository(Name);
-        ClassService.AddProjectReferences(Name);
         ClassService.CreateMappingProfile(Name, _entities);
         ClassService.UpdateProgramClass(Name);
         ClassService.CreateServiceExtensions(Name, _entities);
+
+        _isLoading = true;
+        StateHasChanged();
+
+        await Task.Delay(10000);
+
+        _isLoading = false;
+        StateHasChanged();
 
         Navigation.NavigateTo($"/sql/{Name}");
     }

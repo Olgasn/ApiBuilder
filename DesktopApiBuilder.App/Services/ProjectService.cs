@@ -2,6 +2,9 @@
 using DesktopApiBuilder.App.Data.Enums;
 using DesktopApiBuilder.App.Data.Models;
 using DesktopApiBuilder.App.Helpers;
+using System.Text;
+using System.Xml;
+using System.Xml.Linq;
 
 namespace DesktopApiBuilder.App.Services;
 
@@ -21,6 +24,17 @@ public static class ProjectService
         ProcessManager.ExecuteCmdCommands([.. commands]);
 
         CheckIfDirectoriesExist(solutionName, config);
+
+        var apiProjectName = $"{solutionName}.{config?.Projects?.FirstOrDefault(p => p.Type == ProjectTypes.AspNetWebApi)?.Name}";
+        var xmlPath = $"{Path}\\{solutionName}\\{apiProjectName}\\{apiProjectName}.csproj";
+
+        XmlDocument doc = new();
+        doc.Load(xmlPath);
+
+        doc.SelectSingleNode("/Project/PropertyGroup/InvariantGlobalization").FirstChild.Value = "false";
+
+        using XmlTextWriter xtw = new(xmlPath, Encoding.UTF8);
+        doc.WriteContentTo(xtw);
     }
 
     private static List<string> GenerateExecutionCommands(string solutionName, SolutionConfig? config)

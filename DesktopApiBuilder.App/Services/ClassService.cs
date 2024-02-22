@@ -303,8 +303,12 @@ public static class ClassService
             $"cd {Path}\\{solutionName}",
             $"dotnet add {solutionName}.BLL/{solutionName}.BLL.csproj reference {solutionName}.DAL/{solutionName}.DAL.csproj",
             $"dotnet add {solutionName}.API/{solutionName}.API.csproj reference {solutionName}.BLL/{solutionName}.BLL.csproj",
-            $"cd {Path}\\{solutionName}\\{solutionName}.API",
+            $"cd {Path}\\{solutionName}\\{solutionName}.DAL",
             "dotnet add package Microsoft.EntityFrameworkCore.SqlServer",
+            "dotnet add package Microsoft.EntityFrameworkCore.Relational",
+            $"cd {Path}\\{solutionName}\\{solutionName}.API",
+            "dotnet add package Microsoft.EntityFrameworkCore.Design",
+            "dotnet add package Microsoft.EntityFrameworkCore.Tools",
         ]);
     }
 
