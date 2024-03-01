@@ -56,6 +56,7 @@
 
         if (task == completedTask)
         {
+            await Task.Run(() => ProjectDependenciesService.AddProjectReferences(Name));
             _message = $"Projects for solution \"{Name}\" were succesfully created!";
         }
         else

@@ -295,23 +295,6 @@ public static class ClassService
         }
     }
 
-    public static void AddProjectReferences(string solutionName)
-    {
-        ProcessManager.ExecuteCmdCommands([
-            $"cd {Path}\\{solutionName}\\{solutionName}.BLL",
-            "dotnet add package AutoMapper",
-            $"cd {Path}\\{solutionName}",
-            $"dotnet add {solutionName}.BLL/{solutionName}.BLL.csproj reference {solutionName}.DAL/{solutionName}.DAL.csproj",
-            $"dotnet add {solutionName}.API/{solutionName}.API.csproj reference {solutionName}.BLL/{solutionName}.BLL.csproj",
-            $"cd {Path}\\{solutionName}\\{solutionName}.DAL",
-            "dotnet add package Microsoft.EntityFrameworkCore.SqlServer",
-            "dotnet add package Microsoft.EntityFrameworkCore.Relational",
-            $"cd {Path}\\{solutionName}\\{solutionName}.API",
-            "dotnet add package Microsoft.EntityFrameworkCore.Design",
-            "dotnet add package Microsoft.EntityFrameworkCore.Tools",
-        ]);
-    }
-
     public static void UpdateProgramClass(string solutionName)
     {
         try

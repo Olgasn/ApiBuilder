@@ -18,4 +18,20 @@ public static class ConfigHelper
             return null;
         }
     }
+
+    public static string GetProjectPath(SolutionConfig? config, ProjectConfig project, string solutionName)
+    {
+        var solutionFolderName = GetSolutionPathForProject(config, project);
+        var projectPath = solutionName;
+
+        if (!string.IsNullOrEmpty(solutionFolderName))
+        {
+            projectPath += $"/{solutionFolderName}";
+        }
+
+        return projectPath;
+    }
+
+    public static string GetSolutionPathForProject(SolutionConfig? config, ProjectConfig? project) => 
+        config?.SolutionFolders?.FirstOrDefault(f => f.Id == project?.SolutionFolderId)?.Name ?? string.Empty;
 }

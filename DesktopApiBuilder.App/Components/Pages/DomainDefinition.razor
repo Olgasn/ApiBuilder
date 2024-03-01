@@ -90,13 +90,6 @@
 
     [Parameter] public string Name { get; init; }
 
-    protected override async Task OnInitializedAsync()
-    {
-        await base.OnInitializedAsync();
-
-        await Task.Run(() => ClassService.AddProjectReferences(Name));
-    }
-
     private void AddEmptyProperty()
     {
         _currentEntity.Properties.Add(new EntityPropViewModel

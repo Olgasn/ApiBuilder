@@ -93,14 +93,7 @@ public static class ProjectService
 
         foreach (var project in config?.Projects ?? [])
         {
-            var solutionFolderName = config?.SolutionFolders?
-                .FirstOrDefault(f => f.Id == project.SolutionFolderId)?.Name ?? string.Empty;
-            var projectPath = solutionName;
-
-            if (!string.IsNullOrEmpty(solutionFolderName))
-            {
-                projectPath += $"/{solutionFolderName}";
-            }
+            var projectPath = ConfigHelper.GetProjectPath(config, project, solutionName);
 
             commands.Add(string.Format(GoToProjectPathCommandTemplate,
                 Path,
