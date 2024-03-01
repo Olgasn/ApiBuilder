@@ -4,33 +4,50 @@
 
 ```
 {
-    "solutionFolders" : [],
-    "projects" : [
+    "solutionFolders": [],
+    "projects": [
         { 
-            "name" : "API", 
-            "type" : "webapi",
+            "name": "API", 
+            "type": "webapi",
             "directories": [
-                { "name" : "Controllers", "parentPath" : "" },
-                { "name" : "Extensions", "parentPath" : "" }
-            ]
+                { "name": "Controllers", "parentPath": "" },
+                { "name": "Extensions", "parentPath": "" }
+            ],
+            "dependencies": {
+                "packages": [
+                    "Microsoft.EntityFrameworkCore.Design",
+                    "Microsoft.EntityFrameworkCore.Tools"
+                ],
+                "projectReferences": ["BLL"]
+            }
         },
         { 
-            "name" : "BLL", 
-            "type" : "classlib",
+            "name": "BLL", 
+            "type": "classlib",
             "directories": [
-                { "name" : "Dtos", "parentPath" : "" },
-                { "name" : "Services", "parentPath" : "" },
-                { "name" : "Abstractions", "parentPath" : "/Services" }
-            ]
+                { "name": "Dtos", "parentPath": "" },
+                { "name": "Services", "parentPath": "" },
+                { "name": "Abstractions", "parentPath": "/Services" }
+            ],
+            "dependencies": {
+                "packages": ["AutoMapper"],
+                "projectReferences": ["DAL"]
+            }
         },
         { 
-            "name" : "DAL", 
-            "type" : "classlib",
+            "name": "DAL", 
+            "type": "classlib",
             "directories": [
-                { "name" : "Entities", "parentPath" : "" },
-                { "name" : "Repositories", "parentPath" : "" },
-                { "name" : "Abstractions", "parentPath" : "/Repositories" }
-            ]
+                { "name": "Entities", "parentPath": "" },
+                { "name": "Repositories", "parentPath": "" },
+                { "name": "Abstractions", "parentPath": "/Repositories" }
+            ],
+            "dependencies": {
+                "packages": [
+                    "Microsoft.EntityFrameworkCore.SqlServer", 
+                    "Microsoft.EntityFrameworkCore.Relational"
+                ]
+            }
         }
     ]
 }
@@ -40,66 +57,66 @@
 
 ```
 {
-    "solutionFolders" : [
+    "solutionFolders": [
         {
-            "id" : 1,
-            "name" : "Core"
+            "id": 1,
+            "name": "Core"
         },
         {
-            "id" : 2,
-            "name" : "Infrastructure"
+            "id": 2,
+            "name": "Infrastructure"
         },
         {
-            "id" : 3,
-            "name" : "Presentation"
+            "id": 3,
+            "name": "Presentation"
         }
     ],
-    "projects" : [
+    "projects": [
         { 
-            "name" : "API", 
-            "type" : "webapi",
+            "name": "API", 
+            "type": "webapi",
             "directories": [
-                { "name" : "Extensions", "parentPath" : "" }
+                { "name": "Extensions", "parentPath": "" }
             ],
-            "solutionFolderId" : 3
+            "solutionFolderId": 3
         },
         { 
-            "name" : "Infrastructure", 
-            "type" : "classlib",
+            "name": "Infrastructure", 
+            "type": "classlib",
             "directories": [
-                { "name" : "Repositories", "parentPath" : "" }
+                { "name": "Repositories", "parentPath": "" }
             ],
-            "solutionFolderId" : 2
+            "solutionFolderId": 2
         },
         { 
-            "name" : "Persistence", 
-            "type" : "classlib",
+            "name": "Persistence", 
+            "type": "classlib",
             "directories": [
-                { "name" : "Controllers", "parentPath" : "" }
+                { "name": "Controllers", "parentPath": "" }
             ],
-            "solutionFolderId" : 2
+            "solutionFolderId": 2
         },
         { 
-            "name" : "Application", 
-            "type" : "classlib",
+            "name": "Application", 
+            "type": "classlib",
             "directories": [
-                { "name" : "Requests", "parentPath" : "" },
-                { "name" : "RequestHandlers", "parentPath" : "" },
-                { "name" : "Queries", "parentPath" : "/Requests" },
-                { "name" : "Commands", "parentPath" : "/Requests" },
-                { "name" : "QueryHandlers", "parentPath" : "/RequestHandlers" },
-                { "name" : "CommandHandlers", "parentPath" : "/RequestHandlers" }
+                { "name": "Requests", "parentPath": "" },
+                { "name": "RequestHandlers", "parentPath": "" },
+                { "name": "Queries", "parentPath": "/Requests" },
+                { "name": "Commands", "parentPath": "/Requests" },
+                { "name": "QueryHandlers", "parentPath": "/RequestHandlers" },
+                { "name": "CommandHandlers", "parentPath": "/RequestHandlers" }
             ],
-            "solutionFolderId" : 1
+            "solutionFolderId": 1
         },
         { 
-            "name" : "Domain", 
-            "type" : "classlib",
+            "name": "Domain", 
+            "type": "classlib",
             "directories": [
-                { "name" : "Entities", "parentPath" : "" },
-                { "name" : "Abstractions", "parentPath" : "/Repositories" }
+                { "name": "Entities", "parentPath": "" },
+                { "name": "Abstractions", "parentPath": "/Repositories" }
             ],
-            "solutionFolderId" : 1
+            "solutionFolderId": 1
         }
     ]
 }
