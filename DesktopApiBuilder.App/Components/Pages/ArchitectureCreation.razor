@@ -1,5 +1,6 @@
 ﻿@page "/architecture/{name}"
 @using DesktopApiBuilder.App.Services
+@using DesktopApiBuilder.App.Data.Enums
 
 <h3>Choose an architecture</h3>
 
@@ -20,6 +21,7 @@
 </div>
 
 <MudText Color="Color.Success" Class="mt-6">@_message</MudText>
+<MudText Color="Color.Error" Class="mt-6">@_errorMessage</MudText>
 
 @if (!string.IsNullOrEmpty(_message))
 {
@@ -27,9 +29,10 @@
 }
 
 @code {
-    private List<string> _arcTypes = new List<string>() { "3-Layered", "Onion" };
-    private string _selectedArc;
+    private List<ArchitectureType> _arcTypes = new() { ArchitectureType.ThreeLayered, ArchitectureType.Clean };
+    private ArchitectureType _selectedArc;
     private string _message = string.Empty;
+    private string _errorMessage = string.Empty;
     private bool _isCreateButtonDisabled;
     private bool _isLoading;
 
@@ -48,9 +51,18 @@
         _isLoading = true;
         StateHasChanged();
 
-        await Task.Run(() => ProjectService.CreateProjects(Name, Data.Enums.ArchitectureType.ThreeLayered));
+        var task = Task.Run(() => ProjectService.CreateProjects(Name, _selectedArc));
+        var completedTask = await Task.WhenAny(task, Task.Delay(TimeSpan.FromMinutes(5)));
 
-        _message = $"Projects for solution \"{Name}\" were succesfully created!";
+        if (task == completedTask)
+        {
+            _message = $"Projects for solution \"{Name}\" were succesfully created!";
+        }
+        else
+        {
+            _errorMessage = "Execution timeout: something went wrong!";
+        }
+
         _isLoading = false;
         StateHasChanged();
     }

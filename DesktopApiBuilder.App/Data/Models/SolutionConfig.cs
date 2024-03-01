@@ -4,6 +4,9 @@ namespace DesktopApiBuilder.App.Data.Models;
 
 public class SolutionConfig
 {
+    [JsonPropertyName("solutionFolders")]
+    public IEnumerable<SolutionFolderConfig>? SolutionFolders { get; set; }
+
     [JsonPropertyName("projects")]
     public IEnumerable<ProjectConfig>? Projects { get; set; }
 }

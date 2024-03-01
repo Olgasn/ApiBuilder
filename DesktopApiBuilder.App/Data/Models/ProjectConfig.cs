@@ -12,4 +12,7 @@ public class ProjectConfig
 
     [JsonPropertyName("directories")]
     public IEnumerable<DirectoryConfig>? Directories { get; set; }
+
+    [JsonPropertyName("solutionFolderId")]
+    public int SolutionFolderId { get; set; }
 }
