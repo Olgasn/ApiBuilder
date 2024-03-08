@@ -5,17 +5,15 @@ namespace DesktopApiBuilder.App.Services;
 
 public static class ProjectDependenciesService
 {
-    private const string Path = "C:\\D\\Projects\\test";
-
     // 0 - path
     // 1 - project path
     // 2 - solution name
     // 3 - project name
     private const string GoToProjectPathCommandTemplate = "cd {0}/{1}/{2}.{3}";
 
-    public static void AddProjectReferences(string solutionName)
+    public static void AddProjectReferences(string solutionName, string solutionPath)
     {
-        SolutionConfig? config = ConfigHelper.GetSolutionConfig($"{Path}\\myconfig0.json");
+        SolutionConfig? config = ConfigHelper.GetSolutionConfig($"{solutionPath}\\myconfig0.json");
 
         List<string> commands = [];
 
@@ -24,7 +22,7 @@ public static class ProjectDependenciesService
             var projectPath = ConfigHelper.GetProjectPath(config, project, solutionName);
 
             commands.Add(string.Format(GoToProjectPathCommandTemplate,
-                Path,
+                solutionPath,
                 projectPath,
                 solutionName,
                 project.Name));
@@ -34,7 +32,7 @@ public static class ProjectDependenciesService
                 commands.Add($"dotnet add package {package}");
             }
 
-            commands.Add($"cd {Path}\\{solutionName}");
+            commands.Add($"cd {solutionPath}\\{solutionName}");
 
             foreach (var projectRef in project?.Dependencies?.ProjectReferences ?? [])
             {

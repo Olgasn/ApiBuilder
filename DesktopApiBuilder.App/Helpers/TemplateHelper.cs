@@ -2,9 +2,9 @@
 
 public static class TemplateHelper
 {
-    public static string GetTemplateContent(string templateFileName)
+    public static string GetTemplateContent(string templateFilePath)
     {
-        string absoluteTemplatesPath = AppDomain.CurrentDomain.BaseDirectory.Replace("bin\\Debug\\net8.0-windows10.0.19041.0\\win10-x64\\AppX\\", templateFileName);
+        string absoluteTemplatesPath = AppDomain.CurrentDomain.BaseDirectory.Replace("bin\\Debug\\net8.0-windows10.0.19041.0\\win10-x64\\AppX\\", templateFilePath);
 
         try
         {

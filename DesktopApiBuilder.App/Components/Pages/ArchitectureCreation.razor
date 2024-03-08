@@ -1,4 +1,4 @@
-﻿@page "/architecture/{name}"
+﻿@page "/architecture"
 @using DesktopApiBuilder.App.Services
 @using DesktopApiBuilder.App.Data.Enums
 
@@ -25,7 +25,7 @@
 
 @if (!string.IsNullOrEmpty(_message))
 {
-    <MudButton Href=@($"/domain/{Name}") Variant="Variant.Outlined" Class="mt-4">Next</MudButton>
+    <MudButton Href=@($"/domain/{InMemoryUserSettings.SolutionName}") Variant="Variant.Outlined" Class="mt-4">Next</MudButton>
 }
 
 @code {
@@ -35,8 +35,6 @@
     private string _errorMessage = string.Empty;
     private bool _isCreateButtonDisabled;
     private bool _isLoading;
-
-    [Parameter] public string Name { get; init; }
 
     protected override void OnInitialized()
     {
@@ -51,13 +49,15 @@
         _isLoading = true;
         StateHasChanged();
 
-        var task = Task.Run(() => ProjectService.CreateProjects(Name, _selectedArc));
+        var task = Task.Run(() => ProjectService.CreateProjects(
+            InMemoryUserSettings.SolutionName, InMemoryUserSettings.SolutionPath, _selectedArc));
         var completedTask = await Task.WhenAny(task, Task.Delay(TimeSpan.FromMinutes(5)));
 
         if (task == completedTask)
         {
-            await Task.Run(() => ProjectDependenciesService.AddProjectReferences(Name));
-            _message = $"Projects for solution \"{Name}\" were succesfully created!";
+            await Task.Run(() => ProjectDependenciesService.AddProjectReferences(
+                InMemoryUserSettings.SolutionName, InMemoryUserSettings.SolutionPath));
+            _message = $"Projects for solution \"{InMemoryUserSettings.SolutionName}\" were succesfully created!";
         }
         else
         {

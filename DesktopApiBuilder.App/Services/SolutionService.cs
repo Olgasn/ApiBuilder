@@ -2,14 +2,12 @@
 
 public static class SolutionService
 {
-    private const string Path = "C:\\D\\Projects\\test";
-
-    public static void CreateSolution(string name)
+    public static void CreateSolution(string name, string path)
     {
         ProcessManager.ExecuteCmdCommands([
-            $"cd {Path}",
+            $"cd {path}",
             $"mkdir {name}",
-            $"cd {Path}\\{name}",
+            $"cd {path}\\{name}",
             $"dotnet new sln --name {name}"
         ]);
     }

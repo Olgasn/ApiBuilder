@@ -1,0 +1,48 @@
+{
+    "solutionFolders": [],
+    "projects": [
+        { 
+            "name": "API", 
+            "type": "webapi",
+            "directories": [
+                { "name": "Controllers", "parentPath": "" },
+                { "name": "Extensions", "parentPath": "" }
+            ],
+            "dependencies": {
+                "packages": [
+                    "Microsoft.EntityFrameworkCore.Design",
+                    "Microsoft.EntityFrameworkCore.Tools"
+                ],
+                "projectReferences": ["BLL"]
+            }
+        },
+        { 
+            "name": "BLL", 
+            "type": "classlib",
+            "directories": [
+                { "name": "Dtos", "parentPath": "" },
+                { "name": "Services", "parentPath": "" },
+                { "name": "Abstractions", "parentPath": "/Services" }
+            ],
+            "dependencies": {
+                "packages": ["AutoMapper"],
+                "projectReferences": ["DAL"]
+            }
+        },
+        { 
+            "name": "DAL", 
+            "type": "classlib",
+            "directories": [
+                { "name": "Entities", "parentPath": "" },
+                { "name": "Repositories", "parentPath": "" },
+                { "name": "Abstractions", "parentPath": "/Repositories" }
+            ],
+            "dependencies": {
+                "packages": [
+                    "Microsoft.EntityFrameworkCore.SqlServer", 
+                    "Microsoft.EntityFrameworkCore.Relational"
+                ]
+            }
+        }
+    ]
+}
