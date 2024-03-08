@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace DesktopApiBuilder.App.Data.Models;
+namespace DesktopApiBuilder.App.Data.Models.Configs;
 
 public class SolutionFolderConfig
 {

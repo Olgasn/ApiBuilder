@@ -1,4 +1,5 @@
 ﻿using DesktopApiBuilder.App.Data.Models;
+using DesktopApiBuilder.App.Data.Models.Configs;
 using DesktopApiBuilder.App.Helpers;
 
 namespace DesktopApiBuilder.App.Services;
@@ -11,20 +12,20 @@ public static class ProjectDependenciesService
     // 3 - project name
     private const string GoToProjectPathCommandTemplate = "cd {0}/{1}/{2}.{3}";
 
-    public static void AddProjectReferences(string solutionName, string solutionPath)
+    public static void AddProjectReferences(SolutionSettingsModel solutionSettings)
     {
-        SolutionConfig? config = ConfigHelper.GetSolutionConfig($"{solutionPath}\\myconfig0.json");
+        SolutionConfig? config = ConfigHelper.GetSolutionConfig(solutionSettings.ArchitectureType);
 
         List<string> commands = [];
 
         foreach (var project in config?.Projects ?? [])
         {
-            var projectPath = ConfigHelper.GetProjectPath(config, project, solutionName);
+            var projectPath = ConfigHelper.GetProjectPath(config, project, solutionSettings.SolutionName);
 
             commands.Add(string.Format(GoToProjectPathCommandTemplate,
-                solutionPath,
+                solutionSettings.SolutionPath,
                 projectPath,
-                solutionName,
+                solutionSettings.SolutionName,
                 project.Name));
 
             foreach (var package in project?.Dependencies?.Packages ?? [])
@@ -32,7 +33,7 @@ public static class ProjectDependenciesService
                 commands.Add($"dotnet add package {package}");
             }
 
-            commands.Add($"cd {solutionPath}\\{solutionName}");
+            commands.Add($"cd {solutionSettings.FullSolutionPath}");
 
             foreach (var projectRef in project?.Dependencies?.ProjectReferences ?? [])
             {
@@ -42,8 +43,8 @@ public static class ProjectDependenciesService
 
                 var projectSolutionPath = ConfigHelper.GetSolutionPathForProject(config, project);
                 var relatedProjectSolutionPath = ConfigHelper.GetSolutionPathForProject(config, relatedProject);
-                var projectFullName = $"{solutionName}.{project?.Name}";
-                var relatedProjectFullName = $"{solutionName}.{relatedProject.Name}";
+                var projectFullName = $"{solutionSettings.SolutionName}.{project?.Name}";
+                var relatedProjectFullName = $"{solutionSettings.SolutionName}.{relatedProject.Name}";
                 
                 if (!string.IsNullOrEmpty(projectSolutionPath))
                 {

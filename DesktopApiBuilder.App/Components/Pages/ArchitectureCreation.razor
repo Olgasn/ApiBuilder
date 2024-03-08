@@ -49,14 +49,25 @@
         _isLoading = true;
         StateHasChanged();
 
-        var task = Task.Run(() => ProjectService.CreateProjects(
-            InMemoryUserSettings.SolutionName, InMemoryUserSettings.SolutionPath, _selectedArc));
+        InMemoryUserSettings.ArchitectureType = _selectedArc;
+
+        var task = Task.Run(() => ProjectService.CreateProjects(new SolutionSettingsModel()
+        {
+            SolutionName = InMemoryUserSettings.SolutionName,
+            SolutionPath = InMemoryUserSettings.SolutionPath,
+            ArchitectureType = InMemoryUserSettings.ArchitectureType
+        }));
+
         var completedTask = await Task.WhenAny(task, Task.Delay(TimeSpan.FromMinutes(5)));
 
         if (task == completedTask)
         {
-            await Task.Run(() => ProjectDependenciesService.AddProjectReferences(
-                InMemoryUserSettings.SolutionName, InMemoryUserSettings.SolutionPath));
+            await Task.Run(() => ProjectDependenciesService.AddProjectReferences(new SolutionSettingsModel()
+                {
+                    SolutionName = InMemoryUserSettings.SolutionName,
+                    SolutionPath = InMemoryUserSettings.SolutionPath,
+                    ArchitectureType = InMemoryUserSettings.ArchitectureType
+                }));
             _message = $"Projects for solution \"{InMemoryUserSettings.SolutionName}\" were succesfully created!";
         }
         else

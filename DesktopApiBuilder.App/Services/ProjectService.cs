@@ -1,6 +1,6 @@
 ﻿using DesktopApiBuilder.App.Data.Constants;
-using DesktopApiBuilder.App.Data.Enums;
 using DesktopApiBuilder.App.Data.Models;
+using DesktopApiBuilder.App.Data.Models.Configs;
 using DesktopApiBuilder.App.Helpers;
 
 namespace DesktopApiBuilder.App.Services;
@@ -23,38 +23,34 @@ public static class ProjectService
     // 3 - project name
     private const string GoToProjectPathCommandTemplate = "cd {0}/{1}/{2}.{3}";
 
-    private const string ConfigsPath = "wwwroot\\defaultConfigs";
-
-    public static void CreateProjects(string solutionName, string solutionPath, ArchitectureType architectureType)
+    public static void CreateProjects(SolutionSettingsModel solutionSettings)
     {
-        string absoluteConfigsPath = AppDomain.CurrentDomain.BaseDirectory.Replace("bin\\Debug\\net8.0-windows10.0.19041.0\\win10-x64\\AppX\\", ConfigsPath);
-
-        SolutionConfig? config = ConfigHelper.GetSolutionConfig($"{absoluteConfigsPath}\\configType{(int)architectureType}.json");
-        List<string> commands = GenerateExecutionCommands(solutionName, solutionPath, config);
+        SolutionConfig? config = ConfigHelper.GetSolutionConfig(solutionSettings.ArchitectureType);
+        List<string> commands = GenerateExecutionCommands(solutionSettings, config);
 
         ProcessManager.ExecuteCmdCommands([.. commands]);
 
-        CheckIfDirectoriesExist(solutionName, solutionPath, config);
+        CheckIfDirectoriesExist(solutionSettings, config);
     }
 
-    private static List<string> GenerateExecutionCommands(string solutionName, string solutionPath, SolutionConfig? config)
+    private static List<string> GenerateExecutionCommands(SolutionSettingsModel solutionSettings, SolutionConfig? config)
     {
         List<string> commands = [];
 
-        commands.Add($"cd {solutionPath}\\{solutionName}");
+        commands.Add($"cd {solutionSettings.FullSolutionPath}");
 
         foreach (var folder in config?.SolutionFolders ?? [])
         {
             commands.Add($"mkdir {folder.Name}");
         }
 
-        commands.AddRange(GenerateProjectsCreationCommands(solutionName, solutionPath, config));
-        commands.AddRange(GenerateProjectDirectoriesCreationCommands(solutionName, solutionPath, config));
+        commands.AddRange(GenerateProjectsCreationCommands(solutionSettings, config));
+        commands.AddRange(GenerateProjectDirectoriesCreationCommands(solutionSettings, config));
 
         return commands;
     }
 
-    private static List<string> GenerateProjectsCreationCommands(string solutionName, string solutionPath, SolutionConfig? config)
+    private static List<string> GenerateProjectsCreationCommands(SolutionSettingsModel solutionSettings, SolutionConfig? config)
     {
         List<string> commands = [];
 
@@ -65,23 +61,23 @@ public static class ProjectService
 
             if (!string.IsNullOrEmpty(solutionFolderName))
             {
-                commands.Add($"cd {solutionPath}\\{solutionName}\\{solutionFolderName}");
+                commands.Add($"cd {solutionSettings.FullSolutionPath}/{solutionFolderName}");
                 solutionFolderName += "/";
             }
             else
             {
-                commands.Add($"cd {solutionPath}\\{solutionName}");
+                commands.Add($"cd {solutionSettings.FullSolutionPath}");
             }
 
             commands.Add(string.Format(ProjectCreationCommandTemplate,
                 project.Type,
-                solutionName,
+                solutionSettings.SolutionName,
                 project.Name));
 
-            commands.Add($"cd {solutionPath}\\{solutionName}");
+            commands.Add($"cd {solutionSettings.FullSolutionPath}");
 
             commands.Add(string.Format(AddProjectToSolutionCommandTemplate,
-                solutionName,
+                solutionSettings.SolutionName,
                 solutionFolderName,
                 project.Name));
         }
@@ -89,18 +85,18 @@ public static class ProjectService
         return commands;
     }
 
-    private static List<string> GenerateProjectDirectoriesCreationCommands(string solutionName, string solutionPath, SolutionConfig? config)
+    private static List<string> GenerateProjectDirectoriesCreationCommands(SolutionSettingsModel solutionSettings, SolutionConfig? config)
     {
         List<string> commands = [];
 
         foreach (var project in config?.Projects ?? [])
         {
-            var projectPath = ConfigHelper.GetProjectPath(config, project, solutionName);
+            var projectPath = ConfigHelper.GetProjectPath(config, project, solutionSettings.SolutionName);
 
             commands.Add(string.Format(GoToProjectPathCommandTemplate,
-                solutionPath,
+                solutionSettings.SolutionPath,
                 projectPath,
-                solutionName,
+                solutionSettings.SolutionName,
                 project.Name));
 
             if (project.Type == ProjectTypes.ClassLibrary)
@@ -109,7 +105,7 @@ public static class ProjectService
             }
             else if (project.Type == ProjectTypes.AspNetWebApi)
             {
-                commands.Add($"del \"{solutionName}.{project.Name}.http\"");
+                commands.Add($"del \"{solutionSettings.SolutionName}.{project.Name}.http\"");
             }
 
             foreach (var dir in project?.Directories ?? [])
@@ -117,9 +113,9 @@ public static class ProjectService
                 if (!string.IsNullOrEmpty(dir.ParentPath))
                 {
                     commands.Add(string.Format(GoToProjectPathCommandTemplate,
-                        solutionPath,
+                        solutionSettings.SolutionPath,
                         projectPath,
-                        solutionName,
+                        solutionSettings.SolutionName,
                         $"{project?.Name}{dir.ParentPath}"));
                 }
 
@@ -130,7 +126,7 @@ public static class ProjectService
         return commands;
     }
 
-    private static void CheckIfDirectoriesExist(string solutionName, string solutionPath, SolutionConfig? config)
+    private static void CheckIfDirectoriesExist(SolutionSettingsModel solutionSettings, SolutionConfig? config)
     {
         List<string> commonPaths = [];
 
@@ -146,7 +142,7 @@ public static class ProjectService
                             solutionFolderName += "/";
                         }
 
-                        return $"{solutionPath}/{solutionName}/{solutionFolderName}{solutionName}.{p?.Name}/{d?.Name}";
+                        return $"{solutionSettings.FullSolutionPath}/{solutionFolderName}{solutionSettings.SolutionName}.{p?.Name}/{d?.Name}";
                     }) ?? []));
 
         while (true)

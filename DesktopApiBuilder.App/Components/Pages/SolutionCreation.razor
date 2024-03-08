@@ -28,7 +28,11 @@
         InMemoryUserSettings.SolutionName = _solutionName;
         InMemoryUserSettings.SolutionPath = _solutionPath;
 
-        SolutionService.CreateSolution(_solutionName, _solutionPath);
+        SolutionService.CreateSolution(new SolutionSettingsModel 
+            {
+                SolutionName = _solutionName,
+                SolutionPath = _solutionPath
+            });
 
         _message = $"Solution \"{_solutionName}\" was succesfully created!";
     }
