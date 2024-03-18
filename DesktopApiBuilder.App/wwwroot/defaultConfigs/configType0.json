@@ -20,7 +20,11 @@
             "name": "BLL", 
             "type": "classlib",
             "directories": [
-                { "name": "Dtos", "parentPath": "" },
+                { 
+                    "name": "Dtos", 
+                    "parentPath": "",
+                    "contentType": "DtoClass"
+                },
                 { "name": "Services", "parentPath": "" },
                 { "name": "Abstractions", "parentPath": "/Services" }
             ],

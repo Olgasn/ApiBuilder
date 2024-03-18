@@ -108,7 +108,7 @@ public static class ProjectService
                 commands.Add($"del \"{solutionSettings.SolutionName}.{project.Name}.http\"");
             }
 
-            foreach (var dir in project?.Directories ?? [])
+            foreach (var dir in project.Directories ?? [])
             {
                 if (!string.IsNullOrEmpty(dir.ParentPath))
                 {
@@ -116,7 +116,7 @@ public static class ProjectService
                         solutionSettings.SolutionPath,
                         projectPath,
                         solutionSettings.SolutionName,
-                        $"{project?.Name}{dir.ParentPath}"));
+                        $"{project.Name}{dir.ParentPath}"));
                 }
 
                 commands.Add($"mkdir {dir.Name}");

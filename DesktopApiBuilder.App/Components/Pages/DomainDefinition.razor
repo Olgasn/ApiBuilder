@@ -147,7 +147,6 @@
         }, _entities);
 
         // ClassService.CreateRepository(_currentEntity.Name, Name);
-        // ClassService.CreateDtoClass(_currentEntity.Name, Name, result.Value);
         // ClassService.CreateService(_currentEntity.Name, Name);
         // ClassService.CreateController(Name, _currentEntity);
 
@@ -160,12 +159,12 @@
         _isLoading = true;
         StateHasChanged();
 
-        await Task.Delay(5000);
+        await Task.Delay(3000);
 
         _isLoading = false;
         StateHasChanged();
 
         _classesCreated = true;
-        _message = $"Entity classes for solution \"{InMemoryUserSettings.SolutionName}\" were succesfully created!";
+        _message = $"Classes for solution \"{InMemoryUserSettings.SolutionName}\" were succesfully created!";
     }
 }

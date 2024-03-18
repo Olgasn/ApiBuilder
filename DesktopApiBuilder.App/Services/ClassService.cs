@@ -11,8 +11,6 @@ public static class ClassService
 {
     private const string Path = "C:\\D\\Projects\\test";
 
-    private const string EntityTemplatePath = "wwwroot\\templates\\domain\\EntityClassTemplate.txt";
-    private const string DtoTemplatePath = "wwwroot\\templates\\core\\DtoClassTemplate.txt";
     private const string EntityPropTemplate = "\r\n\tpublic {0} {1} {{ get; set; }}";
 
     private const string RepositoryInterfaceTemplatePath = "wwwroot\\templates\\domain\\RepositoryInterfaceTemplate.txt";
@@ -65,7 +63,7 @@ public static class ClassService
                         foreach (var entity in entities)
                         {
                             var className = GetClassName(entity.Name, contentType);
-                            var filePath = $"{solutionSettings.SolutionPath}/{projectPath}/{solutionSettings.SolutionName}.{project.Name}{directory.ParentPath}/{directory.Name}/{className}";
+                            var filePath = $"{solutionSettings.SolutionPath}/{projectPath}/{solutionSettings.SolutionName}.{project.Name}{directory.ParentPath}/{directory.Name}/{className}.cs";
 
                             var classSettings = new ClassTemplateSettings()
                             {
@@ -96,13 +94,9 @@ public static class ClassService
         switch (classSettings.ContentType)
         {
             case DirectoryContentType.EntityClass:
-                var props = new StringBuilder();
-                foreach (var prop in classSettings.Entity?.Properties ?? [])
-                {
-                    props.Append(string.Format(EntityPropTemplate, prop.Type, prop.Name));
-                }
-
-                return string.Format(classSettings.Template ?? string.Empty, classSettings.Namespace, classSettings.Entity?.Name, props);
+                return GetEntityCreationTemplate(classSettings);
+            case DirectoryContentType.DtoClass:
+                return GetEntityCreationTemplate(classSettings);
         }
 
         return string.Empty;
@@ -111,13 +105,13 @@ public static class ClassService
     private static string GetClassName(string entityName, DirectoryContentType contentType) =>
         _ = contentType switch
         {
-            DirectoryContentType.EntityClass => $"{entityName}.cs",
+            DirectoryContentType.EntityClass => entityName,
             DirectoryContentType.RepositoryClass => throw new NotImplementedException(),
             DirectoryContentType.RepositoryInterface => throw new NotImplementedException(),
             DirectoryContentType.BaseRepositoryClass => throw new NotImplementedException(),
             DirectoryContentType.BaseRepositoryInterface => throw new NotImplementedException(),
             DirectoryContentType.DbContext => throw new NotImplementedException(),
-            DirectoryContentType.DtoClass => throw new NotImplementedException(),
+            DirectoryContentType.DtoClass => $"{entityName}Dto",
             DirectoryContentType.MappingProfile => throw new NotImplementedException(),
             DirectoryContentType.ServiceClass => throw new NotImplementedException(),
             DirectoryContentType.ServiceInterface => throw new NotImplementedException(),
@@ -132,6 +126,17 @@ public static class ClassService
         return string.IsNullOrEmpty(directory.ParentPath) 
             ? $"{projectFullName}.{directory.Name}" 
             : $"{projectFullName}.{directory.ParentPath.Trim('/')}.{directory.Name}";
+    }
+
+    private static string GetEntityCreationTemplate(ClassTemplateSettings classSettings)
+    {
+        var props = new StringBuilder();
+        foreach (var prop in classSettings.Entity?.Properties ?? [])
+        {
+            props.Append(string.Format(EntityPropTemplate, prop.Type, prop.Name));
+        }
+
+        return string.Format(classSettings.Template ?? string.Empty, classSettings.Namespace, classSettings.Entity?.Name, props);
     }
 
     public static void CreateRepository(string entityName, string solutionName)
@@ -219,29 +224,6 @@ public static class ClassService
                 $"{solutionName}.DAL.Repositories"));
 
             sw2.Close();
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine(ex.Message);
-        }
-    }
-
-    public static void CreateDtoClass(string className, string solutionName, Dictionary<string, string> properties)
-    {
-        try
-        {
-            var fileContent = TemplateHelper.GetTemplateContent(DtoTemplatePath);
-
-            StreamWriter sw = new($"{Path}\\{solutionName}\\{solutionName}.BLL\\Dtos\\{className}Dto.cs");
-
-            var props = string.Empty;
-            foreach (var prop in properties)
-            {
-                props += string.Format(EntityPropTemplate, prop.Value, prop.Key);
-            }
-
-            sw.WriteLine(string.Format(fileContent, $"{solutionName}.BLL.Dtos", className, props));
-            sw.Close();
         }
         catch (Exception ex)
         {

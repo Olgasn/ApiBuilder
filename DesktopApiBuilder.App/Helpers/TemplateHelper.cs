@@ -53,7 +53,7 @@ public static class TemplateHelper
             DirectoryContentType.BaseRepositoryClass => throw new NotImplementedException(),
             DirectoryContentType.BaseRepositoryInterface => throw new NotImplementedException(),
             DirectoryContentType.DbContext => throw new NotImplementedException(),
-            DirectoryContentType.DtoClass => throw new NotImplementedException(),
+            DirectoryContentType.DtoClass => TemplatePaths.DtoTemplatePath,
             DirectoryContentType.MappingProfile => throw new NotImplementedException(),
             DirectoryContentType.ServiceClass => throw new NotImplementedException(),
             DirectoryContentType.ServiceInterface => throw new NotImplementedException(),
