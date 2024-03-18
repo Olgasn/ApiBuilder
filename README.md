@@ -38,7 +38,11 @@
             "name": "DAL", 
             "type": "classlib",
             "directories": [
-                { "name": "Entities", "parentPath": "" },
+                {
+                  "name": "Entities",
+                  "parentPath": "",
+                  "contentType": "EntityClass"
+                },
                 { "name": "Repositories", "parentPath": "" },
                 { "name": "Abstractions", "parentPath": "/Repositories" }
             ],
