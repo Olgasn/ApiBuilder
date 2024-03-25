@@ -38,12 +38,20 @@
             "type": "classlib",
             "directories": [
                 {
-                  "name": "Entities",
-                  "parentPath": "",
-                  "contentType": "EntityClass"
+                    "name": "Entities",
+                    "parentPath": "",
+                    "contentType": "EntityClass"
                 },
-                { "name": "Repositories", "parentPath": "" },
-                { "name": "Abstractions", "parentPath": "/Repositories" }
+                { 
+                    "name": "Repositories", 
+                    "parentPath": "",
+                    "contentType": "RepositoryClass"
+                },
+                { 
+                    "name": "Abstractions", 
+                    "parentPath": "/Repositories",
+                    "contentType": "RepositoryInterface"
+                }
             ],
             "dependencies": {
                 "packages": [

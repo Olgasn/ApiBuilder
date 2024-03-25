@@ -48,10 +48,8 @@ public static class TemplateHelper
         _ = contentType switch
         {
             DirectoryContentType.EntityClass => TemplatePaths.EntityTemplatePath,
-            DirectoryContentType.RepositoryClass => throw new NotImplementedException(),
-            DirectoryContentType.RepositoryInterface => throw new NotImplementedException(),
-            DirectoryContentType.BaseRepositoryClass => throw new NotImplementedException(),
-            DirectoryContentType.BaseRepositoryInterface => throw new NotImplementedException(),
+            DirectoryContentType.RepositoryClass => TemplatePaths.RepositoryTemplatePath,
+            DirectoryContentType.RepositoryInterface => TemplatePaths.RepositoryInterfaceTemplatePath,
             DirectoryContentType.DbContext => throw new NotImplementedException(),
             DirectoryContentType.DtoClass => TemplatePaths.DtoTemplatePath,
             DirectoryContentType.MappingProfile => throw new NotImplementedException(),

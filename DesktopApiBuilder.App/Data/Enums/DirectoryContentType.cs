@@ -6,8 +6,6 @@ public enum DirectoryContentType
     EntityClass,
     RepositoryClass,
     RepositoryInterface,
-    BaseRepositoryClass,
-    BaseRepositoryInterface,
     DbContext,
     // Business logic
     DtoClass,

@@ -10,9 +10,6 @@ public static class TemplatePaths
 
     public const string DbContextTemplatePath = "wwwroot\\templates\\domain\\DbContextTemplate.txt";
 
-    public const string BaseRepositoryInterfaceTemplatePath = "wwwroot\\templates\\domain\\BaseRepositoryInterfaceTemplate.txt";
-    public const string BaseRepositoryTemplatePath = "wwwroot\\templates\\domain\\BaseRepositoryTemplate.txt";
-
     public const string ServiceInterfaceTemplatePath = "wwwroot\\templates\\core\\ServiceInterfaceTemplate.txt";
     public const string ServiceTemplatePath = "wwwroot\\templates\\core\\ServiceTemplate.txt";
 

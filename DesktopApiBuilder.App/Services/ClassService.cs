@@ -13,14 +13,8 @@ public static class ClassService
 
     private const string EntityPropTemplate = "\r\n\tpublic {0} {1} {{ get; set; }}";
 
-    private const string RepositoryInterfaceTemplatePath = "wwwroot\\templates\\domain\\RepositoryInterfaceTemplate.txt";
-    private const string RepositoryTemplatePath = "wwwroot\\templates\\domain\\RepositoryTemplate.txt";
-
     private const string DbContextTemplatePath = "wwwroot\\templates\\domain\\DbContextTemplate.txt";
     private const string DbSetTemplate = "\r\n\tpublic DbSet<{0}> {1} {{ get; set; }}";
-
-    private const string BaseRepositoryInterfaceTemplatePath = "wwwroot\\templates\\domain\\BaseRepositoryInterfaceTemplate.txt";
-    private const string BaseRepositoryTemplatePath = "wwwroot\\templates\\domain\\BaseRepositoryTemplate.txt";
 
     private const string ServiceInterfaceTemplatePath = "wwwroot\\templates\\core\\ServiceInterfaceTemplate.txt";
     private const string ServiceTemplatePath = "wwwroot\\templates\\core\\ServiceTemplate.txt";
@@ -71,7 +65,8 @@ public static class ClassService
                                 ContentType = contentType,
                                 Template = fileContent,
                                 ClassName = className,
-                                Namespace = classNamespace
+                                Namespace = classNamespace,
+                                Usings = GetUsings(contentType, $"{solutionSettings.SolutionName}.{project.Name}", project.Directories ?? [])
                             };
 
                             StreamWriter sw = new(filePath);
@@ -97,6 +92,21 @@ public static class ClassService
                 return GetEntityCreationTemplate(classSettings);
             case DirectoryContentType.DtoClass:
                 return GetEntityCreationTemplate(classSettings);
+            case DirectoryContentType.RepositoryInterface:
+                return string.Format(
+                    classSettings.Template ?? string.Empty, 
+                    classSettings.Usings[0], 
+                    classSettings.Namespace, 
+                    classSettings.Entity?.Name, 
+                    "int");
+            case DirectoryContentType.RepositoryClass:
+                return string.Format(
+                    classSettings.Template ?? string.Empty,
+                    classSettings.Usings[0],
+                    classSettings.Usings[1],
+                    classSettings.Namespace,
+                    classSettings.Entity?.Name,
+                    "int");
         }
 
         return string.Empty;
@@ -106,10 +116,8 @@ public static class ClassService
         _ = contentType switch
         {
             DirectoryContentType.EntityClass => entityName,
-            DirectoryContentType.RepositoryClass => throw new NotImplementedException(),
-            DirectoryContentType.RepositoryInterface => throw new NotImplementedException(),
-            DirectoryContentType.BaseRepositoryClass => throw new NotImplementedException(),
-            DirectoryContentType.BaseRepositoryInterface => throw new NotImplementedException(),
+            DirectoryContentType.RepositoryClass => $"{entityName}Repository",
+            DirectoryContentType.RepositoryInterface => $"I{entityName}Repository",
             DirectoryContentType.DbContext => throw new NotImplementedException(),
             DirectoryContentType.DtoClass => $"{entityName}Dto",
             DirectoryContentType.MappingProfile => throw new NotImplementedException(),
@@ -121,11 +129,30 @@ public static class ClassService
             _ => throw new NotImplementedException(),
         };
 
-    private static string GetClassNamespace(string projectFullName, DirectoryConfig directory)
+    private static string GetClassNamespace(string projectFullName, DirectoryConfig? directory)
     {
-        return string.IsNullOrEmpty(directory.ParentPath) 
-            ? $"{projectFullName}.{directory.Name}" 
+        return string.IsNullOrEmpty(directory?.ParentPath) 
+            ? $"{projectFullName}.{directory?.Name}" 
             : $"{projectFullName}.{directory.ParentPath.Trim('/')}.{directory.Name}";
+    }
+
+    private static string[] GetUsings(DirectoryContentType contentType, string projectFullName, IEnumerable<DirectoryConfig> projectDirectories)
+    {
+        var entitiesDir = projectDirectories.FirstOrDefault(d => d.ContentType == DirectoryContentType.EntityClass.ToString());
+
+        switch (contentType)
+        {
+            case DirectoryContentType.RepositoryInterface:
+                return [GetClassNamespace(projectFullName, entitiesDir)];
+            case DirectoryContentType.RepositoryClass:
+                var repoInterfacesDir = projectDirectories.FirstOrDefault(d => d.ContentType == DirectoryContentType.RepositoryInterface.ToString());
+                return [
+                    GetClassNamespace(projectFullName, entitiesDir),
+                    GetClassNamespace(projectFullName, repoInterfacesDir),
+                ];
+        }
+
+        return [];
     }
 
     private static string GetEntityCreationTemplate(ClassTemplateSettings classSettings)
@@ -137,40 +164,6 @@ public static class ClassService
         }
 
         return string.Format(classSettings.Template ?? string.Empty, classSettings.Namespace, classSettings.Entity?.Name, props);
-    }
-
-    public static void CreateRepository(string entityName, string solutionName)
-    {
-        try
-        {
-            var interfaceTemplateContent = TemplateHelper.GetTemplateContent(RepositoryInterfaceTemplatePath);
-            var classTemplateContent = TemplateHelper.GetTemplateContent(RepositoryTemplatePath);
-
-            StreamWriter sw1 = new($"{Path}\\{solutionName}\\{solutionName}.DAL\\Repositories\\Abstractions\\I{entityName}Repository.cs");
-
-            sw1.WriteLine(string.Format(interfaceTemplateContent, 
-                $"{solutionName}.DAL.Entities",
-                $"{solutionName}.DAL.Repositories.Abstractions", 
-                entityName,
-                $"int"));
-
-            sw1.Close();
-
-            StreamWriter sw2 = new($"{Path}\\{solutionName}\\{solutionName}.DAL\\Repositories\\{entityName}Repository.cs");
-
-            sw2.WriteLine(string.Format(classTemplateContent,
-                $"{solutionName}.DAL.Entities",
-                $"{solutionName}.DAL.Repositories.Abstractions",
-                $"{solutionName}.DAL.Repositories",
-                entityName,
-                $"int"));
-
-            sw2.Close();
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine(ex.Message);
-        }
     }
 
     public static void CreateDbContext(string solutionName, List<EntityClassViewModel> entities)
@@ -203,32 +196,6 @@ public static class ClassService
             $"cd {Path}\\{solutionName}\\{solutionName}.DAL",
             "dotnet add package Microsoft.EntityFrameworkCore"
         ]);
-    }
-
-    public static void CreateBaseRepository(string solutionName)
-    {
-        try
-        {
-            var interfaceTemplateContent = TemplateHelper.GetTemplateContent(BaseRepositoryInterfaceTemplatePath);
-            var classTemplateContent = TemplateHelper.GetTemplateContent(BaseRepositoryTemplatePath);
-
-            StreamWriter sw1 = new($"{Path}\\{solutionName}\\{solutionName}.DAL\\Repositories\\Abstractions\\IRepository.cs");
-
-            sw1.WriteLine(string.Format(interfaceTemplateContent, $"{solutionName}.DAL.Repositories.Abstractions"));
-            sw1.Close();
-
-            StreamWriter sw2 = new($"{Path}\\{solutionName}\\{solutionName}.DAL\\Repositories\\BaseRepository.cs");
-
-            sw2.WriteLine(string.Format(classTemplateContent, 
-                $"{solutionName}.DAL.Repositories.Abstractions",
-                $"{solutionName}.DAL.Repositories"));
-
-            sw2.Close();
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine(ex.Message);
-        }
     }
 
     public static void CreateService(string entityName, string solutionName)
