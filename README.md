@@ -25,7 +25,11 @@
             "name": "BLL", 
             "type": "classlib",
             "directories": [
-                { "name": "Dtos", "parentPath": "" },
+                { 
+                    "name": "Dtos", 
+                    "parentPath": "",
+                    "contentType": "DtoClass"
+                },
                 { "name": "Services", "parentPath": "" },
                 { "name": "Abstractions", "parentPath": "/Services" }
             ],
@@ -39,12 +43,20 @@
             "type": "classlib",
             "directories": [
                 {
-                  "name": "Entities",
-                  "parentPath": "",
-                  "contentType": "EntityClass"
+                    "name": "Entities",
+                    "parentPath": "",
+                    "contentType": "EntityClass"
                 },
-                { "name": "Repositories", "parentPath": "" },
-                { "name": "Abstractions", "parentPath": "/Repositories" }
+                { 
+                    "name": "Repositories", 
+                    "parentPath": "",
+                    "contentType": "RepositoryClass"
+                },
+                { 
+                    "name": "Abstractions", 
+                    "parentPath": "/Repositories",
+                    "contentType": "RepositoryInterface"
+                }
             ],
             "dependencies": {
                 "packages": [
