@@ -55,9 +55,9 @@ public static class TemplateHelper
             DirectoryContentType.MappingProfile => TemplatePaths.MappingProfileTemplatePath,
             DirectoryContentType.ServiceClass => TemplatePaths.ServiceTemplatePath,
             DirectoryContentType.ServiceInterface => TemplatePaths.ServiceInterfaceTemplatePath,
-            DirectoryContentType.ProgramClass => throw new NotImplementedException(),
-            DirectoryContentType.Controller => throw new NotImplementedException(),
-            DirectoryContentType.ServiceExtensionsClass => throw new NotImplementedException(),
+            DirectoryContentType.ProgramClass => TemplatePaths.ProgramClassTemplatePath,
+            DirectoryContentType.Controller => TemplatePaths.ControllerTemplatePath,
+            DirectoryContentType.ServiceExtensions => TemplatePaths.ServiceExtensionsTemplatePath,
             _ => throw new NotImplementedException(),
         };
 }

@@ -15,5 +15,5 @@ public enum DirectoryContentType
     // API
     ProgramClass,
     Controller,
-    ServiceExtensionsClass
+    ServiceExtensions
 }

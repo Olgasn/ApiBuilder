@@ -5,8 +5,16 @@
             "name": "API", 
             "type": "webapi",
             "directories": [
-                { "name": "Controllers", "parentPath": "" },
-                { "name": "Extensions", "parentPath": "" }
+                { 
+                    "name": "Controllers", 
+                    "parentPath": "",
+                    "contentType": "Controller"
+                },
+                { 
+                    "name": "Extensions", 
+                    "parentPath": "",
+                    "contentType": "ServiceExtensions"
+                }
             ],
             "dependencies": {
                 "packages": [
@@ -14,7 +22,8 @@
                     "Microsoft.EntityFrameworkCore.Tools"
                 ],
                 "projectReferences": ["BLL"]
-            }
+            },
+            "rootContentTypes": [ "ProgramClass" ]
         },
         { 
             "name": "BLL", 
