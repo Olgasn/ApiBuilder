@@ -25,13 +25,22 @@
                     "parentPath": "",
                     "contentType": "DtoClass"
                 },
-                { "name": "Services", "parentPath": "" },
-                { "name": "Abstractions", "parentPath": "/Services" }
+                { 
+                    "name": "Services", 
+                    "parentPath": "",
+                    "contentType": "ServiceClass"
+                },
+                { 
+                    "name": "Abstractions", 
+                    "parentPath": "/Services",
+                    "contentType": "ServiceInterface"
+                }
             ],
             "dependencies": {
                 "packages": ["AutoMapper"],
                 "projectReferences": ["DAL"]
-            }
+            },
+            "rootContentTypes": [ "MappingProfile" ]
         },
         { 
             "name": "DAL", 
@@ -55,10 +64,12 @@
             ],
             "dependencies": {
                 "packages": [
+                    "Microsoft.EntityFrameworkCore",
                     "Microsoft.EntityFrameworkCore.SqlServer", 
                     "Microsoft.EntityFrameworkCore.Relational"
                 ]
-            }
+            },
+            "rootContentTypes": [ "DbContext" ]
         }
     ]
 }

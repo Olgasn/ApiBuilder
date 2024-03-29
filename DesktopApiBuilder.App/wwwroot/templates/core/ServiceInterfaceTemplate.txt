@@ -6,7 +6,7 @@ public interface I{2}Service
 {{
 	Task<IEnumerable<{2}Dto>> Get();
 	Task<{2}Dto?> GetById({3} id);
-    Task Create({2}Dto entity);
+    Task Create({2}Dto entityForCreation);
     Task<bool> Delete({3} id);
-    Task<bool> Update({3} id, {2}Dto entity);
+    Task<bool> Update({3} id, {2}Dto entityForUpdate);
 }}

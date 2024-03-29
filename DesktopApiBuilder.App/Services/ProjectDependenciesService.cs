@@ -28,14 +28,14 @@ public static class ProjectDependenciesService
                 solutionSettings.SolutionName,
                 project.Name));
 
-            foreach (var package in project?.Dependencies?.Packages ?? [])
+            foreach (var package in project.Dependencies?.Packages ?? [])
             {
                 commands.Add($"dotnet add package {package}");
             }
 
             commands.Add($"cd {solutionSettings.FullSolutionPath}");
 
-            foreach (var projectRef in project?.Dependencies?.ProjectReferences ?? [])
+            foreach (var projectRef in project.Dependencies?.ProjectReferences ?? [])
             {
                 var relatedProject = config?.Projects?.FirstOrDefault(p => p.Name == projectRef);
 

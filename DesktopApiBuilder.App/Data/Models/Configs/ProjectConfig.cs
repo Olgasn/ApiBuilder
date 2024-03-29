@@ -18,4 +18,7 @@ public class ProjectConfig
 
     [JsonPropertyName("dependencies")]
     public ProjectDependenciesConfig? Dependencies { get; set; }
+
+    [JsonPropertyName("rootContentTypes")]
+    public string[]? RootContentTypes { get; set; }
 }
