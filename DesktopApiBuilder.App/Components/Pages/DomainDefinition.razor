@@ -1,13 +1,17 @@
-﻿@page "/domain/{name}"
-@using DesktopApiBuilder.App.Services
+﻿@page "/domain"
 @using DesktopApiBuilder.App.Data.ViewModels
 @inject NavigationManager Navigation
 
 <h3>Domain Definition</h3>
 
-<div class="d-flex flex-row">
-    <MudButton OnClick="@(() => _isOverlayOpened = true)" Variant="Variant.Outlined" Class="mt-4">Create entity class</MudButton>
-    <MudButton OnClick="CreateDbContext" Variant="Variant.Outlined" Class="mt-4 ml-4">Next</MudButton>
+<div class="d-flex flex-row mt-4 align-center">
+    <MudButton OnClick="@(() => _isOverlayOpened = true)" Variant="Variant.Outlined" Disabled=_isLoading>Add entity class</MudButton>
+    <MudButton OnClick="CreateClasses" Variant="Variant.Outlined" Class="ml-4" Disabled=_isLoading>Create classes</MudButton>
+    <MudButton Href=@($"/sql/{InMemoryUserSettings.SolutionName}") Variant="Variant.Outlined" Class="ml-4" Disabled=@(_isLoading || !_classesCreated)>Next</MudButton>
+    @if (_isLoading)
+    {
+        <MudProgressCircular Color="Color.Default" Indeterminate Class="ml-4" Size="Size.Small" />
+    }
 </div>
 
 <MudText Color="Color.Success" Class="mt-6">@_message</MudText>
@@ -59,13 +63,15 @@
              <MudButton OnClick="@(() => _isOverlayOpened = false)" Variant="Variant.Outlined" Class="mt-4 ml-4">Close</MudButton>
         </div>
 
-        <MudButton OnClick=CreateEntityClasses Variant="Variant.Outlined" Class="mt-4">Create entity</MudButton>
+        <MudButton OnClick=AddEntity Variant="Variant.Outlined" Class="mt-4">Add entity</MudButton>
     </div>
 </MudOverlay>
 
 @code {
     private string _message = string.Empty;
+    private bool _isLoading;
     private bool _isOverlayOpened;
+    private bool _classesCreated;
 
     private EntityClassViewModel _currentEntity = new EntityClassViewModel
     {
@@ -83,8 +89,6 @@
 
     private List<EntityClassViewModel> _entities = new();
 
-    [Parameter] public string Name { get; init; }
-
     private void AddEmptyProperty()
     {
         _currentEntity.Properties.Add(new EntityPropViewModel
@@ -99,7 +103,7 @@
         _currentEntity.Properties.Remove(entity);
     }
 
-    private void CreateEntityClasses()
+    private void AddEntity()
     {
         var result = Mapper.EntityPropsToDict(_currentEntity.Properties);
 
@@ -107,15 +111,6 @@
         {
             return;
         }
-
-        ClassService.CreateEntityClass(_currentEntity.Name, Name, result.Value);
-        ClassService.CreateRepository(_currentEntity.Name, Name);
-        ClassService.CreateDtoClass(_currentEntity.Name, Name, result.Value);
-        ClassService.CreateService(_currentEntity.Name, Name);
-        ClassService.CreateController(Name, _currentEntity);
-
-        _message = $"Entity classes for solution \"{Name}\" were succesfully created!";
-        _isOverlayOpened = false;
 
         _entities.Add(new EntityClassViewModel
         {
@@ -137,17 +132,29 @@
                 }
             }
         };
+
+        _isOverlayOpened = false;
+        StateHasChanged();
     }
 
-    private void CreateDbContext()
+    private async Task CreateClasses()
     {
-        ClassService.CreateDbContext(Name, _entities);
-        ClassService.CreateBaseRepository(Name);
-        ClassService.AddProjectReferences(Name);
-        ClassService.CreateMappingProfile(Name, _entities);
-        ClassService.UpdateProgramClass(Name);
-        ClassService.CreateServiceExtensions(Name, _entities);
+        ClassService.CreateClasses(new SolutionSettingsModel()
+        {
+            SolutionName = InMemoryUserSettings.SolutionName,
+            SolutionPath = InMemoryUserSettings.SolutionPath,
+            ArchitectureType = InMemoryUserSettings.ArchitectureType
+        }, _entities);
 
-        Navigation.NavigateTo($"/sql/{Name}");
+        _isLoading = true;
+        StateHasChanged();
+
+        await Task.Delay(3000);
+
+        _isLoading = false;
+        StateHasChanged();
+
+        _classesCreated = true;
+        _message = $"Classes for solution \"{InMemoryUserSettings.SolutionName}\" were succesfully created!";
     }
 }

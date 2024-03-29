@@ -1,27 +1,38 @@
 ﻿@page "/"
 
+@* <input type="file" id="directoryPicker" webkitdirectory directory onchange="handleDirectorySelection(event)"> *@
+<MudTextField @bind-Value=_solutionPath Required RequiredError="Solution path is required" Placeholder="Solution Path"/>
 <MudTextField @bind-Value=_solutionName Required RequiredError="Solution name is required" Placeholder="Solution Name"/>
+
 <MudButton OnClick="CreateSolution" Variant="Variant.Outlined" Class="mt-4" Disabled="!string.IsNullOrEmpty(_message)">Create solution</MudButton>
 
 <MudText Color="Color.Success" Class="mt-6">@_message</MudText>
 
 @if (!string.IsNullOrEmpty(_message))
 {
-    <MudButton Href=@($"/architecture/{_solutionName}") Variant="Variant.Outlined" Class="mt-4">Next</MudButton>
+    <MudButton Href=@($"/architecture") Variant="Variant.Outlined" Class="mt-4">Next</MudButton>
 }
 
 @code {
     private string? _solutionName;
+    private string? _solutionPath = "C:/D/Projects/test";
     private string _message = string.Empty;
 
     private void CreateSolution()
     {
-        if (string.IsNullOrEmpty(_solutionName))
+        if (string.IsNullOrEmpty(_solutionName) || string.IsNullOrEmpty(_solutionPath))
         {
             return;
         }
 
-        SolutionService.CreateSolution(_solutionName);
+        InMemoryUserSettings.SolutionName = _solutionName;
+        InMemoryUserSettings.SolutionPath = _solutionPath;
+
+        SolutionService.CreateSolution(new SolutionSettingsModel 
+            {
+                SolutionName = _solutionName,
+                SolutionPath = _solutionPath
+            });
 
         _message = $"Solution \"{_solutionName}\" was succesfully created!";
     }

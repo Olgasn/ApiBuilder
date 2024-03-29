@@ -1,16 +1,16 @@
-﻿namespace DesktopApiBuilder.App.Services;
+﻿using DesktopApiBuilder.App.Data.Models;
+
+namespace DesktopApiBuilder.App.Services;
 
 public static class SolutionService
 {
-    private const string Path = "C:\\D\\Projects\\test";
-
-    public static void CreateSolution(string name)
+    public static void CreateSolution(SolutionSettingsModel solutionSettings)
     {
         ProcessManager.ExecuteCmdCommands([
-            $"cd {Path}",
-            $"mkdir {name}",
-            $"cd {Path}\\{name}",
-            $"dotnet new sln --name {name}"
+            $"cd {solutionSettings.SolutionPath}",
+            $"mkdir {solutionSettings.SolutionName}",
+            $"cd {solutionSettings.FullSolutionPath}",
+            $"dotnet new sln --name {solutionSettings.SolutionName}"
         ]);
     }
 }

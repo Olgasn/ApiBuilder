@@ -1,26 +1,30 @@
 ﻿@page "/sql/{name}"
 @inject NavigationManager Navigation
 
-<MudTextField @bind-Value=_sqlConnection Required RequiredError="SQL connection string is required" Placeholder="SQL connection string" />
-<MudButton OnClick="SetConnectionString" Variant="Variant.Outlined" Class="mt-4" Disabled="!string.IsNullOrEmpty(_message)">Setup connection string</MudButton>
+<MudTextField @bind-Value=_sqlServerName Required RequiredError="SQL server name is required" Placeholder="SQL server name" />
+<MudTextField @bind-Value=_dbName Placeholder=@($"Database name (default value: {Name}Db)") />
+<MudCheckBox @bind-Value=_applyMigration Label="Apply migration automatically"/>
+<MudButton OnClick="SetConnectionString" Variant="Variant.Outlined" Class="mt-4" Disabled="string.IsNullOrEmpty(_sqlServerName)">
+    Setup DB connection + Add migration
+</MudButton>
 
  @code {
-    private string? _sqlConnection;
-    private string _message = string.Empty;
+    private string? _sqlServerName = "DESKTOP-0SM65GV\\\\SQLEXPRESS";
+    private string? _dbName;
+    private bool _applyMigration;
 
     [Parameter] public string Name { get; init; }
 
     private void SetConnectionString()
     {
-        if (string.IsNullOrEmpty(_sqlConnection))
+        if (string.IsNullOrEmpty(_sqlServerName))
         {
             return;
         }
 
-        SqlService.SetupSqlConnection(Name, "Server=DESKTOP-0SM65GV\\\\SQLEXPRESS;Database=NciDb;Trusted_Connection=True;");
+        SqlService.SetupSqlConnection(Name, _sqlServerName, _dbName ?? $"{Name}Db");
+        SqlService.AddMigration(Name, "Initial", _applyMigration);
 
         Navigation.NavigateTo("/final");
-
-        //_message = $"Solution \"{_sqlConnection}\" was succesfully created!";
     }
 }

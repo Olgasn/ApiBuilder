@@ -4,19 +4,28 @@ using {1};
 
 namespace {2};
 
-public class {3}Repository(AppDbContext dbContext) : BaseRepository<{3}>(dbContext), I{3}Repository
+public class {3}Repository : I{3}Repository
 {{
-    public async Task Create({3} entity) => await CreateEntity(entity);
+    private readonly AppDbContext _dbContext;
+
+    public {3}Repository(AppDbContext dbContext) 
+    {{
+        _dbContext = dbContext;
+    }}
+
+    public async Task Create({3} entity) => await _dbContext.{4}.AddAsync(entity);
 
     public async Task<IEnumerable<{3}>> Get(bool trackChanges) =>
-        await GetAllEntities(trackChanges).ToListAsync();
+        await (!trackChanges ? _dbContext.{4}.AsNoTracking() : _dbContext.{4}).ToListAsync();
 
-    public async Task<{3}?> GetById({4} id, bool trackChanges) =>
-        await GetByCondition(x => x.Id.Equals(id), trackChanges).SingleOrDefaultAsync();
+    public async Task<{3}?> GetById({5} id, bool trackChanges) =>
+        await (!trackChanges ?
+            _dbContext.{4}.Where(e => e.Id == id).AsNoTracking() :
+            _dbContext.{4}.Where(e => e.Id == id)).SingleOrDefaultAsync();
 
-    public void Delete({3} entity) => DeleteEntity(entity);
+    public void Delete({3} entity) => _dbContext.{4}.Remove(entity);
 
-    public void Update({3} entity) => UpdateEntity(entity);
+    public void Update({3} entity) => _dbContext.{4}.Update(entity);
 
-    public async Task SaveChanges() => await dbContext.SaveChangesAsync();
+    public async Task SaveChanges() => await _dbContext.SaveChangesAsync();
 }}

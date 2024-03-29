@@ -1,5 +1,6 @@
-﻿@page "/architecture/{name}"
+﻿@page "/architecture"
 @using DesktopApiBuilder.App.Services
+@using DesktopApiBuilder.App.Data.Enums
 
 <h3>Choose an architecture</h3>
 
@@ -20,20 +21,20 @@
 </div>
 
 <MudText Color="Color.Success" Class="mt-6">@_message</MudText>
+<MudText Color="Color.Error" Class="mt-6">@_errorMessage</MudText>
 
 @if (!string.IsNullOrEmpty(_message))
 {
-    <MudButton Href=@($"/domain/{Name}") Variant="Variant.Outlined" Class="mt-4">Next</MudButton>
+    <MudButton Href="/domain" Variant="Variant.Outlined" Class="mt-4">Next</MudButton>
 }
 
 @code {
-    private List<string> _arcTypes = new List<string>() { "3-Layered", "Onion" };
-    private string _selectedArc;
+    private List<ArchitectureType> _arcTypes = new() { ArchitectureType.ThreeLayered, ArchitectureType.Clean };
+    private ArchitectureType _selectedArc;
     private string _message = string.Empty;
+    private string _errorMessage = string.Empty;
     private bool _isCreateButtonDisabled;
     private bool _isLoading;
-
-    [Parameter] public string Name { get; init; }
 
     protected override void OnInitialized()
     {
@@ -48,9 +49,32 @@
         _isLoading = true;
         StateHasChanged();
 
-        await Task.Run(() => ProjectService.CreateProjects(Name, Data.Enums.ArchitectureType.ThreeLayered));
+        InMemoryUserSettings.ArchitectureType = _selectedArc;
 
-        _message = $"Projects for solution \"{Name}\" were succesfully created!";
+        var task = Task.Run(() => ProjectService.CreateProjects(new SolutionSettingsModel()
+        {
+            SolutionName = InMemoryUserSettings.SolutionName,
+            SolutionPath = InMemoryUserSettings.SolutionPath,
+            ArchitectureType = InMemoryUserSettings.ArchitectureType
+        }));
+
+        var completedTask = await Task.WhenAny(task, Task.Delay(TimeSpan.FromMinutes(5)));
+
+        if (task == completedTask)
+        {
+            await Task.Run(() => ProjectDependenciesService.AddProjectReferences(new SolutionSettingsModel()
+                {
+                    SolutionName = InMemoryUserSettings.SolutionName,
+                    SolutionPath = InMemoryUserSettings.SolutionPath,
+                    ArchitectureType = InMemoryUserSettings.ArchitectureType
+                }));
+            _message = $"Projects for solution \"{InMemoryUserSettings.SolutionName}\" were succesfully created!";
+        }
+        else
+        {
+            _errorMessage = "Execution timeout: something went wrong!";
+        }
+
         _isLoading = false;
         StateHasChanged();
     }

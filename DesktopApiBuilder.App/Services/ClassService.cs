@@ -1,55 +1,99 @@
-﻿using DesktopApiBuilder.App.Data.ViewModels;
+﻿using DesktopApiBuilder.App.Data.Enums;
+using DesktopApiBuilder.App.Data.Models;
+using DesktopApiBuilder.App.Data.Models.Configs;
+using DesktopApiBuilder.App.Data.ViewModels;
 using DesktopApiBuilder.App.Helpers;
+using System.Text;
 
 namespace DesktopApiBuilder.App.Services;
 
 public static class ClassService
 {
-    private const string Path = "C:\\D\\Projects\\test";
-
-    private const string EntityTemplatePath = "wwwroot\\templates\\domain\\EntityClassTemplate.txt";
-    private const string DtoTemplatePath = "wwwroot\\templates\\core\\DtoClassTemplate.txt";
     private const string EntityPropTemplate = "\r\n\tpublic {0} {1} {{ get; set; }}";
-
-    private const string RepositoryInterfaceTemplatePath = "wwwroot\\templates\\domain\\RepositoryInterfaceTemplate.txt";
-    private const string RepositoryTemplatePath = "wwwroot\\templates\\domain\\RepositoryTemplate.txt";
-
-    private const string DbContextTemplatePath = "wwwroot\\templates\\domain\\DbContextTemplate.txt";
     private const string DbSetTemplate = "\r\n\tpublic DbSet<{0}> {1} {{ get; set; }}";
 
-    private const string BaseRepositoryInterfaceTemplatePath = "wwwroot\\templates\\domain\\BaseRepositoryInterfaceTemplate.txt";
-    private const string BaseRepositoryTemplatePath = "wwwroot\\templates\\domain\\BaseRepositoryTemplate.txt";
+    private const string MappingItemTemplate = "\r\n\t\tCreateMap<{0}, {0}Dto>().ReverseMap();";
 
-    private const string ServiceInterfaceTemplatePath = "wwwroot\\templates\\core\\ServiceInterfaceTemplate.txt";
-    private const string ServiceTemplatePath = "wwwroot\\templates\\core\\ServiceTemplate.txt";
-    
-    private const string ControllerTemplatePath = "wwwroot\\templates\\api\\ControllerTemplate.txt";
-    
-    private const string MappingProfileTemplatePath = "wwwroot\\templates\\core\\MappingProfileTemplate.txt";
-    private const string MappingItemTemplate = "\r\n\t\tCreateMap<{0}, {0}Dto>();";
-    
-    private const string ProgramClassTemplatePath = "wwwroot\\templates\\api\\ApiProgramClassTemplate.txt";
-    
-    private const string ServiceExtensionsTemplatePath = "wwwroot\\templates\\api\\ServiceExtensionsTemplate.txt";
     private const string RepositoryRegTemplate = "\r\n\t\tservices.AddScoped<I{0}Repository, {0}Repository>();";
     private const string ServiceRegTemplate = "\r\n\t\tservices.AddScoped<I{0}Service, {0}Service>();";
 
-    public static void CreateEntityClass(string className, string solutionName, Dictionary<string, string> properties)
+    public static void CreateClasses(SolutionSettingsModel solutionSettings, List<EntityClassViewModel> entities)
     {
+        SolutionConfig? config = ConfigHelper.GetSolutionConfig(solutionSettings.ArchitectureType);
+
         try
         {
-            var fileContent = TemplateHelper.GetTemplateContent(EntityTemplatePath);
-
-            StreamWriter sw = new($"{Path}\\{solutionName}\\{solutionName}.DAL\\Entities\\{className}.cs");
-
-            var props = string.Empty;
-            foreach (var prop in properties)
+            foreach (var project in config?.Projects ?? [])
             {
-                props += string.Format(EntityPropTemplate, prop.Value, prop.Key);
+                var projectPath = ConfigHelper.GetProjectPath(config, project, solutionSettings.SolutionName);
+
+                foreach (var directory in project.Directories ?? [])
+                {
+                    if (string.IsNullOrEmpty(directory.ContentType) 
+                        || !Enum.TryParse(typeof(DirectoryContentType), directory.ContentType, out object? contentTypeObj))
+                    {
+                        continue;
+                    }
+
+                    var contentType = (DirectoryContentType)contentTypeObj;
+                    var fileContent = TemplateHelper.GetTemplateContent(contentType);
+                    var classNamespace = GetClassNamespace($"{solutionSettings.SolutionName}.{project.Name}", directory);
+
+                    foreach (var entity in entities)
+                    {
+                        var className = GetClassName(entity.Name, contentType);
+                        var filePath = $"{solutionSettings.SolutionPath}/{projectPath}/{solutionSettings.SolutionName}.{project.Name}{directory.ParentPath}/{directory.Name}/{className}.cs";
+
+                        var classSettings = new ClassTemplateSettings()
+                        {
+                            Entity = entity,
+                            Entities = contentType == DirectoryContentType.ServiceExtensions ? entities : null,
+                            ContentType = contentType,
+                            Template = fileContent,
+                            ClassName = className,
+                            Namespace = classNamespace,
+                            Usings = GetUsings(contentType, solutionSettings.SolutionName, 
+                                $"{solutionSettings.SolutionName}.{project.Name}", config?.Projects)
+                        };
+
+                        StreamWriter sw = new(filePath);
+                        sw.WriteLine(GetFormattedString(classSettings));
+
+                        sw.Close();
+                    }
+                }
+
+                foreach (var rootContentType in project.RootContentTypes ?? [])
+                {
+                    if (string.IsNullOrEmpty(rootContentType)
+                        || !Enum.TryParse(typeof(DirectoryContentType), rootContentType, out object? contentTypeObj))
+                    {
+                        continue;
+                    }
+
+                    var contentType = (DirectoryContentType)contentTypeObj;
+                    var fileContent = TemplateHelper.GetTemplateContent(contentType);
+
+                    var className = GetClassName(string.Empty, contentType);
+                    var filePath = $"{solutionSettings.SolutionPath}/{projectPath}/{solutionSettings.SolutionName}.{project.Name}/{className}.cs";
+
+                    var classSettings = new ClassTemplateSettings()
+                    {
+                        Entities = entities,
+                        ContentType = contentType,
+                        Template = fileContent,
+                        ClassName = className,
+                        Namespace = $"{solutionSettings.SolutionName}.{project.Name}",
+                        Usings = GetUsings(contentType, solutionSettings.SolutionName, 
+                            $"{solutionSettings.SolutionName}.{project.Name}", config?.Projects)
+                    };
+
+                    StreamWriter sw = new(filePath);
+                    sw.WriteLine(GetFormattedString(classSettings));
+
+                    sw.Close();
+                }
             }
-
-            sw.WriteLine(string.Format(fileContent, $"{solutionName}.DAL.Entities", className, props));
-            sw.Close();
         }
         catch (Exception ex)
         {
@@ -57,274 +101,200 @@ public static class ClassService
         }
     }
 
-    public static void CreateRepository(string entityName, string solutionName)
+    private static string GetFormattedString(ClassTemplateSettings classSettings)
     {
-        try
+        var props = new StringBuilder();
+
+        switch (classSettings.ContentType)
         {
-            var interfaceTemplateContent = TemplateHelper.GetTemplateContent(RepositoryInterfaceTemplatePath);
-            var classTemplateContent = TemplateHelper.GetTemplateContent(RepositoryTemplatePath);
-
-            StreamWriter sw1 = new($"{Path}\\{solutionName}\\{solutionName}.DAL\\Repositories\\Abstractions\\I{entityName}Repository.cs");
-
-            sw1.WriteLine(string.Format(interfaceTemplateContent, 
-                $"{solutionName}.DAL.Entities",
-                $"{solutionName}.DAL.Repositories.Abstractions", 
-                entityName,
-                $"int"));
-
-            sw1.Close();
-
-            StreamWriter sw2 = new($"{Path}\\{solutionName}\\{solutionName}.DAL\\Repositories\\{entityName}Repository.cs");
-
-            sw2.WriteLine(string.Format(classTemplateContent,
-                $"{solutionName}.DAL.Entities",
-                $"{solutionName}.DAL.Repositories.Abstractions",
-                $"{solutionName}.DAL.Repositories",
-                entityName,
-                $"int"));
-
-            sw2.Close();
+            case DirectoryContentType.EntityClass:
+                return GetEntityCreationTemplate(classSettings);
+            case DirectoryContentType.DtoClass:
+                return GetEntityCreationTemplate(classSettings);
+            case DirectoryContentType.RepositoryInterface:
+                return string.Format(
+                    classSettings.Template ?? string.Empty, 
+                    classSettings.Usings[0], 
+                    classSettings.Namespace, 
+                    classSettings.Entity?.Name, 
+                    "int");
+            case DirectoryContentType.RepositoryClass:
+                return string.Format(
+                    classSettings.Template ?? string.Empty,
+                    classSettings.Usings[0],
+                    classSettings.Usings[1],
+                    classSettings.Namespace,
+                    classSettings.Entity?.Name,
+                    classSettings.Entity?.PluralName,
+                    "int");
+            case DirectoryContentType.ServiceInterface:
+                return string.Format(
+                    classSettings.Template ?? string.Empty,
+                    classSettings.Usings[0],
+                    classSettings.Namespace,
+                    classSettings.Entity?.Name,
+                    "int");
+            case DirectoryContentType.ServiceClass:
+                return string.Format(
+                    classSettings.Template ?? string.Empty,
+                    classSettings.Usings[0],
+                    classSettings.Usings[1],
+                    classSettings.Usings[2],
+                    classSettings.Usings[3],
+                    classSettings.Namespace,
+                    classSettings.Entity?.Name,
+                    "int");
+            case DirectoryContentType.Controller:
+                return string.Format(
+                    classSettings.Template ?? string.Empty,
+                    classSettings.Usings[0],
+                    classSettings.Usings[1],
+                    classSettings.Namespace,
+                    $"{classSettings.Entity?.PluralName[..1].ToLower()}{classSettings.Entity?.PluralName[1..]}", 
+                    classSettings.Entity?.Name,
+                    $"{classSettings.Entity?.Name[..1].ToLower()}{classSettings.Entity?.Name[1..]}",
+                    "int");
+            case DirectoryContentType.DbContext:
+                foreach (var entity in classSettings.Entities ?? [])
+                {
+                    props.Append(string.Format(DbSetTemplate, entity.Name, entity.PluralName));
+                }
+                return string.Format(classSettings.Template ?? string.Empty,
+                    classSettings.Usings[0],
+                    classSettings.Namespace,
+                    props);
+            case DirectoryContentType.MappingProfile:
+                foreach (var entity in classSettings.Entities ?? [])
+                {
+                    props.Append(string.Format(MappingItemTemplate, entity.Name));
+                }
+                return string.Format(
+                    classSettings.Template ?? string.Empty,
+                    classSettings.Usings[0],
+                    classSettings.Usings[1],
+                    classSettings.Namespace,
+                    props);
+            case DirectoryContentType.ServiceExtensions:
+                var repositoryProps = new StringBuilder();
+                var serviceProps = new StringBuilder();
+                foreach (var entityName in (classSettings.Entities ?? []).Select(e => e.Name))
+                {
+                    repositoryProps.Append(string.Format(RepositoryRegTemplate, entityName));
+                    serviceProps.Append(string.Format(ServiceRegTemplate, entityName));
+                }
+                return string.Format(
+                    classSettings.Template ?? string.Empty,
+                    classSettings.Usings[0],
+                    classSettings.Usings[1],
+                    classSettings.Usings[2],
+                    classSettings.Usings[3],
+                    classSettings.Usings[4],
+                    classSettings.Namespace,
+                    repositoryProps,
+                    serviceProps);
+            case DirectoryContentType.ProgramClass:
+                return string.Format(
+                    classSettings.Template ?? string.Empty,
+                    classSettings.Usings[0],
+                    classSettings.Usings[1]);
         }
-        catch (Exception ex)
-        {
-            Console.WriteLine(ex.Message);
-        }
+
+        return string.Empty;
     }
 
-    public static void CreateDbContext(string solutionName, List<EntityClassViewModel> entities)
+    private static string GetClassName(string entityName, DirectoryContentType contentType) =>
+        _ = contentType switch
+        {
+            DirectoryContentType.EntityClass => entityName,
+            DirectoryContentType.RepositoryClass => $"{entityName}Repository",
+            DirectoryContentType.RepositoryInterface => $"I{entityName}Repository",
+            DirectoryContentType.DbContext => "AppDbContext",
+            DirectoryContentType.DtoClass => $"{entityName}Dto",
+            DirectoryContentType.MappingProfile => "MappingProfile",
+            DirectoryContentType.ServiceClass => $"{entityName}Service",
+            DirectoryContentType.ServiceInterface => $"I{entityName}Service",
+            DirectoryContentType.ProgramClass => "Program",
+            DirectoryContentType.Controller => $"{entityName}Controller",
+            DirectoryContentType.ServiceExtensions => "ServiceExtensions",
+            _ => throw new NotImplementedException(),
+        };
+
+    private static string GetClassNamespace(string projectFullName, DirectoryConfig? directory)
     {
-        try
-        {
-            var fileContent = TemplateHelper.GetTemplateContent(DbContextTemplatePath);
-
-            StreamWriter sw = new($"{Path}\\{solutionName}\\{solutionName}.DAL\\AppDbContext.cs");
-
-            var props = string.Empty;
-            foreach (var entity in entities)
-            {
-                props += string.Format(DbSetTemplate, entity.Name, entity.PluralName);
-            }
-
-            sw.WriteLine(string.Format(fileContent,
-                $"{solutionName}.DAL.Entities",
-                $"{solutionName}.DAL",
-                props));
-
-            sw.Close();
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine(ex.Message);
-        }
-
-        ProcessManager.ExecuteCmdCommands([
-            $"cd {Path}\\{solutionName}\\{solutionName}.DAL",
-            "dotnet add package Microsoft.EntityFrameworkCore"
-        ]);
+        return string.IsNullOrEmpty(directory?.ParentPath) 
+            ? $"{projectFullName}.{directory?.Name}" 
+            : $"{projectFullName}.{directory.ParentPath.Trim('/')}.{directory.Name}";
     }
 
-    public static void CreateBaseRepository(string solutionName)
+    private static string[] GetUsings(DirectoryContentType contentType, string solutionName,
+        string projectFullName, IEnumerable<ProjectConfig>? projects)
     {
-        try
+        var directories = projects?.SelectMany(p => p.Directories ?? []);
+
+        var entitiesDir = directories?.FirstOrDefault(d => d.ContentType == DirectoryContentType.EntityClass.ToString());
+        var dtosDir = directories?.FirstOrDefault(d => d.ContentType == DirectoryContentType.DtoClass.ToString());
+        var repoInterfacesDir = directories?.FirstOrDefault(d => d.ContentType == DirectoryContentType.RepositoryInterface.ToString());
+        var serviceInterfacesDir = directories?.FirstOrDefault(d => d.ContentType == DirectoryContentType.ServiceInterface.ToString());
+
+        switch (contentType)
         {
-            var interfaceTemplateContent = TemplateHelper.GetTemplateContent(BaseRepositoryInterfaceTemplatePath);
-            var classTemplateContent = TemplateHelper.GetTemplateContent(BaseRepositoryTemplatePath);
-
-            StreamWriter sw1 = new($"{Path}\\{solutionName}\\{solutionName}.DAL\\Repositories\\Abstractions\\IRepository.cs");
-
-            sw1.WriteLine(string.Format(interfaceTemplateContent, $"{solutionName}.DAL.Repositories.Abstractions"));
-            sw1.Close();
-
-            StreamWriter sw2 = new($"{Path}\\{solutionName}\\{solutionName}.DAL\\Repositories\\BaseRepository.cs");
-
-            sw2.WriteLine(string.Format(classTemplateContent, 
-                $"{solutionName}.DAL.Repositories.Abstractions",
-                $"{solutionName}.DAL.Repositories"));
-
-            sw2.Close();
+            case DirectoryContentType.RepositoryInterface:
+                return [GetClassNamespace(projectFullName, entitiesDir)];
+            case DirectoryContentType.RepositoryClass:
+                return [
+                    GetClassNamespace(projectFullName, entitiesDir),
+                    GetClassNamespace(projectFullName, repoInterfacesDir),
+                ];
+            case DirectoryContentType.ServiceInterface:
+                return [GetClassNamespace(projectFullName, dtosDir)];
+            case DirectoryContentType.ServiceClass:
+                return [
+                    GetClassNamespace($"{solutionName}.{projects?.FirstOrDefault(p => (p.Directories ?? []).Any(d => d.ContentType == entitiesDir?.ContentType))?.Name}", entitiesDir),
+                    GetClassNamespace(projectFullName, dtosDir),
+                    GetClassNamespace($"{solutionName}.{projects?.FirstOrDefault(p => (p.Directories ?? []).Any(d => d.ContentType == repoInterfacesDir?.ContentType))?.Name}", repoInterfacesDir),
+                    GetClassNamespace(projectFullName, serviceInterfacesDir)
+                ];
+            case DirectoryContentType.Controller:
+                return [
+                    GetClassNamespace($"{solutionName}.{projects?.FirstOrDefault(p => (p.Directories ?? []).Any(d => d.ContentType == dtosDir?.ContentType))?.Name}", dtosDir),
+                    GetClassNamespace($"{solutionName}.{projects?.FirstOrDefault(p => (p.Directories ?? []).Any(d => d.ContentType == serviceInterfacesDir?.ContentType))?.Name}", serviceInterfacesDir)
+                ];
+            case DirectoryContentType.DbContext:
+                return [GetClassNamespace(projectFullName, entitiesDir)];
+            case DirectoryContentType.MappingProfile:
+                return [
+                    GetClassNamespace($"{solutionName}.{projects?.FirstOrDefault(p => (p.Directories ?? []).Any(d => d.ContentType == entitiesDir?.ContentType))?.Name}", entitiesDir),
+                    GetClassNamespace(projectFullName, dtosDir)
+                ];
+            case DirectoryContentType.ServiceExtensions:
+                var repoDir = directories?.FirstOrDefault(d => d.ContentType == DirectoryContentType.RepositoryClass.ToString());
+                var serviceDir = directories?.FirstOrDefault(d => d.ContentType == DirectoryContentType.ServiceClass.ToString());
+                return [
+                    $"{solutionName}.{projects?.FirstOrDefault(p => (p.Directories ?? []).Any(d => d.ContentType == entitiesDir?.ContentType))?.Name}",
+                    GetClassNamespace($"{solutionName}.{projects?.FirstOrDefault(p => (p.Directories ?? []).Any(d => d.ContentType == repoDir?.ContentType))?.Name}", repoDir),
+                    GetClassNamespace($"{solutionName}.{projects?.FirstOrDefault(p => (p.Directories ?? []).Any(d => d.ContentType == repoInterfacesDir?.ContentType))?.Name}", repoInterfacesDir),
+                    GetClassNamespace($"{solutionName}.{projects?.FirstOrDefault(p => (p.Directories ?? []).Any(d => d.ContentType == serviceDir?.ContentType))?.Name}", serviceDir),
+                    GetClassNamespace($"{solutionName}.{projects?.FirstOrDefault(p => (p.Directories ?? []).Any(d => d.ContentType == serviceInterfacesDir?.ContentType))?.Name}", serviceInterfacesDir)
+                ];
+            case DirectoryContentType.ProgramClass:
+                var extensionsDir = directories?.FirstOrDefault(d => d.ContentType == DirectoryContentType.ServiceExtensions.ToString());
+                return [
+                    GetClassNamespace(projectFullName, extensionsDir),
+                    $"{solutionName}.{projects?.FirstOrDefault(p => (p.Directories ?? []).Any(d => d.ContentType == dtosDir?.ContentType))?.Name}"
+                ];
         }
-        catch (Exception ex)
-        {
-            Console.WriteLine(ex.Message);
-        }
+
+        return [];
     }
 
-    public static void CreateDtoClass(string className, string solutionName, Dictionary<string, string> properties)
+    private static string GetEntityCreationTemplate(ClassTemplateSettings classSettings)
     {
-        try
+        var props = new StringBuilder();
+        foreach (var prop in classSettings.Entity?.Properties ?? [])
         {
-            var fileContent = TemplateHelper.GetTemplateContent(DtoTemplatePath);
-
-            StreamWriter sw = new($"{Path}\\{solutionName}\\{solutionName}.BLL\\Dtos\\{className}Dto.cs");
-
-            var props = string.Empty;
-            foreach (var prop in properties)
-            {
-                props += string.Format(EntityPropTemplate, prop.Value, prop.Key);
-            }
-
-            sw.WriteLine(string.Format(fileContent, $"{solutionName}.BLL.Dtos", className, props));
-            sw.Close();
+            props.Append(string.Format(EntityPropTemplate, prop.Type, prop.Name));
         }
-        catch (Exception ex)
-        {
-            Console.WriteLine(ex.Message);
-        }
-    }
 
-    public static void CreateService(string entityName, string solutionName)
-    {
-        try
-        {
-            var interfaceTemplateContent = TemplateHelper.GetTemplateContent(ServiceInterfaceTemplatePath);
-            var classTemplateContent = TemplateHelper.GetTemplateContent(ServiceTemplatePath);
-
-            StreamWriter sw1 = new($"{Path}\\{solutionName}\\{solutionName}.BLL\\Services\\Abstractions\\I{entityName}Service.cs");
-
-            sw1.WriteLine(string.Format(interfaceTemplateContent,
-                $"{solutionName}.BLL.Dtos",
-                $"{solutionName}.BLL.Services.Abstractions",
-                entityName,
-                $"int"));
-
-            sw1.Close();
-
-            StreamWriter sw2 = new($"{Path}\\{solutionName}\\{solutionName}.BLL\\Services\\{entityName}Service.cs");
-
-            sw2.WriteLine(string.Format(classTemplateContent,
-                $"{solutionName}.DAL.Entities",
-                $"{solutionName}.DAL.Repositories.Abstractions",
-                $"{solutionName}.BLL.Services.Abstractions",
-                $"{solutionName}.BLL.Dtos",
-                $"{solutionName}.BLL.Services",
-                entityName,
-                $"int"));
-
-            sw2.Close();
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine(ex.Message);
-        }
-    }
-
-    public static void CreateController(string solutionName, EntityClassViewModel entity)
-    {
-        try
-        {
-            var fileContent = TemplateHelper.GetTemplateContent(ControllerTemplatePath);
-
-            StreamWriter sw = new($"{Path}\\{solutionName}\\{solutionName}.API\\Controllers\\{entity.Name}Controller.cs");
-
-            sw.WriteLine(string.Format(fileContent, 
-                $"{solutionName}.BLL.Dtos", 
-                $"{solutionName}.BLL.Services.Abstractions",
-                $"{solutionName}.API.Controllers",
-                $"{entity.PluralName[..1].ToLower()}{entity.PluralName[1..]}",
-                entity.Name,
-                $"{entity.Name[..1].ToLower()}{entity.Name[1..]}",
-                "int"));
-
-            sw.Close();
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine(ex.Message);
-        }
-    }
-
-    public static void CreateMappingProfile(string solutionName, List<EntityClassViewModel> entities)
-    {
-        try
-        {
-            var fileContent = TemplateHelper.GetTemplateContent(MappingProfileTemplatePath);
-
-            StreamWriter sw = new($"{Path}\\{solutionName}\\{solutionName}.BLL\\MappingProfile.cs");
-
-            var props = string.Empty;
-            foreach (var entity in entities)
-            {
-                props += string.Format(MappingItemTemplate, entity.Name);
-            }
-
-            sw.WriteLine(string.Format(fileContent,
-                $"{solutionName}.DAL.Entities",
-                $"{solutionName}.BLL.Dtos",
-                $"{solutionName}.BLL",
-                props));
-
-            sw.Close();
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine(ex.Message);
-        }
-    }
-
-    public static void CreateServiceExtensions(string solutionName, List<EntityClassViewModel> entities)
-    {
-        try
-        {
-            var fileContent = TemplateHelper.GetTemplateContent(ServiceExtensionsTemplatePath);
-
-            StreamWriter sw = new($"{Path}\\{solutionName}\\{solutionName}.API\\Extensions\\ServiceExtensions.cs");
-
-            var repositoryProps = string.Empty;
-            var serviceProps = string.Empty;
-            foreach (var entity in entities)
-            {
-                repositoryProps += string.Format(RepositoryRegTemplate, entity.Name);
-                serviceProps += string.Format(ServiceRegTemplate, entity.Name);
-            }
-
-            sw.WriteLine(string.Format(fileContent,
-                $"{solutionName}.DAL",
-                $"{solutionName}.DAL.Repositories",
-                $"{solutionName}.DAL.Repositories.Abstractions",
-                $"{solutionName}.BLL.Services",
-                $"{solutionName}.BLL.Services.Abstractions",
-                $"{solutionName}.API.Extensions",
-                repositoryProps,
-                serviceProps));
-
-            sw.Close();
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine(ex.InnerException);
-        }
-    }
-
-    public static void AddProjectReferences(string solutionName)
-    {
-        ProcessManager.ExecuteCmdCommands([
-            $"cd {Path}\\{solutionName}\\{solutionName}.BLL",
-            "dotnet add package AutoMapper",
-            $"cd {Path}\\{solutionName}",
-            $"dotnet add {solutionName}.BLL/{solutionName}.BLL.csproj reference {solutionName}.DAL/{solutionName}.DAL.csproj",
-            $"dotnet add {solutionName}.API/{solutionName}.API.csproj reference {solutionName}.BLL/{solutionName}.BLL.csproj",
-            $"cd {Path}\\{solutionName}\\{solutionName}.API",
-            "dotnet add package Microsoft.EntityFrameworkCore.SqlServer",
-        ]);
-    }
-
-    public static void UpdateProgramClass(string solutionName)
-    {
-        try
-        {
-            var fileContent = TemplateHelper.GetTemplateContent(ProgramClassTemplatePath);
-
-            StreamWriter sw = new($"{Path}\\{solutionName}\\{solutionName}.API\\Program.cs");
-
-            sw.WriteLine(string.Format(fileContent, 
-                $"{solutionName}.API.Extensions",
-                $"{solutionName}.BLL"));
-
-            sw.Close();
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine(ex.Message);
-        }
+        return string.Format(classSettings.Template ?? string.Empty, classSettings.Namespace, classSettings.Entity?.Name, props);
     }
 }

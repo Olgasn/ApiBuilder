@@ -1,0 +1,84 @@
+{
+    "solutionFolders": [],
+    "projects": [
+        { 
+            "name": "API", 
+            "type": "webapi",
+            "directories": [
+                { 
+                    "name": "Controllers", 
+                    "parentPath": "",
+                    "contentType": "Controller"
+                },
+                { 
+                    "name": "Extensions", 
+                    "parentPath": "",
+                    "contentType": "ServiceExtensions"
+                }
+            ],
+            "dependencies": {
+                "packages": [
+                    "Microsoft.EntityFrameworkCore.Design",
+                    "Microsoft.EntityFrameworkCore.Tools"
+                ],
+                "projectReferences": ["BLL"]
+            },
+            "rootContentTypes": [ "ProgramClass" ]
+        },
+        { 
+            "name": "BLL", 
+            "type": "classlib",
+            "directories": [
+                { 
+                    "name": "Dtos", 
+                    "parentPath": "",
+                    "contentType": "DtoClass"
+                },
+                { 
+                    "name": "Services", 
+                    "parentPath": "",
+                    "contentType": "ServiceClass"
+                },
+                { 
+                    "name": "Abstractions", 
+                    "parentPath": "/Services",
+                    "contentType": "ServiceInterface"
+                }
+            ],
+            "dependencies": {
+                "packages": ["AutoMapper"],
+                "projectReferences": ["DAL"]
+            },
+            "rootContentTypes": [ "MappingProfile" ]
+        },
+        { 
+            "name": "DAL", 
+            "type": "classlib",
+            "directories": [
+                {
+                    "name": "Entities",
+                    "parentPath": "",
+                    "contentType": "EntityClass"
+                },
+                { 
+                    "name": "Repositories", 
+                    "parentPath": "",
+                    "contentType": "RepositoryClass"
+                },
+                { 
+                    "name": "Abstractions", 
+                    "parentPath": "/Repositories",
+                    "contentType": "RepositoryInterface"
+                }
+            ],
+            "dependencies": {
+                "packages": [
+                    "Microsoft.EntityFrameworkCore",
+                    "Microsoft.EntityFrameworkCore.SqlServer", 
+                    "Microsoft.EntityFrameworkCore.Relational"
+                ]
+            },
+            "rootContentTypes": [ "DbContext" ]
+        }
+    ]
+}
