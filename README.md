@@ -10,8 +10,16 @@
             "name": "API", 
             "type": "webapi",
             "directories": [
-                { "name": "Controllers", "parentPath": "" },
-                { "name": "Extensions", "parentPath": "" }
+                { 
+                    "name": "Controllers", 
+                    "parentPath": "",
+                    "contentType": "Controller"
+                },
+                { 
+                    "name": "Extensions", 
+                    "parentPath": "",
+                    "contentType": "ServiceExtensions"
+                }
             ],
             "dependencies": {
                 "packages": [
@@ -19,7 +27,8 @@
                     "Microsoft.EntityFrameworkCore.Tools"
                 ],
                 "projectReferences": ["BLL"]
-            }
+            },
+            "rootContentTypes": [ "ProgramClass" ]
         },
         { 
             "name": "BLL", 
@@ -30,13 +39,22 @@
                     "parentPath": "",
                     "contentType": "DtoClass"
                 },
-                { "name": "Services", "parentPath": "" },
-                { "name": "Abstractions", "parentPath": "/Services" }
+                { 
+                    "name": "Services", 
+                    "parentPath": "",
+                    "contentType": "ServiceClass"
+                },
+                { 
+                    "name": "Abstractions", 
+                    "parentPath": "/Services",
+                    "contentType": "ServiceInterface"
+                }
             ],
             "dependencies": {
                 "packages": ["AutoMapper"],
                 "projectReferences": ["DAL"]
-            }
+            },
+            "rootContentTypes": [ "MappingProfile" ]
         },
         { 
             "name": "DAL", 
@@ -60,10 +78,12 @@
             ],
             "dependencies": {
                 "packages": [
+                    "Microsoft.EntityFrameworkCore",
                     "Microsoft.EntityFrameworkCore.SqlServer", 
                     "Microsoft.EntityFrameworkCore.Relational"
                 ]
-            }
+            },
+            "rootContentTypes": [ "DbContext" ]
         }
     ]
 }
