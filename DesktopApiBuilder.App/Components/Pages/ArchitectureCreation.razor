@@ -2,12 +2,19 @@
 @using DesktopApiBuilder.App.Services
 @using DesktopApiBuilder.App.Data.Enums
 
-<h3>Choose an architecture</h3>
+<h3>Infrastructure settings</h3>
 
-<MudSelect @bind-Value=_selectedArc>
+<MudSelect @bind-Value=_selectedArc Label="Architecture Type" Class="mt-2">
     @foreach (var item in _arcTypes)
     {
         <MudSelectItem Value="@item"/>
+    }
+</MudSelect>
+
+<MudSelect @bind-Value=_selectedIdType Label="Id Type" Class="mt-4">
+    @foreach (var item in _idTypes)
+    {
+        <MudSelectItem Value="@item" />
     }
 </MudSelect>
 
@@ -30,7 +37,11 @@
 
 @code {
     private List<ArchitectureType> _arcTypes = new() { ArchitectureType.ThreeLayered, ArchitectureType.Clean };
+    private List<IdType> _idTypes = new() { IdType.Int, IdType.Guid };
+
     private ArchitectureType _selectedArc;
+    private IdType _selectedIdType;
+
     private string _message = string.Empty;
     private string _errorMessage = string.Empty;
     private bool _isCreateButtonDisabled;
@@ -50,6 +61,7 @@
         StateHasChanged();
 
         InMemoryUserSettings.ArchitectureType = _selectedArc;
+        InMemoryUserSettings.IdType = _selectedIdType;
 
         var task = Task.Run(() => ProjectService.CreateProjects(new SolutionSettingsModel()
         {

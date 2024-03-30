@@ -1,19 +1,17 @@
-﻿@page "/sql/{name}"
+﻿@page "/sql"
 @inject NavigationManager Navigation
 
 <MudTextField @bind-Value=_sqlServerName Required RequiredError="SQL server name is required" Placeholder="SQL server name" />
-<MudTextField @bind-Value=_dbName Placeholder=@($"Database name (default value: {Name}Db)") />
+<MudTextField @bind-Value=_dbName Placeholder=@($"Database name (default value: {InMemoryUserSettings.SolutionName}Db)") />
 <MudCheckBox @bind-Value=_applyMigration Label="Apply migration automatically"/>
 <MudButton OnClick="SetConnectionString" Variant="Variant.Outlined" Class="mt-4" Disabled="string.IsNullOrEmpty(_sqlServerName)">
-    Setup DB connection + Add migration
+    Setup DB connection + Add initial migration
 </MudButton>
 
  @code {
     private string? _sqlServerName = "DESKTOP-0SM65GV\\\\SQLEXPRESS";
     private string? _dbName;
     private bool _applyMigration;
-
-    [Parameter] public string Name { get; init; }
 
     private void SetConnectionString()
     {
@@ -22,8 +20,19 @@
             return;
         }
 
-        SqlService.SetupSqlConnection(Name, _sqlServerName, _dbName ?? $"{Name}Db");
-        SqlService.AddMigration(Name, "Initial", _applyMigration);
+        SqlService.SetupSqlConnection(new SolutionSettingsModel()
+        {
+            SolutionName = InMemoryUserSettings.SolutionName,
+            SolutionPath = InMemoryUserSettings.SolutionPath,
+            ArchitectureType = InMemoryUserSettings.ArchitectureType
+        }, _sqlServerName, _dbName ?? $"{InMemoryUserSettings.SolutionName}Db");
+
+        SqlService.AddMigration(new SolutionSettingsModel()
+        {
+            SolutionName = InMemoryUserSettings.SolutionName,
+            SolutionPath = InMemoryUserSettings.SolutionPath,
+            ArchitectureType = InMemoryUserSettings.ArchitectureType
+        }, "Initial", _applyMigration);
 
         Navigation.NavigateTo("/final");
     }

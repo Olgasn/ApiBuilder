@@ -80,5 +80,6 @@
             },
             "rootContentTypes": [ "DbContext" ]
         }
-    ]
+    ],
+    "migrationsProjectName": "DAL"
 }

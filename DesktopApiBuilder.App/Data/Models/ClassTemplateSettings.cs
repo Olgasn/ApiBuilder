@@ -12,4 +12,5 @@ public class ClassTemplateSettings
     public string? Namespace { get; set; }
     public string[] Usings { get; set; } = [];
     public DirectoryContentType ContentType { get; set; }
+    public IdType IdType { get; set; }
 }

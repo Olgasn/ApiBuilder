@@ -7,7 +7,7 @@
 <div class="d-flex flex-row mt-4 align-center">
     <MudButton OnClick="@(() => _isOverlayOpened = true)" Variant="Variant.Outlined" Disabled=_isLoading>Add entity class</MudButton>
     <MudButton OnClick="CreateClasses" Variant="Variant.Outlined" Class="ml-4" Disabled=_isLoading>Create classes</MudButton>
-    <MudButton Href=@($"/sql/{InMemoryUserSettings.SolutionName}") Variant="Variant.Outlined" Class="ml-4" Disabled=@(_isLoading || !_classesCreated)>Next</MudButton>
+    <MudButton Href="/sql" Variant="Variant.Outlined" Class="ml-4" Disabled=@(_isLoading || !_classesCreated)>Next</MudButton>
     @if (_isLoading)
     {
         <MudProgressCircular Color="Color.Default" Indeterminate Class="ml-4" Size="Size.Small" />
@@ -44,17 +44,17 @@
             <MudTextField @bind-Value=_currentEntity.PluralName Required RequiredError="Entity plural name is required" Label="Entity plural name" />
         </div>
 
-         @foreach (var item in _currentEntity.Properties)
+        @foreach (var item in _currentEntity.Properties)
         {
             <div class="d-flex flex-row">
-                <MudTextField @bind-Value=item.Name Required RequiredError="Property name is required" Placeholder="Property name" />
-                 <MudSelect @bind-Value=item.Type Required RequiredError="Property type is required" Placeholder="Property type">
+                <MudTextField @bind-Value=item.Name Required RequiredError="Property name is required" Placeholder="Property name" Disabled=@(item.Name == "Id") />
+                <MudSelect @bind-Value=item.Type Required RequiredError="Property type is required" Placeholder="Property type" Disabled=@(item.Name == "Id")>
                     @foreach (var t in DefaultEntityTypes.Types)
                     {
                         <MudSelectItem T=string Value="t"/>
                     }
                 </MudSelect>
-                 <MudButton OnClick="@(() => RemovePropertyItem(item))" Variant="Variant.Outlined" Color=Color.Error Class="mt-4 ml-4">R</MudButton>
+                <MudButton OnClick="@(() => RemovePropertyItem(item))" Variant="Variant.Outlined" Color=Color.Error Class="mt-4 ml-4" Disabled=@(item.Name == "Id")>R</MudButton>
             </div>
         }
 
@@ -82,7 +82,7 @@
             new()
             {
                 Name = "Id",
-                Type = "int"
+                Type = EnumHelper.GetIdTypeName(InMemoryUserSettings.IdType)
             }
         }
     };
@@ -128,7 +128,7 @@
                 new()
                 {
                     Name = "Id",
-                    Type = "int"
+                    Type = EnumHelper.GetIdTypeName(InMemoryUserSettings.IdType)
                 }
             }
         };
@@ -143,7 +143,8 @@
         {
             SolutionName = InMemoryUserSettings.SolutionName,
             SolutionPath = InMemoryUserSettings.SolutionPath,
-            ArchitectureType = InMemoryUserSettings.ArchitectureType
+            ArchitectureType = InMemoryUserSettings.ArchitectureType,
+            IdType = InMemoryUserSettings.IdType
         }, _entities);
 
         _isLoading = true;

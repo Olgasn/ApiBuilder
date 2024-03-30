@@ -53,7 +53,8 @@ public static class ClassService
                             ClassName = className,
                             Namespace = classNamespace,
                             Usings = GetUsings(contentType, solutionSettings.SolutionName, 
-                                $"{solutionSettings.SolutionName}.{project.Name}", config?.Projects)
+                                $"{solutionSettings.SolutionName}.{project.Name}", config?.Projects),
+                            IdType = solutionSettings.IdType
                         };
 
                         StreamWriter sw = new(filePath);
@@ -85,7 +86,8 @@ public static class ClassService
                         ClassName = className,
                         Namespace = $"{solutionSettings.SolutionName}.{project.Name}",
                         Usings = GetUsings(contentType, solutionSettings.SolutionName, 
-                            $"{solutionSettings.SolutionName}.{project.Name}", config?.Projects)
+                            $"{solutionSettings.SolutionName}.{project.Name}", config?.Projects),
+                        IdType = solutionSettings.IdType
                     };
 
                     StreamWriter sw = new(filePath);
@@ -117,7 +119,7 @@ public static class ClassService
                     classSettings.Usings[0], 
                     classSettings.Namespace, 
                     classSettings.Entity?.Name, 
-                    "int");
+                    EnumHelper.GetIdTypeName(classSettings.IdType));
             case DirectoryContentType.RepositoryClass:
                 return string.Format(
                     classSettings.Template ?? string.Empty,
@@ -126,14 +128,14 @@ public static class ClassService
                     classSettings.Namespace,
                     classSettings.Entity?.Name,
                     classSettings.Entity?.PluralName,
-                    "int");
+                    EnumHelper.GetIdTypeName(classSettings.IdType));
             case DirectoryContentType.ServiceInterface:
                 return string.Format(
                     classSettings.Template ?? string.Empty,
                     classSettings.Usings[0],
                     classSettings.Namespace,
                     classSettings.Entity?.Name,
-                    "int");
+                    EnumHelper.GetIdTypeName(classSettings.IdType));
             case DirectoryContentType.ServiceClass:
                 return string.Format(
                     classSettings.Template ?? string.Empty,
@@ -143,7 +145,7 @@ public static class ClassService
                     classSettings.Usings[3],
                     classSettings.Namespace,
                     classSettings.Entity?.Name,
-                    "int");
+                    EnumHelper.GetIdTypeName(classSettings.IdType));
             case DirectoryContentType.Controller:
                 return string.Format(
                     classSettings.Template ?? string.Empty,
@@ -153,7 +155,7 @@ public static class ClassService
                     $"{classSettings.Entity?.PluralName[..1].ToLower()}{classSettings.Entity?.PluralName[1..]}", 
                     classSettings.Entity?.Name,
                     $"{classSettings.Entity?.Name[..1].ToLower()}{classSettings.Entity?.Name[1..]}",
-                    "int");
+                    EnumHelper.GetIdTypeName(classSettings.IdType));
             case DirectoryContentType.DbContext:
                 foreach (var entity in classSettings.Entities ?? [])
                 {

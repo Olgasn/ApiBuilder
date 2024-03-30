@@ -9,4 +9,7 @@ public class SolutionConfig
 
     [JsonPropertyName("projects")]
     public IEnumerable<ProjectConfig>? Projects { get; set; }
+
+    [JsonPropertyName("migrationsProjectName")]
+    public string? MigrationsProjectName { get; set; }
 }
