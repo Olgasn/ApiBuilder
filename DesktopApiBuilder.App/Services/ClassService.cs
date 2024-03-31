@@ -52,8 +52,7 @@ public static class ClassService
                             Template = fileContent,
                             ClassName = className,
                             Namespace = classNamespace,
-                            Usings = GetUsings(contentType, solutionSettings.SolutionName, 
-                                $"{solutionSettings.SolutionName}.{project.Name}", config?.Projects),
+                            Usings = GetUsings(contentType, solutionSettings.SolutionName, config?.Projects),
                             IdType = solutionSettings.IdType
                         };
 
@@ -85,8 +84,7 @@ public static class ClassService
                         Template = fileContent,
                         ClassName = className,
                         Namespace = $"{solutionSettings.SolutionName}.{project.Name}",
-                        Usings = GetUsings(contentType, solutionSettings.SolutionName, 
-                            $"{solutionSettings.SolutionName}.{project.Name}", config?.Projects),
+                        Usings = GetUsings(contentType, solutionSettings.SolutionName, config?.Projects),
                         IdType = solutionSettings.IdType
                     };
 
@@ -204,10 +202,10 @@ public static class ClassService
         return string.Empty;
     }
 
-    private static string GetClassName(string entityName, DirectoryContentType contentType) =>
+    private static string GetClassName(string? entityName, DirectoryContentType contentType) =>
         _ = contentType switch
         {
-            DirectoryContentType.EntityClass => entityName,
+            DirectoryContentType.EntityClass => entityName ?? string.Empty,
             DirectoryContentType.RepositoryClass => $"{entityName}Repository",
             DirectoryContentType.RepositoryInterface => $"I{entityName}Repository",
             DirectoryContentType.DbContext => "AppDbContext",
@@ -228,8 +226,7 @@ public static class ClassService
             : $"{projectFullName}.{directory.ParentPath.Trim('/')}.{directory.Name}";
     }
 
-    private static string[] GetUsings(DirectoryContentType contentType, string solutionName,
-        string projectFullName, IEnumerable<ProjectConfig>? projects)
+    private static string[] GetUsings(DirectoryContentType contentType, string solutionName, IEnumerable<ProjectConfig>? projects)
     {
         var directories = projects?.SelectMany(p => p.Directories ?? []);
 
@@ -241,47 +238,47 @@ public static class ClassService
         switch (contentType)
         {
             case DirectoryContentType.RepositoryInterface:
-                return [GetClassNamespace(projectFullName, entitiesDir)];
+                return [GetSpecificUsing(solutionName, projects, entitiesDir)];
             case DirectoryContentType.RepositoryClass:
                 return [
-                    GetClassNamespace(projectFullName, entitiesDir),
-                    GetClassNamespace(projectFullName, repoInterfacesDir),
+                    GetSpecificUsing(solutionName, projects, entitiesDir),
+                    GetSpecificUsing(solutionName, projects, repoInterfacesDir),
                 ];
             case DirectoryContentType.ServiceInterface:
-                return [GetClassNamespace(projectFullName, dtosDir)];
+                return [GetSpecificUsing(solutionName, projects, dtosDir)];
             case DirectoryContentType.ServiceClass:
                 return [
-                    GetClassNamespace($"{solutionName}.{projects?.FirstOrDefault(p => (p.Directories ?? []).Any(d => d.ContentType == entitiesDir?.ContentType))?.Name}", entitiesDir),
-                    GetClassNamespace(projectFullName, dtosDir),
-                    GetClassNamespace($"{solutionName}.{projects?.FirstOrDefault(p => (p.Directories ?? []).Any(d => d.ContentType == repoInterfacesDir?.ContentType))?.Name}", repoInterfacesDir),
-                    GetClassNamespace(projectFullName, serviceInterfacesDir)
+                    GetSpecificUsing(solutionName, projects, entitiesDir),
+                    GetSpecificUsing(solutionName, projects, dtosDir),
+                    GetSpecificUsing(solutionName, projects, repoInterfacesDir),
+                    GetSpecificUsing(solutionName, projects, serviceInterfacesDir)
                 ];
             case DirectoryContentType.Controller:
                 return [
-                    GetClassNamespace($"{solutionName}.{projects?.FirstOrDefault(p => (p.Directories ?? []).Any(d => d.ContentType == dtosDir?.ContentType))?.Name}", dtosDir),
-                    GetClassNamespace($"{solutionName}.{projects?.FirstOrDefault(p => (p.Directories ?? []).Any(d => d.ContentType == serviceInterfacesDir?.ContentType))?.Name}", serviceInterfacesDir)
+                    GetSpecificUsing(solutionName, projects, dtosDir),
+                    GetSpecificUsing(solutionName, projects, serviceInterfacesDir)
                 ];
             case DirectoryContentType.DbContext:
-                return [GetClassNamespace(projectFullName, entitiesDir)];
+                return [GetSpecificUsing(solutionName, projects, entitiesDir)];
             case DirectoryContentType.MappingProfile:
                 return [
-                    GetClassNamespace($"{solutionName}.{projects?.FirstOrDefault(p => (p.Directories ?? []).Any(d => d.ContentType == entitiesDir?.ContentType))?.Name}", entitiesDir),
-                    GetClassNamespace(projectFullName, dtosDir)
+                    GetSpecificUsing(solutionName, projects, entitiesDir),
+                    GetSpecificUsing(solutionName, projects, dtosDir)
                 ];
             case DirectoryContentType.ServiceExtensions:
                 var repoDir = directories?.FirstOrDefault(d => d.ContentType == DirectoryContentType.RepositoryClass.ToString());
                 var serviceDir = directories?.FirstOrDefault(d => d.ContentType == DirectoryContentType.ServiceClass.ToString());
                 return [
                     $"{solutionName}.{projects?.FirstOrDefault(p => (p.Directories ?? []).Any(d => d.ContentType == entitiesDir?.ContentType))?.Name}",
-                    GetClassNamespace($"{solutionName}.{projects?.FirstOrDefault(p => (p.Directories ?? []).Any(d => d.ContentType == repoDir?.ContentType))?.Name}", repoDir),
-                    GetClassNamespace($"{solutionName}.{projects?.FirstOrDefault(p => (p.Directories ?? []).Any(d => d.ContentType == repoInterfacesDir?.ContentType))?.Name}", repoInterfacesDir),
-                    GetClassNamespace($"{solutionName}.{projects?.FirstOrDefault(p => (p.Directories ?? []).Any(d => d.ContentType == serviceDir?.ContentType))?.Name}", serviceDir),
-                    GetClassNamespace($"{solutionName}.{projects?.FirstOrDefault(p => (p.Directories ?? []).Any(d => d.ContentType == serviceInterfacesDir?.ContentType))?.Name}", serviceInterfacesDir)
+                    GetSpecificUsing(solutionName, projects, repoDir),
+                    GetSpecificUsing(solutionName, projects, repoInterfacesDir),
+                    GetSpecificUsing(solutionName, projects, serviceDir),
+                    GetSpecificUsing(solutionName, projects, serviceInterfacesDir)
                 ];
             case DirectoryContentType.ProgramClass:
                 var extensionsDir = directories?.FirstOrDefault(d => d.ContentType == DirectoryContentType.ServiceExtensions.ToString());
                 return [
-                    GetClassNamespace(projectFullName, extensionsDir),
+                    GetSpecificUsing(solutionName, projects, extensionsDir),
                     $"{solutionName}.{projects?.FirstOrDefault(p => (p.Directories ?? []).Any(d => d.ContentType == dtosDir?.ContentType))?.Name}"
                 ];
         }
@@ -299,4 +296,7 @@ public static class ClassService
 
         return string.Format(classSettings.Template ?? string.Empty, classSettings.Namespace, classSettings.Entity?.Name, props);
     }
+
+    private static string GetSpecificUsing(string solutionName, IEnumerable<ProjectConfig>? projects, DirectoryConfig? directory) =>
+        GetClassNamespace($"{solutionName}.{projects?.FirstOrDefault(p => (p.Directories ?? []).Any(d => d.ContentType == directory?.ContentType))?.Name}", directory);
 }

@@ -21,7 +21,7 @@
                     "Microsoft.EntityFrameworkCore.Design",
                     "Microsoft.EntityFrameworkCore.Tools"
                 ],
-                "projectReferences": ["BLL"]
+                "projectReferences": [ "BLL" ]
             },
             "rootContentTypes": [ "ProgramClass" ]
         },
@@ -47,7 +47,7 @@
             ],
             "dependencies": {
                 "packages": ["AutoMapper"],
-                "projectReferences": ["DAL"]
+                "projectReferences": [ "DAL" ]
             },
             "rootContentTypes": [ "MappingProfile" ]
         },

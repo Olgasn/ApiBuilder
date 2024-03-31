@@ -26,8 +26,19 @@
             "name": "Infrastructure", 
             "type": "classlib",
             "directories": [
-                { "name": "Repositories", "parentPath": "" }
+                { 
+                    "name": "Repositories", 
+                    "parentPath": "",
+                    "contentType": "RepositoryClass"
+                }
             ],
+            "dependencies": {
+                "packages": [
+                    "Microsoft.EntityFrameworkCore"
+                ],
+                "projectReferences": [ "Domain" ]
+            },
+            "rootContentTypes": [ "DbContext" ],
             "solutionFolderId": 2
         },
         { 
@@ -55,8 +66,16 @@
             "name": "Domain", 
             "type": "classlib",
             "directories": [
-                { "name": "Entities", "parentPath": "" },
-                { "name": "Abstractions", "parentPath": "/Repositories" }
+                { 
+                    "name": "Entities", 
+                    "parentPath": "",
+                    "contentType": "EntityClass"
+                },
+                { 
+                    "name": "Abstractions", 
+                    "parentPath": "",
+                    "contentType": "RepositoryInterface"
+                }
             ],
             "solutionFolderId": 1
         }
