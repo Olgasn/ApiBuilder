@@ -5,9 +5,9 @@
 <h3>Domain Definition</h3>
 
 <div class="d-flex flex-row mt-4 align-center">
-    <MudButton OnClick="@(() => _isOverlayOpened = true)" Variant="Variant.Outlined" Disabled=_isLoading>Add entity class</MudButton>
-    <MudButton OnClick="CreateClasses" Variant="Variant.Outlined" Class="ml-4" Disabled=_isLoading>Create classes</MudButton>
-    <MudButton Href=@($"/sql/{InMemoryUserSettings.SolutionName}") Variant="Variant.Outlined" Class="ml-4" Disabled=@(_isLoading || !_classesCreated)>Next</MudButton>
+    <MudButton OnClick="@(() => _isOverlayOpened = true)" Variant="Variant.Outlined" Disabled=@(_isLoading || _classesCreated)>Add entity class</MudButton>
+    <MudButton OnClick="CreateClasses" Variant="Variant.Outlined" Class="ml-4" Disabled=@(_isLoading || _classesCreated)>Create classes</MudButton>
+    <MudButton Href="/sql" Variant="Variant.Outlined" Class="ml-4" Disabled=@(_isLoading || !_classesCreated)>Next</MudButton>
     @if (_isLoading)
     {
         <MudProgressCircular Color="Color.Default" Indeterminate Class="ml-4" Size="Size.Small" />
@@ -19,9 +19,13 @@
 <MudTable Items="_entities" Breakpoint="Breakpoint.None">
     <HeaderContent>
         <MudTh>Entity name</MudTh>
+        <MudTh></MudTh>
     </HeaderContent>
     <RowTemplate>
-        <MudTd>@context.Name</MudTd>
+        <MudTd>@context.Name (@context.PluralName)</MudTd>
+        <MudTd>
+            <MudButton OnClick="@(() => OpenEditEntityOverlay(context.Name))" Variant="Variant.Outlined" Disabled=@(_isLoading || _classesCreated)>Edit</MudButton>
+        </MudTd>
     </RowTemplate>
     <ChildRowContent>
         <MudTable Items="@context.Properties" Breakpoint="Breakpoint.None" Context="propsContext" Dense>
@@ -44,48 +48,49 @@
             <MudTextField @bind-Value=_currentEntity.PluralName Required RequiredError="Entity plural name is required" Label="Entity plural name" />
         </div>
 
-         @foreach (var item in _currentEntity.Properties)
+        @foreach (var item in _currentEntity.Properties)
         {
             <div class="d-flex flex-row">
-                <MudTextField @bind-Value=item.Name Required RequiredError="Property name is required" Placeholder="Property name" />
-                 <MudSelect @bind-Value=item.Type Required RequiredError="Property type is required" Placeholder="Property type">
+                <MudTextField @bind-Value=item.Name Required RequiredError="Property name is required" Placeholder="Property name" Disabled=@(item.Name == "Id") />
+                <MudSelect @bind-Value=item.Type Required RequiredError="Property type is required" Placeholder="Property type" Disabled=@(item.Name == "Id")>
                     @foreach (var t in DefaultEntityTypes.Types)
                     {
                         <MudSelectItem T=string Value="t"/>
                     }
                 </MudSelect>
-                 <MudButton OnClick="@(() => RemovePropertyItem(item))" Variant="Variant.Outlined" Color=Color.Error Class="mt-4 ml-4">R</MudButton>
+                <MudButton OnClick="@(() => RemovePropertyItem(item))" Variant="Variant.Outlined" Color=Color.Error Class="mt-4 ml-4" Disabled=@(item.Name == "Id")>R</MudButton>
             </div>
         }
 
         <div class="d-flex flex-row">
              <MudButton OnClick=AddEmptyProperty Variant="Variant.Outlined" Class="mt-4">Add property</MudButton>
-             <MudButton OnClick="@(() => _isOverlayOpened = false)" Variant="Variant.Outlined" Class="mt-4 ml-4">Close</MudButton>
+             <MudButton OnClick=CloseEntityOverlay Variant="Variant.Outlined" Class="mt-4 ml-4">Close</MudButton>
         </div>
 
-        <MudButton OnClick=AddEntity Variant="Variant.Outlined" Class="mt-4">Add entity</MudButton>
+        @if (_editEntity)
+        {
+            <MudButton OnClick=EditEntity Variant="Variant.Outlined" Class="mt-4">Edit entity</MudButton>
+        }
+        else
+        {
+            <MudButton OnClick=AddEntity Variant="Variant.Outlined" Class="mt-4">Add entity</MudButton>
+        }
+
+        <MudText Color="Color.Error" Class="mt-4">@_entityErrorMessage</MudText>
     </div>
 </MudOverlay>
 
 @code {
     private string _message = string.Empty;
+    private string _entityErrorMessage = string.Empty;
+
     private bool _isLoading;
     private bool _isOverlayOpened;
     private bool _classesCreated;
+    private bool _editEntity;
 
-    private EntityClassViewModel _currentEntity = new EntityClassViewModel
-    {
-        Name = string.Empty,
-        PluralName = string.Empty,
-        Properties = new List<EntityPropViewModel>()
-        {
-            new()
-            {
-                Name = "Id",
-                Type = "int"
-            }
-        }
-    };
+    private EntityClassViewModel _currentEntity = GetResetedEntity();
+    private string _editingEntityName = string.Empty;
 
     private List<EntityClassViewModel> _entities = new();
 
@@ -105,6 +110,12 @@
 
     private void AddEntity()
     {
+        if (_entities.FirstOrDefault(e => (e.Name ?? string.Empty).Equals(_currentEntity.Name)) is not null)
+        {
+            _entityErrorMessage = $"Entity with name \"{_currentEntity.Name}\" is already exists.";
+            return;
+        }
+
         var result = Mapper.EntityPropsToDict(_currentEntity.Properties);
 
         if (!string.IsNullOrEmpty(result.ErrorMessage))
@@ -119,21 +130,41 @@
             Properties = _currentEntity.Properties
         });
 
-        _currentEntity = new EntityClassViewModel
-        {
-            Name = string.Empty,
-            PluralName = string.Empty,
-            Properties = new List<EntityPropViewModel>()
-            {
-                new()
-                {
-                    Name = "Id",
-                    Type = "int"
-                }
-            }
-        };
+        CloseEntityOverlay();
 
+        StateHasChanged();
+    }
+
+    private void EditEntity()
+    {
+        var entity = _entities.First(e => (e.Name ?? string.Empty).Equals(_editingEntityName));
+        var curEntity = (EntityClassViewModel)_currentEntity.Clone();
+
+        entity.Name = curEntity.Name;
+        entity.PluralName = curEntity.PluralName;
+        entity.Properties = curEntity.Properties;
+
+        CloseEntityOverlay();
+    }
+
+    private void OpenEditEntityOverlay(string? entityName)
+    {
+        var curEntity = _entities.First(e => (e.Name ?? string.Empty).Equals(entityName));
+        _currentEntity = (EntityClassViewModel)curEntity.Clone();
+        _editingEntityName = curEntity.Name ?? string.Empty;
+
+        _editEntity = true;
+        _isOverlayOpened = true;
+
+        StateHasChanged();
+    }
+
+    private void CloseEntityOverlay()
+    {
+        _currentEntity = GetResetedEntity();
+        _editEntity = false;
         _isOverlayOpened = false;
+
         StateHasChanged();
     }
 
@@ -143,7 +174,8 @@
         {
             SolutionName = InMemoryUserSettings.SolutionName,
             SolutionPath = InMemoryUserSettings.SolutionPath,
-            ArchitectureType = InMemoryUserSettings.ArchitectureType
+            ArchitectureType = InMemoryUserSettings.ArchitectureType,
+            IdType = InMemoryUserSettings.IdType
         }, _entities);
 
         _isLoading = true;
@@ -156,5 +188,22 @@
 
         _classesCreated = true;
         _message = $"Classes for solution \"{InMemoryUserSettings.SolutionName}\" were succesfully created!";
+    }
+
+    private static EntityClassViewModel GetResetedEntity()
+    {
+        return new EntityClassViewModel
+        {
+            Name = string.Empty,
+            PluralName = string.Empty,
+            Properties = new List<EntityPropViewModel>()
+            {
+                new()
+                {
+                    Name = "Id",
+                    Type = EnumHelper.GetIdTypeName(InMemoryUserSettings.IdType)
+                }
+            }
+        };
     }
 }
