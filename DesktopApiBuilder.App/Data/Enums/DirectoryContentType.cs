@@ -22,6 +22,9 @@ public enum DirectoryContentType
     // CQRS
     GetAllQuery,
     GetByIdQuery,
+    CreateCommand,
+    UpdateCommand,
+    DeleteCommand,
 
     Undefined
 }

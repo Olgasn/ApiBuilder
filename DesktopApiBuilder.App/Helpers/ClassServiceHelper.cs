@@ -22,6 +22,9 @@ public static class ClassServiceHelper
             DirectoryContentType.ServiceExtensions => "ServiceExtensions",
             DirectoryContentType.GetAllQuery => $"GetAll{entity?.PluralName}Query",
             DirectoryContentType.GetByIdQuery => $"Get{entity?.Name}ByIdQuery",
+            DirectoryContentType.CreateCommand => $"Create{entity?.Name}Command",
+            DirectoryContentType.UpdateCommand => $"Update{entity?.Name}Command",
+            DirectoryContentType.DeleteCommand => $"Delete{entity?.Name}Command",
             _ => throw new NotImplementedException(),
         };
 
@@ -90,6 +93,10 @@ public static class ClassServiceHelper
             case DirectoryContentType.GetAllQuery:
                 return [GetSpecificUsing(solutionName, projects, entitiesDir)];
             case DirectoryContentType.GetByIdQuery:
+                return [GetSpecificUsing(solutionName, projects, entitiesDir)];
+            case DirectoryContentType.CreateCommand:
+                return [GetSpecificUsing(solutionName, projects, entitiesDir)];
+            case DirectoryContentType.UpdateCommand:
                 return [GetSpecificUsing(solutionName, projects, entitiesDir)];
                 // example
                 //var queriesDir = directories?.FirstOrDefault(d => (d.ContentTypeList ?? []).Contains(DirectoryContentType.GetAllQuery.ToString()));

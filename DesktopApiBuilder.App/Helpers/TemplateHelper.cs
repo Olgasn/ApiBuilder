@@ -60,6 +60,9 @@ public static class TemplateHelper
             DirectoryContentType.ServiceExtensions => TemplatePaths.ServiceExtensionsTemplatePath,
             DirectoryContentType.GetAllQuery => TemplatePaths.GetAllQueryTemplatePath,
             DirectoryContentType.GetByIdQuery => TemplatePaths.GetByIdQueryTemplatePath,
+            DirectoryContentType.CreateCommand => TemplatePaths.CreateCommandTemplatePath,
+            DirectoryContentType.UpdateCommand => TemplatePaths.UpdateCommandTemplatePath,
+            DirectoryContentType.DeleteCommand => TemplatePaths.DeleteCommandTemplatePath,
             _ => throw new NotImplementedException(),
         };
 }

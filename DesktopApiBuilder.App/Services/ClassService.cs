@@ -187,6 +187,24 @@ public static class ClassService
                     classSettings.Namespace,
                     classSettings.Entity?.Name,
                     EnumHelper.GetIdTypeName(classSettings.IdType));
+            case DirectoryContentType.CreateCommand:
+                return string.Format(
+                    classSettings.Template ?? string.Empty,
+                    classSettings.Usings[0],
+                    classSettings.Namespace,
+                    classSettings.Entity?.Name);
+            case DirectoryContentType.UpdateCommand:
+                return string.Format(
+                    classSettings.Template ?? string.Empty,
+                    classSettings.Usings[0],
+                    classSettings.Namespace,
+                    classSettings.Entity?.Name);
+            case DirectoryContentType.DeleteCommand:
+                return string.Format(
+                    classSettings.Template ?? string.Empty,
+                    classSettings.Namespace,
+                    classSettings.Entity?.Name,
+                    EnumHelper.GetIdTypeName(classSettings.IdType));
         }
 
         return string.Empty;
