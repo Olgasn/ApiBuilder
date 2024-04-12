@@ -25,6 +25,11 @@ public enum DirectoryContentType
     CreateCommand,
     UpdateCommand,
     DeleteCommand,
+    GetAllQueryHandler,
+    GetByIdQueryHandler,
+    CreateCommandHandler,
+    UpdateCommandHandler,
+    DeleteCommandHandler,
 
     Undefined
 }

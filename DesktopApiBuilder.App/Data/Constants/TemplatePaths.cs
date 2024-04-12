@@ -26,4 +26,10 @@ public static class TemplatePaths
     public const string CreateCommandTemplatePath = "wwwroot\\templates\\cqrs\\CreateCommandTemplate.txt";
     public const string UpdateCommandTemplatePath = "wwwroot\\templates\\cqrs\\UpdateCommandTemplate.txt";
     public const string DeleteCommandTemplatePath = "wwwroot\\templates\\cqrs\\DeleteCommandTemplate.txt";
+
+    public const string GetAllQueryHandlerTemplatePath = "wwwroot\\templates\\cqrs\\GetAllQueryHandlerTemplate.txt";
+    public const string GetByIdQueryHandlerTemplatePath = "wwwroot\\templates\\cqrs\\GetByIdQueryHandlerTemplate.txt";
+    public const string CreateCommandHandlerTemplatePath = "wwwroot\\templates\\cqrs\\CreateCommandHandlerTemplate.txt";
+    public const string UpdateCommandHandlerTemplatePath = "wwwroot\\templates\\cqrs\\UpdateCommandHandlerTemplate.txt";
+    public const string DeleteCommandHandlerTemplatePath = "wwwroot\\templates\\cqrs\\DeleteCommandHandlerTemplate.txt";
 }

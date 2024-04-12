@@ -63,6 +63,11 @@ public static class TemplateHelper
             DirectoryContentType.CreateCommand => TemplatePaths.CreateCommandTemplatePath,
             DirectoryContentType.UpdateCommand => TemplatePaths.UpdateCommandTemplatePath,
             DirectoryContentType.DeleteCommand => TemplatePaths.DeleteCommandTemplatePath,
+            DirectoryContentType.GetAllQueryHandler => TemplatePaths.GetAllQueryHandlerTemplatePath,
+            DirectoryContentType.GetByIdQueryHandler => TemplatePaths.GetByIdQueryHandlerTemplatePath,
+            DirectoryContentType.CreateCommandHandler => TemplatePaths.CreateCommandHandlerTemplatePath,
+            DirectoryContentType.UpdateCommandHandler => TemplatePaths.UpdateCommandHandlerTemplatePath,
+            DirectoryContentType.DeleteCommandHandler => TemplatePaths.DeleteCommandHandlerTemplatePath,
             _ => throw new NotImplementedException(),
         };
 }

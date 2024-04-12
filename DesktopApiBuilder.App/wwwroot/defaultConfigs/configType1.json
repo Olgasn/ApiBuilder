@@ -63,8 +63,16 @@
                     "parentPath": "/Requests",
                     "contentTypeList": [ "CreateCommand", "UpdateCommand", "DeleteCommand" ]
                 },
-                { "name": "QueryHandlers", "parentPath": "/RequestHandlers" },
-                { "name": "CommandHandlers", "parentPath": "/RequestHandlers" }
+                { 
+                    "name": "QueryHandlers", 
+                    "parentPath": "/RequestHandlers",
+                    "contentTypeList": [ "GetAllQueryHandler", "GetByIdQueryHandler" ]
+                },
+                { 
+                    "name": "CommandHandlers", 
+                    "parentPath": "/RequestHandlers",
+                    "contentTypeList": [ "CreateCommandHandler", "UpdateCommandHandler", "DeleteCommandHandler" ] 
+                }
             ],
             "dependencies": {
                 "packages": [ "MediatR" ],

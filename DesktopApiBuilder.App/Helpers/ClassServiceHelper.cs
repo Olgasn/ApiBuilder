@@ -20,11 +20,16 @@ public static class ClassServiceHelper
             DirectoryContentType.ProgramClass => "Program",
             DirectoryContentType.Controller => $"{entity?.Name}Controller",
             DirectoryContentType.ServiceExtensions => "ServiceExtensions",
-            DirectoryContentType.GetAllQuery => $"GetAll{entity?.PluralName}Query",
+            DirectoryContentType.GetAllQuery => $"Get{entity?.PluralName}Query",
             DirectoryContentType.GetByIdQuery => $"Get{entity?.Name}ByIdQuery",
             DirectoryContentType.CreateCommand => $"Create{entity?.Name}Command",
             DirectoryContentType.UpdateCommand => $"Update{entity?.Name}Command",
             DirectoryContentType.DeleteCommand => $"Delete{entity?.Name}Command",
+            DirectoryContentType.GetAllQueryHandler => $"Get{entity?.PluralName}QueryHandler",
+            DirectoryContentType.GetByIdQueryHandler => $"Get{entity?.Name}ByIdQueryHandler",
+            DirectoryContentType.CreateCommandHandler => $"Create{entity?.Name}CommandHandler",
+            DirectoryContentType.UpdateCommandHandler => $"Update{entity?.Name}CommandHandler",
+            DirectoryContentType.DeleteCommandHandler => $"Delete{entity?.Name}CommandHandler",
             _ => throw new NotImplementedException(),
         };
 
@@ -98,9 +103,38 @@ public static class ClassServiceHelper
                 return [GetSpecificUsing(solutionName, projects, entitiesDir)];
             case DirectoryContentType.UpdateCommand:
                 return [GetSpecificUsing(solutionName, projects, entitiesDir)];
-                // example
-                //var queriesDir = directories?.FirstOrDefault(d => (d.ContentTypeList ?? []).Contains(DirectoryContentType.GetAllQuery.ToString()));
-                //return [GetSpecificUsing(solutionName, projects, queriesDir, true, DirectoryContentType.GetAllQuery)];
+            case DirectoryContentType.GetAllQueryHandler:
+                var getAllQueryDir = directories?.FirstOrDefault(d => (d.ContentTypeList ?? []).Contains(DirectoryContentType.GetAllQuery.ToString()));
+                return [
+                    GetSpecificUsing(solutionName, projects, entitiesDir),
+                    GetSpecificUsing(solutionName, projects, repoInterfacesDir),
+                    GetSpecificUsing(solutionName, projects, getAllQueryDir, true, DirectoryContentType.GetAllQuery)
+                ];
+            case DirectoryContentType.GetByIdQueryHandler:
+                var getByIdQueryDir = directories?.FirstOrDefault(d => (d.ContentTypeList ?? []).Contains(DirectoryContentType.GetByIdQuery.ToString()));
+                return [
+                    GetSpecificUsing(solutionName, projects, entitiesDir),
+                    GetSpecificUsing(solutionName, projects, repoInterfacesDir),
+                    GetSpecificUsing(solutionName, projects, getByIdQueryDir, true, DirectoryContentType.GetByIdQuery)
+                ];
+            case DirectoryContentType.CreateCommandHandler:
+                var createCommandDir = directories?.FirstOrDefault(d => (d.ContentTypeList ?? []).Contains(DirectoryContentType.CreateCommand.ToString()));
+                return [
+                    GetSpecificUsing(solutionName, projects, repoInterfacesDir),
+                    GetSpecificUsing(solutionName, projects, createCommandDir, true, DirectoryContentType.CreateCommand)
+                ];
+            case DirectoryContentType.UpdateCommandHandler:
+                var updateCommandDir = directories?.FirstOrDefault(d => (d.ContentTypeList ?? []).Contains(DirectoryContentType.UpdateCommand.ToString()));
+                return [
+                    GetSpecificUsing(solutionName, projects, repoInterfacesDir),
+                    GetSpecificUsing(solutionName, projects, updateCommandDir, true, DirectoryContentType.UpdateCommand)
+                ];
+            case DirectoryContentType.DeleteCommandHandler:
+                var deleteCommandDir = directories?.FirstOrDefault(d => (d.ContentTypeList ?? []).Contains(DirectoryContentType.DeleteCommand.ToString()));
+                return [
+                    GetSpecificUsing(solutionName, projects, repoInterfacesDir),
+                    GetSpecificUsing(solutionName, projects, deleteCommandDir, true, DirectoryContentType.DeleteCommand)
+                ];
         }
 
         return [];

@@ -1,0 +1,13 @@
+﻿﻿using MediatR;
+using {0};
+using {1};
+
+namespace {2};
+
+public class Create{3}CommandHandler(I{3}Repository repository) : IRequestHandler<Create{3}Command>
+{{
+	private readonly I{3}Repository _repository = repository;
+
+	public async Task Handle(Create{3}Command request,
+        CancellationToken cancellationToken) => await _repository.Create(request.{3});
+}}

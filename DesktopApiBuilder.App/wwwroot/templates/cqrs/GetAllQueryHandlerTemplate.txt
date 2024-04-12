@@ -1,0 +1,14 @@
+﻿﻿using MediatR;
+using {0};
+using {1};
+using {2};
+
+namespace {3};
+
+public class Get{4}QueryHandler(I{5}Repository repository) : IRequestHandler<Get{4}Query, IEnumerable<{5}>>
+{{
+	private readonly I{5}Repository _repository = repository;
+
+	public async Task<IEnumerable<{5}>> Handle(Get{4}Query request,
+        CancellationToken cancellationToken) => await _repository.Get(trackChanges: false);
+}}

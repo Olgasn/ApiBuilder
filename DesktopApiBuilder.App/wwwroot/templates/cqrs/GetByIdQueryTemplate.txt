@@ -3,4 +3,4 @@ using {0};
 
 namespace {1};
 
-public record Get{2}ByIdQuery({3} Id) : IRequest<{2}>;
+public record Get{2}ByIdQuery({3} Id) : IRequest<{2}?>;

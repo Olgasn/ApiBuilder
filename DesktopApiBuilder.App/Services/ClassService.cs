@@ -13,6 +13,7 @@ public static class ClassService
     private const string DbSetTemplate = "\r\n\tpublic DbSet<{0}> {1} {{ get; set; }}";
 
     private const string MappingItemTemplate = "\r\n\t\tCreateMap<{0}, {0}Dto>().ReverseMap();";
+    private const string CQRSMapEntityPropTemplate = "\r\n\t\tentity.{0} = request.{1}.{0};";
 
     private const string RepositoryRegTemplate = "\r\n\t\tservices.AddScoped<I{0}Repository, {0}Repository>();";
     private const string ServiceRegTemplate = "\r\n\t\tservices.AddScoped<I{0}Service, {0}Service>();";
@@ -126,9 +127,9 @@ public static class ClassService
                     classSettings.Usings[0],
                     classSettings.Usings[1],
                     classSettings.Namespace,
-                    $"{classSettings.Entity?.PluralName[..1].ToLower()}{classSettings.Entity?.PluralName[1..]}", 
+                    $"{classSettings.Entity?.PluralName?[..1].ToLower()}{classSettings.Entity?.PluralName?[1..]}", 
                     classSettings.Entity?.Name,
-                    $"{classSettings.Entity?.Name[..1].ToLower()}{classSettings.Entity?.Name[1..]}",
+                    $"{classSettings.Entity?.Name?[..1].ToLower()}{classSettings.Entity?.Name?[1..]}",
                     EnumHelper.GetIdTypeName(classSettings.IdType));
             case DirectoryContentType.DbContext:
                 foreach (var entity in classSettings.Entities ?? [])
@@ -205,6 +206,50 @@ public static class ClassService
                     classSettings.Namespace,
                     classSettings.Entity?.Name,
                     EnumHelper.GetIdTypeName(classSettings.IdType));
+            case DirectoryContentType.GetAllQueryHandler:
+                return string.Format(
+                    classSettings.Template ?? string.Empty,
+                    classSettings.Usings[0],
+                    classSettings.Usings[1],
+                    classSettings.Usings[2],
+                    classSettings.Namespace,
+                    classSettings.Entity?.PluralName,
+                    classSettings.Entity?.Name);
+            case DirectoryContentType.GetByIdQueryHandler:
+                return string.Format(
+                    classSettings.Template ?? string.Empty,
+                    classSettings.Usings[0],
+                    classSettings.Usings[1],
+                    classSettings.Usings[2],
+                    classSettings.Namespace,
+                    classSettings.Entity?.Name);
+            case DirectoryContentType.CreateCommandHandler:
+                return string.Format(
+                    classSettings.Template ?? string.Empty,
+                    classSettings.Usings[0],
+                    classSettings.Usings[1],
+                    classSettings.Namespace,
+                    classSettings.Entity?.Name);
+            case DirectoryContentType.UpdateCommandHandler:
+                foreach (var propName in (classSettings.Entity?.Properties ?? []).Select(p => p.Name))
+                {
+                    if (propName.Equals("Id")) continue;
+                    props.Append(string.Format(CQRSMapEntityPropTemplate, propName, classSettings.Entity?.Name));
+                }
+                return string.Format(
+                    classSettings.Template ?? string.Empty,
+                    classSettings.Usings[0],
+                    classSettings.Usings[1],
+                    classSettings.Namespace,
+                    classSettings.Entity?.Name,
+                    props);
+            case DirectoryContentType.DeleteCommandHandler:
+                return string.Format(
+                    classSettings.Template ?? string.Empty,
+                    classSettings.Usings[0],
+                    classSettings.Usings[1],
+                    classSettings.Namespace,
+                    classSettings.Entity?.Name);
         }
 
         return string.Empty;
