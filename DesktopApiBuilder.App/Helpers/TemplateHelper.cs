@@ -58,6 +58,7 @@ public static class TemplateHelper
             DirectoryContentType.ProgramClass => TemplatePaths.ProgramClassTemplatePath,
             DirectoryContentType.Controller => TemplatePaths.ControllerTemplatePath,
             DirectoryContentType.ServiceExtensions => TemplatePaths.ServiceExtensionsTemplatePath,
+            DirectoryContentType.GetAllQuery => TemplatePaths.GetAllQueryTemplatePath,
             _ => throw new NotImplementedException(),
         };
 }

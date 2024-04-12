@@ -33,9 +33,7 @@
                 }
             ],
             "dependencies": {
-                "packages": [
-                    "Microsoft.EntityFrameworkCore"
-                ],
+                "packages": [ "Microsoft.EntityFrameworkCore" ],
                 "projectReferences": [ "Domain" ]
             },
             "rootContentTypes": [ "DbContext" ],
@@ -55,11 +53,19 @@
             "directories": [
                 { "name": "Requests", "parentPath": "" },
                 { "name": "RequestHandlers", "parentPath": "" },
-                { "name": "Queries", "parentPath": "/Requests" },
+                { 
+                    "name": "Queries", 
+                    "parentPath": "/Requests",
+                    "contentTypeList": [ "GetAllQuery" ]
+                },
                 { "name": "Commands", "parentPath": "/Requests" },
                 { "name": "QueryHandlers", "parentPath": "/RequestHandlers" },
                 { "name": "CommandHandlers", "parentPath": "/RequestHandlers" }
             ],
+            "dependencies": {
+                "packages": [ "MediatR" ],
+                "projectReferences": [ "Domain" ]
+            },
             "solutionFolderId": 1
         },
         { 

@@ -12,4 +12,7 @@ public class DirectoryConfig
 
     [JsonPropertyName("contentType")]
     public string? ContentType { get; set; }
+
+    [JsonPropertyName("contentTypeList")]
+    public string[]? ContentTypeList { get; set; }
 }

@@ -29,52 +29,28 @@ public static class ClassService
 
                 foreach (var directory in project.Directories ?? [])
                 {
-                    if (string.IsNullOrEmpty(directory.ContentType) 
-                        || !Enum.TryParse(typeof(DirectoryContentType), directory.ContentType, out object? contentTypeObj))
+                    foreach (var contentTypeListItem in directory.ContentTypeList ?? [])
                     {
-                        continue;
+                        var contentTypeItem = EnumHelper.GetContentTypeFromString(contentTypeListItem);
+                        if (contentTypeItem == DirectoryContentType.Undefined) continue;
+
+                        CreateClassesRelatedToEntities(solutionSettings, entities, contentTypeItem, config, project, directory);
                     }
 
-                    var contentType = (DirectoryContentType)contentTypeObj;
-                    var fileContent = TemplateHelper.GetTemplateContent(contentType);
-                    var classNamespace = GetClassNamespace($"{solutionSettings.SolutionName}.{project.Name}", directory);
+                    var contentType = EnumHelper.GetContentTypeFromString(directory.ContentType);
+                    if (contentType == DirectoryContentType.Undefined) continue;
 
-                    foreach (var entity in entities)
-                    {
-                        var className = GetClassName(entity.Name, contentType);
-                        var filePath = $"{solutionSettings.SolutionPath}/{projectPath}/{solutionSettings.SolutionName}.{project.Name}{directory.ParentPath}/{directory.Name}/{className}.cs";
-
-                        var classSettings = new ClassTemplateSettings()
-                        {
-                            Entity = entity,
-                            Entities = contentType == DirectoryContentType.ServiceExtensions ? entities : null,
-                            ContentType = contentType,
-                            Template = fileContent,
-                            ClassName = className,
-                            Namespace = classNamespace,
-                            Usings = GetUsings(contentType, solutionSettings.SolutionName, config?.Projects),
-                            IdType = solutionSettings.IdType
-                        };
-
-                        StreamWriter sw = new(filePath);
-                        sw.WriteLine(GetFormattedString(classSettings));
-
-                        sw.Close();
-                    }
+                    CreateClassesRelatedToEntities(solutionSettings, entities, contentType, config, project, directory);
                 }
 
                 foreach (var rootContentType in project.RootContentTypes ?? [])
                 {
-                    if (string.IsNullOrEmpty(rootContentType)
-                        || !Enum.TryParse(typeof(DirectoryContentType), rootContentType, out object? contentTypeObj))
-                    {
-                        continue;
-                    }
+                    var contentType = EnumHelper.GetContentTypeFromString(rootContentType);
+                    if (contentType == DirectoryContentType.Undefined) continue;
 
-                    var contentType = (DirectoryContentType)contentTypeObj;
                     var fileContent = TemplateHelper.GetTemplateContent(contentType);
 
-                    var className = GetClassName(string.Empty, contentType);
+                    var className = ClassServiceHelper.GetFileName(null, contentType);
                     var filePath = $"{solutionSettings.SolutionPath}/{projectPath}/{solutionSettings.SolutionName}.{project.Name}/{className}.cs";
 
                     var classSettings = new ClassTemplateSettings()
@@ -84,7 +60,7 @@ public static class ClassService
                         Template = fileContent,
                         ClassName = className,
                         Namespace = $"{solutionSettings.SolutionName}.{project.Name}",
-                        Usings = GetUsings(contentType, solutionSettings.SolutionName, config?.Projects),
+                        Usings = ClassServiceHelper.GetUsings(contentType, solutionSettings.SolutionName, config?.Projects),
                         IdType = solutionSettings.IdType
                     };
 
@@ -197,93 +173,16 @@ public static class ClassService
                     classSettings.Template ?? string.Empty,
                     classSettings.Usings[0],
                     classSettings.Usings[1]);
+            case DirectoryContentType.GetAllQuery:
+                return string.Format(
+                    classSettings.Template ?? string.Empty,
+                    classSettings.Usings[0],
+                    classSettings.Namespace,
+                    classSettings.Entity?.PluralName,
+                    classSettings.Entity?.Name);
         }
 
         return string.Empty;
-    }
-
-    private static string GetClassName(string? entityName, DirectoryContentType contentType) =>
-        _ = contentType switch
-        {
-            DirectoryContentType.EntityClass => entityName ?? string.Empty,
-            DirectoryContentType.RepositoryClass => $"{entityName}Repository",
-            DirectoryContentType.RepositoryInterface => $"I{entityName}Repository",
-            DirectoryContentType.DbContext => "AppDbContext",
-            DirectoryContentType.DtoClass => $"{entityName}Dto",
-            DirectoryContentType.MappingProfile => "MappingProfile",
-            DirectoryContentType.ServiceClass => $"{entityName}Service",
-            DirectoryContentType.ServiceInterface => $"I{entityName}Service",
-            DirectoryContentType.ProgramClass => "Program",
-            DirectoryContentType.Controller => $"{entityName}Controller",
-            DirectoryContentType.ServiceExtensions => "ServiceExtensions",
-            _ => throw new NotImplementedException(),
-        };
-
-    private static string GetClassNamespace(string projectFullName, DirectoryConfig? directory)
-    {
-        return string.IsNullOrEmpty(directory?.ParentPath) 
-            ? $"{projectFullName}.{directory?.Name}" 
-            : $"{projectFullName}.{directory.ParentPath.Trim('/')}.{directory.Name}";
-    }
-
-    private static string[] GetUsings(DirectoryContentType contentType, string solutionName, IEnumerable<ProjectConfig>? projects)
-    {
-        var directories = projects?.SelectMany(p => p.Directories ?? []);
-
-        var entitiesDir = directories?.FirstOrDefault(d => d.ContentType == DirectoryContentType.EntityClass.ToString());
-        var dtosDir = directories?.FirstOrDefault(d => d.ContentType == DirectoryContentType.DtoClass.ToString());
-        var repoInterfacesDir = directories?.FirstOrDefault(d => d.ContentType == DirectoryContentType.RepositoryInterface.ToString());
-        var serviceInterfacesDir = directories?.FirstOrDefault(d => d.ContentType == DirectoryContentType.ServiceInterface.ToString());
-
-        switch (contentType)
-        {
-            case DirectoryContentType.RepositoryInterface:
-                return [GetSpecificUsing(solutionName, projects, entitiesDir)];
-            case DirectoryContentType.RepositoryClass:
-                return [
-                    GetSpecificUsing(solutionName, projects, entitiesDir),
-                    GetSpecificUsing(solutionName, projects, repoInterfacesDir),
-                ];
-            case DirectoryContentType.ServiceInterface:
-                return [GetSpecificUsing(solutionName, projects, dtosDir)];
-            case DirectoryContentType.ServiceClass:
-                return [
-                    GetSpecificUsing(solutionName, projects, entitiesDir),
-                    GetSpecificUsing(solutionName, projects, dtosDir),
-                    GetSpecificUsing(solutionName, projects, repoInterfacesDir),
-                    GetSpecificUsing(solutionName, projects, serviceInterfacesDir)
-                ];
-            case DirectoryContentType.Controller:
-                return [
-                    GetSpecificUsing(solutionName, projects, dtosDir),
-                    GetSpecificUsing(solutionName, projects, serviceInterfacesDir)
-                ];
-            case DirectoryContentType.DbContext:
-                return [GetSpecificUsing(solutionName, projects, entitiesDir)];
-            case DirectoryContentType.MappingProfile:
-                return [
-                    GetSpecificUsing(solutionName, projects, entitiesDir),
-                    GetSpecificUsing(solutionName, projects, dtosDir)
-                ];
-            case DirectoryContentType.ServiceExtensions:
-                var repoDir = directories?.FirstOrDefault(d => d.ContentType == DirectoryContentType.RepositoryClass.ToString());
-                var serviceDir = directories?.FirstOrDefault(d => d.ContentType == DirectoryContentType.ServiceClass.ToString());
-                return [
-                    $"{solutionName}.{projects?.FirstOrDefault(p => (p.Directories ?? []).Any(d => d.ContentType == entitiesDir?.ContentType))?.Name}",
-                    GetSpecificUsing(solutionName, projects, repoDir),
-                    GetSpecificUsing(solutionName, projects, repoInterfacesDir),
-                    GetSpecificUsing(solutionName, projects, serviceDir),
-                    GetSpecificUsing(solutionName, projects, serviceInterfacesDir)
-                ];
-            case DirectoryContentType.ProgramClass:
-                var extensionsDir = directories?.FirstOrDefault(d => d.ContentType == DirectoryContentType.ServiceExtensions.ToString());
-                return [
-                    GetSpecificUsing(solutionName, projects, extensionsDir),
-                    $"{solutionName}.{projects?.FirstOrDefault(p => (p.Directories ?? []).Any(d => d.ContentType == dtosDir?.ContentType))?.Name}"
-                ];
-        }
-
-        return [];
     }
 
     private static string GetEntityCreationTemplate(ClassTemplateSettings classSettings)
@@ -297,6 +196,34 @@ public static class ClassService
         return string.Format(classSettings.Template ?? string.Empty, classSettings.Namespace, classSettings.Entity?.Name, props);
     }
 
-    private static string GetSpecificUsing(string solutionName, IEnumerable<ProjectConfig>? projects, DirectoryConfig? directory) =>
-        GetClassNamespace($"{solutionName}.{projects?.FirstOrDefault(p => (p.Directories ?? []).Any(d => d.ContentType == directory?.ContentType))?.Name}", directory);
+    private static void CreateClassesRelatedToEntities(SolutionSettingsModel solutionSettings, List<EntityClassViewModel> entities, 
+        DirectoryContentType contentType, SolutionConfig? config, ProjectConfig project, DirectoryConfig directory)
+    {
+        var projectPath = ConfigHelper.GetProjectPath(config, project, solutionSettings.SolutionName);
+        var fileContent = TemplateHelper.GetTemplateContent(contentType);
+        var classNamespace = ClassServiceHelper.GetNamespace($"{solutionSettings.SolutionName}.{project.Name}", directory);
+
+        foreach (var entity in entities)
+        {
+            var className = ClassServiceHelper.GetFileName(entity, contentType);
+            var filePath = $"{solutionSettings.SolutionPath}/{projectPath}/{solutionSettings.SolutionName}.{project.Name}{directory.ParentPath}/{directory.Name}/{className}.cs";
+
+            var classSettings = new ClassTemplateSettings()
+            {
+                Entity = entity,
+                Entities = contentType == DirectoryContentType.ServiceExtensions ? entities : null,
+                ContentType = contentType,
+                Template = fileContent,
+                ClassName = className,
+                Namespace = classNamespace,
+                Usings = ClassServiceHelper.GetUsings(contentType, solutionSettings.SolutionName, config?.Projects),
+                IdType = solutionSettings.IdType
+            };
+
+            StreamWriter sw = new(filePath);
+            sw.WriteLine(GetFormattedString(classSettings));
+
+            sw.Close();
+        }
+    }
 }

@@ -11,4 +11,15 @@ public static class EnumHelper
             IdType.Guid => "Guid",
             _ => throw new NotImplementedException(),
         };
+
+    public static DirectoryContentType GetContentTypeFromString(string? contentTypeItem)
+    {
+        if (string.IsNullOrEmpty(contentTypeItem)
+            || !Enum.TryParse(typeof(DirectoryContentType), contentTypeItem, out object? contentTypeObj))
+        {
+            return DirectoryContentType.Undefined;
+        }
+
+        return  (DirectoryContentType)contentTypeObj;
+    }
 }

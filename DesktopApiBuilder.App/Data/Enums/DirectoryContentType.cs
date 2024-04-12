@@ -15,5 +15,9 @@ public enum DirectoryContentType
     // API
     ProgramClass,
     Controller,
-    ServiceExtensions
+    ServiceExtensions,
+    // CQRS
+    GetAllQuery,
+
+    Undefined
 }
