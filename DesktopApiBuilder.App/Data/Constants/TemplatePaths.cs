@@ -22,4 +22,5 @@ public static class TemplatePaths
     public const string ServiceExtensionsTemplatePath = "wwwroot\\templates\\api\\ServiceExtensionsTemplate.txt";
 
     public const string GetAllQueryTemplatePath = "wwwroot\\templates\\cqrs\\GetAllQueryTemplate.txt";
+    public const string GetByIdQueryTemplatePath = "wwwroot\\templates\\cqrs\\GetByIdQueryTemplate.txt";
 }

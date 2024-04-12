@@ -56,7 +56,7 @@
                 { 
                     "name": "Queries", 
                     "parentPath": "/Requests",
-                    "contentTypeList": [ "GetAllQuery" ]
+                    "contentTypeList": [ "GetAllQuery", "GetByIdQuery" ]
                 },
                 { "name": "Commands", "parentPath": "/Requests" },
                 { "name": "QueryHandlers", "parentPath": "/RequestHandlers" },

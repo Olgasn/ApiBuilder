@@ -180,6 +180,13 @@ public static class ClassService
                     classSettings.Namespace,
                     classSettings.Entity?.PluralName,
                     classSettings.Entity?.Name);
+            case DirectoryContentType.GetByIdQuery:
+                return string.Format(
+                    classSettings.Template ?? string.Empty,
+                    classSettings.Usings[0],
+                    classSettings.Namespace,
+                    classSettings.Entity?.Name,
+                    EnumHelper.GetIdTypeName(classSettings.IdType));
         }
 
         return string.Empty;
