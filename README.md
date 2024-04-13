@@ -7,7 +7,7 @@
     "solutionFolders": [],
     "projects": [
         { 
-            "name": "API", 
+            "name": "Web", 
             "type": "webapi",
             "directories": [
                 { 
@@ -18,7 +18,7 @@
                 { 
                     "name": "Extensions", 
                     "parentPath": "",
-                    "contentType": "ServiceExtensions"
+                    "contentType": "ServiceExtensionsWithServices"
                 }
             ],
             "dependencies": {
@@ -26,12 +26,12 @@
                     "Microsoft.EntityFrameworkCore.Design",
                     "Microsoft.EntityFrameworkCore.Tools"
                 ],
-                "projectReferences": ["BLL"]
+                "projectReferences": [ "Core" ]
             },
             "rootContentTypes": [ "ProgramClass" ]
         },
         { 
-            "name": "BLL", 
+            "name": "Core", 
             "type": "classlib",
             "directories": [
                 { 
@@ -51,13 +51,13 @@
                 }
             ],
             "dependencies": {
-                "packages": ["AutoMapper"],
-                "projectReferences": ["DAL"]
+                "packages": [ "AutoMapper" ],
+                "projectReferences": [ "Infrastructure" ]
             },
             "rootContentTypes": [ "MappingProfile" ]
         },
         { 
-            "name": "DAL", 
+            "name": "Infrastructure", 
             "type": "classlib",
             "directories": [
                 {
@@ -86,7 +86,7 @@
             "rootContentTypes": [ "DbContext" ]
         }
     ],
-    "migrationsProjectName": "DAL"
+    "migrationsProjectName": "Infrastructure"
 }
 ```
 
@@ -110,27 +110,50 @@
     ],
     "projects": [
         { 
-            "name": "API", 
+            "name": "Web", 
             "type": "webapi",
             "directories": [
-                { "name": "Extensions", "parentPath": "" }
+                { 
+                    "name": "Controllers", 
+                    "parentPath": "",
+                    "contentType": "ControllerWithMediatr"
+                },
+                { 
+                    "name": "Extensions", 
+                    "parentPath": "",
+                    "contentType": "ServiceExtensions"
+                }
             ],
+            "dependencies": {
+                "packages": [ 
+                    "AutoMapper",
+                    "Microsoft.EntityFrameworkCore.Design",
+                    "Microsoft.EntityFrameworkCore.Tools"
+                 ],
+                "projectReferences": [ "Application", "Infrastructure" ]
+            },
+            "rootContentTypes": [ "ProgramClassWithMediatr" ],
             "solutionFolderId": 3
         },
         { 
             "name": "Infrastructure", 
             "type": "classlib",
             "directories": [
-                { "name": "Repositories", "parentPath": "" }
+                { 
+                    "name": "Repositories", 
+                    "parentPath": "",
+                    "contentType": "RepositoryClass"
+                }
             ],
-            "solutionFolderId": 2
-        },
-        { 
-            "name": "Persistence", 
-            "type": "classlib",
-            "directories": [
-                { "name": "Controllers", "parentPath": "" }
-            ],
+            "dependencies": {
+                "packages": [ 
+                    "Microsoft.EntityFrameworkCore",
+                    "Microsoft.EntityFrameworkCore.SqlServer", 
+                    "Microsoft.EntityFrameworkCore.Relational"
+                 ],
+                "projectReferences": [ "Domain" ]
+            },
+            "rootContentTypes": [ "DbContext" ],
             "solutionFolderId": 2
         },
         { 
@@ -139,22 +162,57 @@
             "directories": [
                 { "name": "Requests", "parentPath": "" },
                 { "name": "RequestHandlers", "parentPath": "" },
-                { "name": "Queries", "parentPath": "/Requests" },
-                { "name": "Commands", "parentPath": "/Requests" },
-                { "name": "QueryHandlers", "parentPath": "/RequestHandlers" },
-                { "name": "CommandHandlers", "parentPath": "/RequestHandlers" }
+                { 
+                    "name": "Dtos", 
+                    "parentPath": "",
+                    "contentType": "DtoClass"
+                },
+                { 
+                    "name": "Queries", 
+                    "parentPath": "/Requests",
+                    "contentTypeList": [ "GetAllQuery", "GetByIdQuery" ]
+                },
+                { 
+                    "name": "Commands", 
+                    "parentPath": "/Requests",
+                    "contentTypeList": [ "CreateCommand", "UpdateCommand", "DeleteCommand" ]
+                },
+                { 
+                    "name": "QueryHandlers", 
+                    "parentPath": "/RequestHandlers",
+                    "contentTypeList": [ "GetAllQueryHandler", "GetByIdQueryHandler" ]
+                },
+                { 
+                    "name": "CommandHandlers", 
+                    "parentPath": "/RequestHandlers",
+                    "contentTypeList": [ "CreateCommandHandler", "UpdateCommandHandler", "DeleteCommandHandler" ] 
+                }
             ],
+            "dependencies": {
+                "packages": [ "MediatR", "AutoMapper" ],
+                "projectReferences": [ "Domain" ]
+            },
+            "rootContentTypes": [ "MappingProfile" ],
             "solutionFolderId": 1
         },
         { 
             "name": "Domain", 
             "type": "classlib",
             "directories": [
-                { "name": "Entities", "parentPath": "" },
-                { "name": "Abstractions", "parentPath": "/Repositories" }
+                { 
+                    "name": "Entities", 
+                    "parentPath": "",
+                    "contentType": "EntityClass"
+                },
+                { 
+                    "name": "Abstractions", 
+                    "parentPath": "",
+                    "contentType": "RepositoryInterface"
+                }
             ],
             "solutionFolderId": 1
         }
-    ]
+    ],
+    "migrationsProjectName": "Infrastructure"
 }
 ```
