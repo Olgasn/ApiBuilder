@@ -1,8 +1,8 @@
 ﻿@page "/"
 
 @* <input type="file" id="directoryPicker" webkitdirectory directory onchange="handleDirectorySelection(event)"> *@
-<MudTextField @bind-Value=_solutionPath Required RequiredError="Solution path is required" Placeholder="Solution Path"/>
-<MudTextField @bind-Value=_solutionName Required RequiredError="Solution name is required" Placeholder="Solution Name"/>
+<MudTextField @bind-Value=_solutionPath Required RequiredError="Solution path is required" Label="Solution Path"/>
+<MudTextField @bind-Value=_solutionName Required RequiredError="Solution name is required" Label="Solution Name"/>
 
 <MudButton OnClick="CreateSolution" Variant="Variant.Outlined" Class="mt-4" Disabled="!string.IsNullOrEmpty(_message)">Create solution</MudButton>
 
