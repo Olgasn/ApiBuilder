@@ -1,0 +1,6 @@
+﻿﻿using MediatR;
+using {0};
+
+namespace {1};
+
+public record Update{2}Command({2}Dto {2}) : IRequest<bool>;

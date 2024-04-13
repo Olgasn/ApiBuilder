@@ -1,0 +1,22 @@
+﻿﻿using MediatR;
+using AutoMapper;
+using {0};
+using {1};
+using {2};
+
+namespace {3};
+
+public class Get{4}ByIdQueryHandler : IRequestHandler<Get{4}ByIdQuery, {4}Dto?>
+{{
+	private readonly I{4}Repository _repository;
+	private readonly IMapper _mapper;
+
+	public Get{4}ByIdQueryHandler(I{4}Repository repository, IMapper mapper)
+	{{
+		_repository = repository;
+		_mapper = mapper;
+	}}
+
+	public async Task<{4}Dto?> Handle(Get{4}ByIdQuery request, CancellationToken cancellationToken) => 
+		_mapper.Map<{4}Dto>(await _repository.GetById(request.Id, trackChanges: false));
+}}

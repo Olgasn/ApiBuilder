@@ -1,0 +1,6 @@
+﻿﻿using MediatR;
+using {0};
+
+namespace {1};
+
+public record Get{2}Query : IRequest<IEnumerable<{3}Dto>>;

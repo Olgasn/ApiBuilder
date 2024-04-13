@@ -17,9 +17,10 @@ public static class SqlService
             var fileContent = TemplateHelper.GetTemplateContent(AppSettingsTemplatePath);
 
             SolutionConfig? config = ConfigHelper.GetSolutionConfig(solutionSettings.ArchitectureType);
-            var projectName = $"{solutionSettings.SolutionName}.{config?.Projects?.FirstOrDefault(p => p.Type == ProjectTypes.AspNetWebApi)?.Name}";
+            var apiProject = config?.Projects?.FirstOrDefault(p => p.Type == ProjectTypes.AspNetWebApi);
+            var projectPath = ConfigHelper.GetProjectPath(config, apiProject, solutionSettings.SolutionName);
 
-            StreamWriter sw = new($"{solutionSettings.FullSolutionPath}\\{projectName}\\appsettings.json");
+            StreamWriter sw = new($"{solutionSettings.SolutionPath}/{projectPath}/{solutionSettings.SolutionName}.{apiProject?.Name}/appsettings.json");
 
             sw.WriteLine(string.Format(fileContent, sqlConnection));
 
@@ -34,12 +35,18 @@ public static class SqlService
     public static void AddMigration(SolutionSettingsModel solutionSettings, string migrationName, bool applyMigration)
     {
         SolutionConfig? config = ConfigHelper.GetSolutionConfig(solutionSettings.ArchitectureType);
-        var startupProjectName = $"{solutionSettings.SolutionName}.{config?.Projects?.FirstOrDefault(p => p.Type == ProjectTypes.AspNetWebApi)?.Name}";
-        var migrationsProjectName = $"{solutionSettings.SolutionName}.{config?.MigrationsProjectName}";
+        var apiProject = config?.Projects?.FirstOrDefault(p => p.Type == ProjectTypes.AspNetWebApi);
+        var migrationProject = config?.Projects?.FirstOrDefault(p => p.Name == config?.MigrationsProjectName);
+
+        var apiProjectPath = ConfigHelper.GetProjectPath(config, apiProject, solutionSettings.SolutionName);
+        var migrationProjectPath = ConfigHelper.GetProjectPath(config, migrationProject, solutionSettings.SolutionName);
+
+        var startupProjectName = $"{apiProjectPath}/{solutionSettings.SolutionName}.{apiProject?.Name}";
+        var migrationsProjectName = $"{migrationProjectPath}/{solutionSettings.SolutionName}.{config?.MigrationsProjectName}";
 
         var commands = new List<string>()
         {
-            $"cd {solutionSettings.FullSolutionPath}",
+            $"cd {solutionSettings.SolutionPath}",
             $"dotnet ef migrations add {migrationName} --project {migrationsProjectName} --startup-project {startupProjectName}"
         };
 

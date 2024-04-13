@@ -15,8 +15,6 @@ public class {4}Controller : ControllerBase
         _{5}Service = {5}Service;
     }}
 
-    #region CRUD
-
     [HttpGet]
     public async Task<IActionResult> Get()
     {{
@@ -81,6 +79,4 @@ public class {4}Controller : ControllerBase
 
         return NoContent();
     }}
-
-    #endregion
 }}

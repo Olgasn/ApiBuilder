@@ -1,0 +1,84 @@
+﻿﻿using Microsoft.AspNetCore.Mvc;
+﻿using MediatR;
+using {0};
+using {1};
+using {2};
+
+namespace {3};
+
+[Route("api/{4}")]
+[ApiController]
+public class {5}Controller : ControllerBase
+{{
+    private readonly IMediator _mediator;
+
+    public {5}Controller(IMediator mediator)
+    {{
+        _mediator = mediator;
+    }}
+
+    [HttpGet]
+    public async Task<IActionResult> Get()
+    {{
+        var {4} = await _mediator.Send(new Get{6}Query());
+
+        return Ok({4});
+    }}
+
+    [HttpGet("{{id}}")]
+    public async Task<IActionResult> GetById({7} id)
+    {{
+        var {8} = await _mediator.Send(new Get{5}ByIdQuery(id));
+
+        if ({8} is null)
+        {{
+            return NotFound($"{5} with id {{id}} is not found.");
+        }}
+        
+        return Ok({8});
+    }}
+
+    [HttpPost]
+    public async Task<IActionResult> Create([FromBody] {5}Dto {8})
+    {{
+        if ({8} is null)
+        {{
+            return BadRequest("Object for creation is null");
+        }}
+
+        await _mediator.Send(new Create{5}Command({8}));
+
+        return Created();
+    }}
+
+    [HttpPut("{{id}}")]
+    public async Task<IActionResult> Update({7} id, [FromBody] {5}Dto {8})
+    {{
+        if ({8} is null)
+        {{
+            return BadRequest("Object for update is null");
+        }}
+
+        var isEntityFound = await _mediator.Send(new Update{5}Command({8}));
+
+        if (!isEntityFound)
+        {{
+            return NotFound($"{5} with id {{id}} is not found.");
+        }}
+
+        return NoContent();
+    }}
+
+    [HttpDelete("{{id}}")]
+    public async Task<IActionResult> Delete({7} id)
+    {{
+        var isEntityFound = await _mediator.Send(new Delete{5}Command(id));
+
+        if (!isEntityFound)
+        {{
+            return NotFound($"{5} with id {{id}} is not found.");
+        }}
+
+        return NoContent();
+    }}
+}}

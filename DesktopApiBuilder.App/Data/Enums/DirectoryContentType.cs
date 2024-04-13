@@ -7,13 +7,32 @@ public enum DirectoryContentType
     RepositoryClass,
     RepositoryInterface,
     DbContext,
+
     // Business logic
     DtoClass,
     MappingProfile,
     ServiceClass,
     ServiceInterface,
+
     // API
     ProgramClass,
+    ProgramClassWithMediatr,
     Controller,
-    ServiceExtensions
+    ControllerWithMediatr,
+    ServiceExtensions,
+    ServiceExtensionsWithServices,
+
+    // CQRS
+    GetAllQuery,
+    GetByIdQuery,
+    CreateCommand,
+    UpdateCommand,
+    DeleteCommand,
+    GetAllQueryHandler,
+    GetByIdQueryHandler,
+    CreateCommandHandler,
+    UpdateCommandHandler,
+    DeleteCommandHandler,
+
+    Undefined
 }

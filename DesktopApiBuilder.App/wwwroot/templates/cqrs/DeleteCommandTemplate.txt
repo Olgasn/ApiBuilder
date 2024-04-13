@@ -1,0 +1,5 @@
+﻿﻿using MediatR;
+
+namespace {0};
+
+public record Delete{1}Command({2} Id) : IRequest<bool>;

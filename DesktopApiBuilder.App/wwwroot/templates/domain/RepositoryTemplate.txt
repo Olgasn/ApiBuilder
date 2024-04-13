@@ -4,14 +4,9 @@ using {1};
 
 namespace {2};
 
-public class {3}Repository : I{3}Repository
+public class {3}Repository(AppDbContext dbContext) : I{3}Repository
 {{
-    private readonly AppDbContext _dbContext;
-
-    public {3}Repository(AppDbContext dbContext) 
-    {{
-        _dbContext = dbContext;
-    }}
+    private readonly AppDbContext _dbContext = dbContext;
 
     public async Task Create({3} entity) => await _dbContext.{4}.AddAsync(entity);
 

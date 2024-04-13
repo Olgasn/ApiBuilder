@@ -1,19 +1,27 @@
 ﻿@page "/sql"
 @inject NavigationManager Navigation
 
-<MudTextField @bind-Value=_sqlServerName Required RequiredError="SQL server name is required" Placeholder="SQL server name" />
-<MudTextField @bind-Value=_dbName Placeholder=@($"Database name (default value: {InMemoryUserSettings.SolutionName}Db)") />
+<MudTextField @bind-Value=_sqlServerName Required RequiredError="SQL server name is required" Label="SQL server name" />
+<MudTextField @bind-Value=_dbName Label=@($"Database name (default value: {InMemoryUserSettings.SolutionName}Db)") />
 <MudCheckBox @bind-Value=_applyMigration Label="Apply migration automatically"/>
-<MudButton OnClick="SetConnectionString" Variant="Variant.Outlined" Class="mt-4" Disabled="string.IsNullOrEmpty(_sqlServerName)">
-    Setup DB connection + Add initial migration
-</MudButton>
 
- @code {
+<div class="d-flex flex-row mt-4 align-center">
+    <MudButton OnClick="SetConnectionString" Variant="Variant.Outlined" Disabled=@(string.IsNullOrEmpty(_sqlServerName) || _isLoading)>
+        Setup DB connection + Add initial migration
+    </MudButton>
+    @if (_isLoading)
+    {
+        <MudProgressCircular Color="Color.Default" Indeterminate Class="ml-4" Size="Size.Small" />
+    }
+</div>
+
+@code {
     private string? _sqlServerName = "DESKTOP-0SM65GV\\\\SQLEXPRESS";
     private string? _dbName;
     private bool _applyMigration;
+    private bool _isLoading;
 
-    private void SetConnectionString()
+    private async Task SetConnectionString()
     {
         if (string.IsNullOrEmpty(_sqlServerName))
         {
@@ -33,6 +41,14 @@
             SolutionPath = InMemoryUserSettings.SolutionPath,
             ArchitectureType = InMemoryUserSettings.ArchitectureType
         }, "Initial", _applyMigration);
+
+        _isLoading = true;
+        StateHasChanged();
+
+        await Task.Delay(10000);
+
+        _isLoading = false;
+        StateHasChanged();
 
         Navigation.NavigateTo("/final");
     }

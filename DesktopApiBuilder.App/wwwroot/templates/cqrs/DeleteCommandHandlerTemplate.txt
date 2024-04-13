@@ -1,0 +1,25 @@
+﻿﻿using MediatR;
+using {0};
+using {1};
+
+namespace {2};
+
+public class Delete{3}CommandHandler(I{3}Repository repository) : IRequestHandler<Delete{3}Command, bool>
+{{
+	private readonly I{3}Repository _repository = repository;
+
+	public async Task<bool> Handle(Delete{3}Command request, CancellationToken cancellationToken)
+	{{
+		var entity = await _repository.GetById(request.Id, trackChanges: false);
+
+        if (entity is null)
+        {{
+            return false;
+        }}
+
+        _repository.Delete(entity);
+        await _repository.SaveChanges();
+
+        return true;
+	}}
+}}

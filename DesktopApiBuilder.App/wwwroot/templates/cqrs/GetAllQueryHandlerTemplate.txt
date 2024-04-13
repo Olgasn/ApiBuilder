@@ -1,0 +1,22 @@
+﻿﻿using MediatR;
+using AutoMapper;
+using {0};
+using {1};
+using {2};
+
+namespace {3};
+
+public class Get{4}QueryHandler : IRequestHandler<Get{4}Query, IEnumerable<{5}Dto>>
+{{
+	private readonly I{5}Repository _repository;
+	private readonly IMapper _mapper;
+
+	public Get{4}QueryHandler(I{5}Repository repository, IMapper mapper)
+	{{
+		_repository = repository;
+		_mapper = mapper;
+	}}
+
+	public async Task<IEnumerable<{5}Dto>> Handle(Get{4}Query request, CancellationToken cancellationToken) => 
+		_mapper.Map<IEnumerable<{5}Dto>>(await _repository.Get(trackChanges: false));
+}}

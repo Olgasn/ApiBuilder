@@ -2,8 +2,10 @@
 using {0};
 using {1};
 using {2};
+using {3};
+using {4};
 
-namespace {3};
+namespace {5};
 
 public static class ServiceExtensions
 {{
@@ -24,6 +26,7 @@ public static class ServiceExtensions
     }}
 
     public static void ConfigureServices(this IServiceCollection services)
-    {{{4}
+    {{{6}
+        {7}
     }}
 }}
