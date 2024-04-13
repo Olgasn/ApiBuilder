@@ -1,12 +1,20 @@
 ﻿﻿using MediatR;
+using AutoMapper;
 using {0};
 using {1};
 
 namespace {2};
 
-public class Update{3}CommandHandler(I{3}Repository repository) : IRequestHandler<Update{3}Command, bool>
+public class Update{3}CommandHandler : IRequestHandler<Update{3}Command, bool>
 {{
-	private readonly I{3}Repository _repository = repository;
+	private readonly I{3}Repository _repository;
+	private readonly IMapper _mapper;
+
+	public Update{3}CommandHandler(I{3}Repository repository, IMapper mapper)
+	{{
+		_repository = repository;
+		_mapper = mapper;
+	}}
 
 	public async Task<bool> Handle(Update{3}Command request, CancellationToken cancellationToken)
 	{{
@@ -16,7 +24,8 @@ public class Update{3}CommandHandler(I{3}Repository repository) : IRequestHandle
         {{
             return false;
         }}
-{4}
+
+		_mapper.Map(request, entity);
 
 		_repository.Update(entity);
 		await _repository.SaveChanges();

@@ -14,12 +14,15 @@ public static class TemplatePaths
     public const string ServiceTemplatePath = "wwwroot\\templates\\core\\ServiceTemplate.txt";
 
     public const string ControllerTemplatePath = "wwwroot\\templates\\api\\ControllerTemplate.txt";
+    public const string ControllerWithMediatrTemplatePath = "wwwroot\\templates\\api\\ControllerWithMediatrTemplate.txt";
 
     public const string MappingProfileTemplatePath = "wwwroot\\templates\\core\\MappingProfileTemplate.txt";
 
-    public const string ProgramClassTemplatePath = "wwwroot\\templates\\api\\ApiProgramClassTemplate.txt";
+    public const string ProgramClassTemplatePath = "wwwroot\\templates\\api\\ProgramClassTemplate.txt";
+    public const string ProgramClassWithMediatrTemplatePath = "wwwroot\\templates\\api\\ProgramClassWithMediatrTemplate.txt";
 
     public const string ServiceExtensionsTemplatePath = "wwwroot\\templates\\api\\ServiceExtensionsTemplate.txt";
+    public const string ServiceExtensionsWithServicesTemplatePath = "wwwroot\\templates\\api\\ServiceExtensionsWithServicesTemplate.txt";
 
     public const string GetAllQueryTemplatePath = "wwwroot\\templates\\cqrs\\GetAllQueryTemplate.txt";
     public const string GetByIdQueryTemplatePath = "wwwroot\\templates\\cqrs\\GetByIdQueryTemplate.txt";

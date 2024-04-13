@@ -131,6 +131,18 @@ public static class ClassService
                     classSettings.Entity?.Name,
                     $"{classSettings.Entity?.Name?[..1].ToLower()}{classSettings.Entity?.Name?[1..]}",
                     EnumHelper.GetIdTypeName(classSettings.IdType));
+            case DirectoryContentType.ControllerWithMediatr:
+                return string.Format(
+                    classSettings.Template ?? string.Empty,
+                    classSettings.Usings[0],
+                    classSettings.Usings[1],
+                    classSettings.Usings[2],
+                    classSettings.Namespace,
+                    $"{classSettings.Entity?.PluralName?[..1].ToLower()}{classSettings.Entity?.PluralName?[1..]}",
+                    classSettings.Entity?.Name,
+                    classSettings.Entity?.PluralName,
+                    EnumHelper.GetIdTypeName(classSettings.IdType),
+                    $"{classSettings.Entity?.Name?[..1].ToLower()}{classSettings.Entity?.Name?[1..]}");
             case DirectoryContentType.DbContext:
                 foreach (var entity in classSettings.Entities ?? [])
                 {
@@ -152,6 +164,19 @@ public static class ClassService
                     classSettings.Namespace,
                     props);
             case DirectoryContentType.ServiceExtensions:
+                props = new StringBuilder();
+                foreach (var entityName in (classSettings.Entities ?? []).Select(e => e.Name))
+                {
+                    props.Append(string.Format(RepositoryRegTemplate, entityName));
+                }
+                return string.Format(
+                    classSettings.Template ?? string.Empty,
+                    classSettings.Usings[0],
+                    classSettings.Usings[1],
+                    classSettings.Usings[2],
+                    classSettings.Namespace,
+                    props);
+            case DirectoryContentType.ServiceExtensionsWithServices:
                 var repositoryProps = new StringBuilder();
                 var serviceProps = new StringBuilder();
                 foreach (var entityName in (classSettings.Entities ?? []).Select(e => e.Name))
@@ -174,6 +199,13 @@ public static class ClassService
                     classSettings.Template ?? string.Empty,
                     classSettings.Usings[0],
                     classSettings.Usings[1]);
+            case DirectoryContentType.ProgramClassWithMediatr:
+                return string.Format(
+                    classSettings.Template ?? string.Empty,
+                    classSettings.Usings[0],
+                    classSettings.Usings[1],
+                    classSettings.Usings[2],
+                    classSettings.Entities?[0].PluralName);
             case DirectoryContentType.GetAllQuery:
                 return string.Format(
                     classSettings.Template ?? string.Empty,
@@ -228,21 +260,16 @@ public static class ClassService
                     classSettings.Template ?? string.Empty,
                     classSettings.Usings[0],
                     classSettings.Usings[1],
+                    classSettings.Usings[2],
                     classSettings.Namespace,
                     classSettings.Entity?.Name);
             case DirectoryContentType.UpdateCommandHandler:
-                foreach (var propName in (classSettings.Entity?.Properties ?? []).Select(p => p.Name))
-                {
-                    if (propName.Equals("Id")) continue;
-                    props.Append(string.Format(CQRSMapEntityPropTemplate, propName, classSettings.Entity?.Name));
-                }
                 return string.Format(
                     classSettings.Template ?? string.Empty,
                     classSettings.Usings[0],
                     classSettings.Usings[1],
                     classSettings.Namespace,
-                    classSettings.Entity?.Name,
-                    props);
+                    classSettings.Entity?.Name);
             case DirectoryContentType.DeleteCommandHandler:
                 return string.Format(
                     classSettings.Template ?? string.Empty,
@@ -281,7 +308,7 @@ public static class ClassService
             var classSettings = new ClassTemplateSettings()
             {
                 Entity = entity,
-                Entities = contentType == DirectoryContentType.ServiceExtensions ? entities : null,
+                Entities = entities,
                 ContentType = contentType,
                 Template = fileContent,
                 ClassName = className,

@@ -15,11 +15,29 @@
     ],
     "projects": [
         { 
-            "name": "API", 
+            "name": "Web", 
             "type": "webapi",
             "directories": [
-                { "name": "Extensions", "parentPath": "" }
+                { 
+                    "name": "Controllers", 
+                    "parentPath": "",
+                    "contentType": "ControllerWithMediatr"
+                },
+                { 
+                    "name": "Extensions", 
+                    "parentPath": "",
+                    "contentType": "ServiceExtensions"
+                }
             ],
+            "dependencies": {
+                "packages": [ 
+                    "AutoMapper",
+                    "Microsoft.EntityFrameworkCore.Design",
+                    "Microsoft.EntityFrameworkCore.Tools"
+                 ],
+                "projectReferences": [ "Application", "Infrastructure" ]
+            },
+            "rootContentTypes": [ "ProgramClassWithMediatr" ],
             "solutionFolderId": 3
         },
         { 
@@ -33,18 +51,14 @@
                 }
             ],
             "dependencies": {
-                "packages": [ "Microsoft.EntityFrameworkCore" ],
+                "packages": [ 
+                    "Microsoft.EntityFrameworkCore",
+                    "Microsoft.EntityFrameworkCore.SqlServer", 
+                    "Microsoft.EntityFrameworkCore.Relational"
+                 ],
                 "projectReferences": [ "Domain" ]
             },
             "rootContentTypes": [ "DbContext" ],
-            "solutionFolderId": 2
-        },
-        { 
-            "name": "Persistence", 
-            "type": "classlib",
-            "directories": [
-                { "name": "Controllers", "parentPath": "" }
-            ],
             "solutionFolderId": 2
         },
         { 
@@ -53,6 +67,11 @@
             "directories": [
                 { "name": "Requests", "parentPath": "" },
                 { "name": "RequestHandlers", "parentPath": "" },
+                { 
+                    "name": "Dtos", 
+                    "parentPath": "",
+                    "contentType": "DtoClass"
+                },
                 { 
                     "name": "Queries", 
                     "parentPath": "/Requests",
@@ -75,9 +94,10 @@
                 }
             ],
             "dependencies": {
-                "packages": [ "MediatR" ],
+                "packages": [ "MediatR", "AutoMapper" ],
                 "projectReferences": [ "Domain" ]
             },
+            "rootContentTypes": [ "MappingProfile" ],
             "solutionFolderId": 1
         },
         { 

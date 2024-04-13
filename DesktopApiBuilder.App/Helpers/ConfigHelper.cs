@@ -39,4 +39,10 @@ public static class ConfigHelper
 
     public static string GetSolutionPathForProject(SolutionConfig? config, ProjectConfig? project) => 
         config?.SolutionFolders?.FirstOrDefault(f => f.Id == project?.SolutionFolderId)?.Name ?? string.Empty;
+
+    public static DirectoryConfig? FindByContentType(this IEnumerable<DirectoryConfig>? directories, 
+        DirectoryContentType contentType, bool multipleContentTypes = false) => 
+        multipleContentTypes
+        ? directories?.FirstOrDefault(d => (d.ContentTypeList ?? []).Contains(contentType.ToString()))
+        : directories?.FirstOrDefault(d => d.ContentType == contentType.ToString());
 }

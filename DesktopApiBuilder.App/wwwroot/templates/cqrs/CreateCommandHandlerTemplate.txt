@@ -1,13 +1,22 @@
 ﻿﻿using MediatR;
+using AutoMapper;
 using {0};
 using {1};
+using {2};
 
-namespace {2};
+namespace {3};
 
-public class Create{3}CommandHandler(I{3}Repository repository) : IRequestHandler<Create{3}Command>
+public class Create{4}CommandHandler : IRequestHandler<Create{4}Command>
 {{
-	private readonly I{3}Repository _repository = repository;
+	private readonly I{4}Repository _repository;
+	private readonly IMapper _mapper;
 
-	public async Task Handle(Create{3}Command request,
-        CancellationToken cancellationToken) => await _repository.Create(request.{3});
+	public Create{4}CommandHandler(I{4}Repository repository, IMapper mapper)
+	{{
+		_repository = repository;
+		_mapper = mapper;
+	}}
+
+	public async Task Handle(Create{4}Command request, CancellationToken cancellationToken) => 
+		await _repository.Create(_mapper.Map<{4}>(request.{4}));
 }}

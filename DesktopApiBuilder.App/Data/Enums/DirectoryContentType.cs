@@ -16,8 +16,11 @@ public enum DirectoryContentType
 
     // API
     ProgramClass,
+    ProgramClassWithMediatr,
     Controller,
+    ControllerWithMediatr,
     ServiceExtensions,
+    ServiceExtensionsWithServices,
 
     // CQRS
     GetAllQuery,
