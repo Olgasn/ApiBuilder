@@ -117,5 +117,6 @@
             ],
             "solutionFolderId": 1
         }
-    ]
+    ],
+    "migrationsProjectName": "Infrastructure"
 }

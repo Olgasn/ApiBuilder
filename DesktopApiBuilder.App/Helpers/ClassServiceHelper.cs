@@ -130,9 +130,9 @@ public static class ClassServiceHelper
                     GetSpecificUsing(solutionName, projects, queriesDir, true, DirectoryContentType.GetAllQuery),
                 ];
             case DirectoryContentType.GetAllQuery:
-                return [GetSpecificUsing(solutionName, projects, entitiesDir)]; // TODO: update to DTO
+                return [GetSpecificUsing(solutionName, projects, dtosDir)];
             case DirectoryContentType.GetByIdQuery:
-                return [GetSpecificUsing(solutionName, projects, entitiesDir)];
+                return [GetSpecificUsing(solutionName, projects, dtosDir)];
             case DirectoryContentType.CreateCommand:
                 return [GetSpecificUsing(solutionName, projects, dtosDir)];
             case DirectoryContentType.UpdateCommand:
@@ -140,14 +140,14 @@ public static class ClassServiceHelper
             case DirectoryContentType.GetAllQueryHandler:
                 var getAllQueryDir = directories?.FirstOrDefault(d => (d.ContentTypeList ?? []).Contains(DirectoryContentType.GetAllQuery.ToString()));
                 return [
-                    GetSpecificUsing(solutionName, projects, entitiesDir),
+                    GetSpecificUsing(solutionName, projects, dtosDir),
                     GetSpecificUsing(solutionName, projects, repoInterfacesDir),
                     GetSpecificUsing(solutionName, projects, getAllQueryDir, true, DirectoryContentType.GetAllQuery)
                 ];
             case DirectoryContentType.GetByIdQueryHandler:
                 var getByIdQueryDir = directories?.FirstOrDefault(d => (d.ContentTypeList ?? []).Contains(DirectoryContentType.GetByIdQuery.ToString()));
                 return [
-                    GetSpecificUsing(solutionName, projects, entitiesDir),
+                    GetSpecificUsing(solutionName, projects, dtosDir),
                     GetSpecificUsing(solutionName, projects, repoInterfacesDir),
                     GetSpecificUsing(solutionName, projects, getByIdQueryDir, true, DirectoryContentType.GetByIdQuery)
                 ];

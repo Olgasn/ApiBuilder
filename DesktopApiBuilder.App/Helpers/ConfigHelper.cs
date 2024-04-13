@@ -24,7 +24,7 @@ public static class ConfigHelper
         }
     }
 
-    public static string GetProjectPath(SolutionConfig? config, ProjectConfig project, string solutionName)
+    public static string GetProjectPath(SolutionConfig? config, ProjectConfig? project, string solutionName)
     {
         var solutionFolderName = GetSolutionPathForProject(config, project);
         var projectPath = solutionName;
