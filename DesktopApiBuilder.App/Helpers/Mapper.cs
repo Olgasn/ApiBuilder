@@ -13,14 +13,17 @@ public static class Mapper
 
             foreach (var entity in entities)
             {
+                if (string.IsNullOrWhiteSpace(entity.Name) || string.IsNullOrWhiteSpace(entity.Type))
+                    continue;
+
                 dict.Add(entity.Name, entity.Type);
             }
 
             return new MapResult<Dictionary<string, string>>() { Value = dict };
         }
-        catch 
+        catch (Exception ex) 
         {
-            return new MapResult<Dictionary<string, string>>() { ErrorMessage = "Invalid cast error" };
+            return new MapResult<Dictionary<string, string>>() { ErrorMessage = ex.Message };
         }
     }
 }

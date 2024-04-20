@@ -110,7 +110,7 @@
 
     private void AddEntity()
     {
-        if (_entities.FirstOrDefault(e => (e.Name ?? string.Empty).Equals(_currentEntity.Name)) is not null)
+        if (_entities.Any(e => (e.Name ?? string.Empty).Equals(_currentEntity.Name)))
         {
             _entityErrorMessage = $"Entity with name \"{_currentEntity.Name}\" is already exists.";
             return;
@@ -120,6 +120,7 @@
 
         if (!string.IsNullOrEmpty(result.ErrorMessage))
         {
+            _entityErrorMessage = result.ErrorMessage;
             return;
         }
 
@@ -127,7 +128,11 @@
         {
             Name = _currentEntity.Name,
             PluralName = _currentEntity.PluralName,
-            Properties = _currentEntity.Properties
+            Properties = result.Value.Select(item => new EntityPropViewModel
+                         {
+                             Name = item.Key,
+                             Type = item.Value
+                         }).ToList()
         });
 
         CloseEntityOverlay();
@@ -140,9 +145,28 @@
         var entity = _entities.First(e => (e.Name ?? string.Empty).Equals(_editingEntityName));
         var curEntity = (EntityClassViewModel)_currentEntity.Clone();
 
+        if (_entities.Where(e => !(e.Name ?? string.Empty).Equals(entity.Name))
+                     .Any(e => (e.Name ?? string.Empty).Equals(curEntity.Name)))
+        {
+            _entityErrorMessage = $"Entity with name \"{_currentEntity.Name}\" is already exists.";
+            return;
+        }
+
+        var result = Mapper.EntityPropsToDict(curEntity.Properties);
+
+        if (!string.IsNullOrEmpty(result.ErrorMessage))
+        {
+            _entityErrorMessage = result.ErrorMessage;
+            return;
+        }
+
         entity.Name = curEntity.Name;
         entity.PluralName = curEntity.PluralName;
-        entity.Properties = curEntity.Properties;
+        entity.Properties = result.Value.Select(item => new EntityPropViewModel
+                            {
+                                Name = item.Key,
+                                Type = item.Value
+                            }).ToList();
 
         CloseEntityOverlay();
     }
@@ -163,6 +187,7 @@
     {
         _currentEntity = GetResetedEntity();
         _editEntity = false;
+        _entityErrorMessage = string.Empty;
         _isOverlayOpened = false;
 
         StateHasChanged();
