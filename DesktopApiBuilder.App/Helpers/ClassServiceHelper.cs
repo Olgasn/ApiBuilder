@@ -14,6 +14,8 @@ public static class ClassServiceHelper
             DirectoryContentType.RepositoryInterface => $"I{entity?.Name}Repository",
             DirectoryContentType.DbContext => "AppDbContext",
             DirectoryContentType.DtoClass => $"{entity?.Name}Dto",
+            DirectoryContentType.DtoForCreationClass => $"{entity?.Name}ForCreationDto",
+            DirectoryContentType.DtoForUpdateClass => $"{entity?.Name}ForUpdateDto",
             DirectoryContentType.MappingProfile => "MappingProfile",
             DirectoryContentType.ServiceClass => $"{entity?.Name}Service",
             DirectoryContentType.ServiceInterface => $"I{entity?.Name}Service",
@@ -48,7 +50,7 @@ public static class ClassServiceHelper
         var directories = projects?.SelectMany(p => p.Directories ?? []);
 
         var entitiesDir = directories.FindByContentType(DirectoryContentType.EntityClass);
-        var dtosDir = directories?.FirstOrDefault(d => d.ContentType == DirectoryContentType.DtoClass.ToString());
+        var dtosDir = directories?.FindByContentType(DirectoryContentType.DtoClass, true);
         var repoInterfacesDir = directories?.FirstOrDefault(d => d.ContentType == DirectoryContentType.RepositoryInterface.ToString());
         DirectoryConfig? serviceInterfacesDir;
         DirectoryConfig? repoDir;
@@ -64,26 +66,26 @@ public static class ClassServiceHelper
                     GetSpecificUsing(solutionName, projects, repoInterfacesDir),
                 ];
             case DirectoryContentType.ServiceInterface:
-                return [GetSpecificUsing(solutionName, projects, dtosDir)];
+                return [GetSpecificUsing(solutionName, projects, dtosDir, true, DirectoryContentType.DtoClass)];
             case DirectoryContentType.ServiceClass:
                 serviceInterfacesDir = directories.FindByContentType(DirectoryContentType.ServiceInterface);
                 return [
                     GetSpecificUsing(solutionName, projects, entitiesDir),
-                    GetSpecificUsing(solutionName, projects, dtosDir),
+                    GetSpecificUsing(solutionName, projects, dtosDir, true, DirectoryContentType.DtoClass),
                     GetSpecificUsing(solutionName, projects, repoInterfacesDir),
                     GetSpecificUsing(solutionName, projects, serviceInterfacesDir)
                 ];
             case DirectoryContentType.Controller:
                 serviceInterfacesDir = directories.FindByContentType(DirectoryContentType.ServiceInterface);
                 return [
-                    GetSpecificUsing(solutionName, projects, dtosDir),
+                    GetSpecificUsing(solutionName, projects, dtosDir, true, DirectoryContentType.DtoClass),
                     GetSpecificUsing(solutionName, projects, serviceInterfacesDir)
                 ];
             case DirectoryContentType.ControllerWithMediatr:
                 queriesDir = directories?.FirstOrDefault(d => (d.ContentTypeList ?? []).Contains(DirectoryContentType.GetAllQuery.ToString()));
                 var commandsDir = directories?.FirstOrDefault(d => (d.ContentTypeList ?? []).Contains(DirectoryContentType.CreateCommand.ToString()));
                 return [
-                    GetSpecificUsing(solutionName, projects, dtosDir),
+                    GetSpecificUsing(solutionName, projects, dtosDir, true, DirectoryContentType.DtoClass),
                     GetSpecificUsing(solutionName, projects, queriesDir, true, DirectoryContentType.GetAllQuery),
                     GetSpecificUsing(solutionName, projects, commandsDir, true, DirectoryContentType.CreateCommand)
                 ];
@@ -92,7 +94,7 @@ public static class ClassServiceHelper
             case DirectoryContentType.MappingProfile:
                 return [
                     GetSpecificUsing(solutionName, projects, entitiesDir),
-                    GetSpecificUsing(solutionName, projects, dtosDir)
+                    GetSpecificUsing(solutionName, projects, dtosDir, true, DirectoryContentType.DtoClass)
                 ];
             case DirectoryContentType.ServiceExtensions:
                 repoDir = directories.FindByContentType(DirectoryContentType.RepositoryClass);
@@ -118,36 +120,36 @@ public static class ClassServiceHelper
                 var extensionsWithServicesDir = directories?.FirstOrDefault(d => d.ContentType == DirectoryContentType.ServiceExtensionsWithServices.ToString());
                 return [
                     GetSpecificUsing(solutionName, projects, extensionsWithServicesDir),
-                    $"{solutionName}.{projects?.FirstOrDefault(p => (p.Directories ?? []).Any(d => d.ContentType == DirectoryContentType.DtoClass.ToString()))?.Name}"
+                    $"{solutionName}.{projects?.FirstOrDefault(p => (p.Directories ?? []).Any(d => (d.ContentTypeList ?? []).Contains(DirectoryContentType.DtoClass.ToString())))?.Name}"
                 ];
             case DirectoryContentType.ProgramClassWithMediatr:
                 var extensionsDir = directories?.FirstOrDefault(d => d.ContentType == DirectoryContentType.ServiceExtensions.ToString());
                 queriesDir = directories?.FirstOrDefault(d => (d.ContentTypeList ?? []).Contains(DirectoryContentType.GetAllQuery.ToString()));
                 return [
                     // TODO: add method for it
-                    $"{solutionName}.{projects?.FirstOrDefault(p => (p.Directories ?? []).Any(d => d.ContentType == DirectoryContentType.DtoClass.ToString()))?.Name}",
+                    $"{solutionName}.{projects?.FirstOrDefault(p => (p.Directories ?? []).Any(d => (d.ContentTypeList ?? []).Contains(DirectoryContentType.DtoClass.ToString())))?.Name}",
                     GetSpecificUsing(solutionName, projects, extensionsDir),
                     GetSpecificUsing(solutionName, projects, queriesDir, true, DirectoryContentType.GetAllQuery),
                 ];
             case DirectoryContentType.GetAllQuery:
-                return [GetSpecificUsing(solutionName, projects, dtosDir)];
+                return [GetSpecificUsing(solutionName, projects, dtosDir, true, DirectoryContentType.DtoClass)];
             case DirectoryContentType.GetByIdQuery:
-                return [GetSpecificUsing(solutionName, projects, dtosDir)];
+                return [GetSpecificUsing(solutionName, projects, dtosDir, true, DirectoryContentType.DtoClass)];
             case DirectoryContentType.CreateCommand:
-                return [GetSpecificUsing(solutionName, projects, dtosDir)];
+                return [GetSpecificUsing(solutionName, projects, dtosDir, true, DirectoryContentType.DtoClass)];
             case DirectoryContentType.UpdateCommand:
-                return [GetSpecificUsing(solutionName, projects, dtosDir)];
+                return [GetSpecificUsing(solutionName, projects, dtosDir, true, DirectoryContentType.DtoClass)];
             case DirectoryContentType.GetAllQueryHandler:
                 var getAllQueryDir = directories?.FirstOrDefault(d => (d.ContentTypeList ?? []).Contains(DirectoryContentType.GetAllQuery.ToString()));
                 return [
-                    GetSpecificUsing(solutionName, projects, dtosDir),
+                    GetSpecificUsing(solutionName, projects, dtosDir, true, DirectoryContentType.DtoClass),
                     GetSpecificUsing(solutionName, projects, repoInterfacesDir),
                     GetSpecificUsing(solutionName, projects, getAllQueryDir, true, DirectoryContentType.GetAllQuery)
                 ];
             case DirectoryContentType.GetByIdQueryHandler:
                 var getByIdQueryDir = directories?.FirstOrDefault(d => (d.ContentTypeList ?? []).Contains(DirectoryContentType.GetByIdQuery.ToString()));
                 return [
-                    GetSpecificUsing(solutionName, projects, dtosDir),
+                    GetSpecificUsing(solutionName, projects, dtosDir, true, DirectoryContentType.DtoClass),
                     GetSpecificUsing(solutionName, projects, repoInterfacesDir),
                     GetSpecificUsing(solutionName, projects, getByIdQueryDir, true, DirectoryContentType.GetByIdQuery)
                 ];

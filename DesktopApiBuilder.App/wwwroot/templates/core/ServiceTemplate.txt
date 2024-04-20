@@ -17,7 +17,7 @@ public class {5}Service : I{5}Service
         _mapper = mapper;
     }}
 
-    public async Task Create({5}Dto entityForCreation)
+    public async Task Create({5}ForCreationDto entityForCreation)
     {{
         var entity = _mapper.Map<{5}>(entityForCreation);
 
@@ -46,7 +46,7 @@ public class {5}Service : I{5}Service
     public async Task<{5}Dto?> GetById({6} id) =>
         _mapper.Map<{5}Dto>(await _repository.GetById(id, trackChanges: false));
 
-    public async Task<bool> Update({6} id, {5}Dto entityForUpdate)
+    public async Task<bool> Update({6} id, {5}ForUpdateDto entityForUpdate)
     {{
         var entity = await _repository.GetById(id, trackChanges: true);
 

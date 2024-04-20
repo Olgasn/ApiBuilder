@@ -52,6 +52,8 @@ public static class TemplateHelper
             DirectoryContentType.RepositoryInterface => TemplatePaths.RepositoryInterfaceTemplatePath,
             DirectoryContentType.DbContext => TemplatePaths.DbContextTemplatePath,
             DirectoryContentType.DtoClass => TemplatePaths.DtoTemplatePath,
+            DirectoryContentType.DtoForCreationClass => TemplatePaths.DtoForCreationTemplatePath,
+            DirectoryContentType.DtoForUpdateClass => TemplatePaths.DtoForUpdateTemplatePath,
             DirectoryContentType.MappingProfile => TemplatePaths.MappingProfileTemplatePath,
             DirectoryContentType.ServiceClass => TemplatePaths.ServiceTemplatePath,
             DirectoryContentType.ServiceInterface => TemplatePaths.ServiceInterfaceTemplatePath,

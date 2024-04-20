@@ -70,7 +70,7 @@
                 { 
                     "name": "Dtos", 
                     "parentPath": "",
-                    "contentType": "DtoClass"
+                    "contentTypeList": [ "DtoClass", "DtoForCreationClass", "DtoForUpdateClass" ]
                 },
                 { 
                     "name": "Queries", 

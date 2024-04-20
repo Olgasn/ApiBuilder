@@ -12,7 +12,8 @@ public static class ClassService
     private const string EntityPropTemplate = "\r\n\tpublic {0} {1} {{ get; set; }}";
     private const string DbSetTemplate = "\r\n\tpublic DbSet<{0}> {1} {{ get; set; }}";
 
-    private const string MappingItemTemplate = "\r\n\t\tCreateMap<{0}, {0}Dto>().ReverseMap();";
+    //private const string MappingItemTemplate = "\r\n\t\tCreateMap<{0}, {0}Dto>().ReverseMap();";
+    private const string MappingItemTemplate = "\r\n\t\tCreateMap<{0}, {1}>();";
 
     private const string RepositoryRegTemplate = "\r\n\t\tservices.AddScoped<I{0}Repository, {0}Repository>();";
     private const string ServiceRegTemplate = "\r\n\t\tservices.AddScoped<I{0}Service, {0}Service>();";
@@ -87,6 +88,10 @@ public static class ClassService
                 return GetEntityCreationTemplate(classSettings);
             case DirectoryContentType.DtoClass:
                 return GetEntityCreationTemplate(classSettings);
+            case DirectoryContentType.DtoForCreationClass:
+                return GetEntityCreationTemplate(classSettings, includeId: false);
+            case DirectoryContentType.DtoForUpdateClass:
+                return GetEntityCreationTemplate(classSettings);
             case DirectoryContentType.RepositoryInterface:
                 return string.Format(
                     classSettings.Template ?? string.Empty, 
@@ -152,9 +157,18 @@ public static class ClassService
                     classSettings.Namespace,
                     props);
             case DirectoryContentType.MappingProfile:
-                foreach (var entity in classSettings.Entities ?? [])
+                var index = 0;
+                foreach (var entityName in (classSettings.Entities ?? []).Select(e => e.Name))
                 {
-                    props.Append(string.Format(MappingItemTemplate, entity.Name));
+                    props.Append(string.Format(MappingItemTemplate, entityName, $"{entityName}Dto"));
+                    props.Append(string.Format(MappingItemTemplate, $"{entityName}ForCreationDto", entityName));
+                    props.Append(string.Format(MappingItemTemplate, $"{entityName}ForUpdateDto", entityName));
+                    if (index != classSettings.Entities?.Count - 1)
+                    {
+                        props.Append('\n');
+                    }
+                    
+                    index++;
                 }
                 return string.Format(
                     classSettings.Template ?? string.Empty,
@@ -281,11 +295,13 @@ public static class ClassService
         return string.Empty;
     }
 
-    private static string GetEntityCreationTemplate(ClassTemplateSettings classSettings)
+    private static string GetEntityCreationTemplate(ClassTemplateSettings classSettings, bool includeId = true)
     {
         var props = new StringBuilder();
         foreach (var prop in classSettings.Entity?.Properties ?? [])
         {
+            if (!includeId && prop.Name == "Id") continue;
+
             props.Append(string.Format(EntityPropTemplate, prop.Type, prop.Name));
         }
 

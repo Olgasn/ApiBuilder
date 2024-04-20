@@ -39,7 +39,7 @@ public class {5}Controller : ControllerBase
     }}
 
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] {5}Dto {8})
+    public async Task<IActionResult> Create([FromBody] {5}ForCreationDto {8})
     {{
         if ({8} is null)
         {{
@@ -48,11 +48,11 @@ public class {5}Controller : ControllerBase
 
         await _mediator.Send(new Create{5}Command({8}));
 
-        return Created();
+        return CreatedAtAction(nameof(Create), {8});
     }}
 
     [HttpPut("{{id}}")]
-    public async Task<IActionResult> Update({7} id, [FromBody] {5}Dto {8})
+    public async Task<IActionResult> Update({7} id, [FromBody] {5}ForUpdateDto {8})
     {{
         if ({8} is null)
         {{

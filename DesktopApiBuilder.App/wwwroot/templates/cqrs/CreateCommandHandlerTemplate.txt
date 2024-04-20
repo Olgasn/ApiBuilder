@@ -17,6 +17,9 @@ public class Create{4}CommandHandler : IRequestHandler<Create{4}Command>
 		_mapper = mapper;
 	}}
 
-	public async Task Handle(Create{4}Command request, CancellationToken cancellationToken) => 
+	public async Task Handle(Create{4}Command request, CancellationToken cancellationToken)
+	{{
 		await _repository.Create(_mapper.Map<{4}>(request.{4}));
+		await _repository.SaveChanges();
+	}}
 }}

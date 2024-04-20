@@ -37,7 +37,7 @@ public class {4}Controller : ControllerBase
     }}
 
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] {4}Dto {5})
+    public async Task<IActionResult> Create([FromBody] {4}ForCreationDto {5})
     {{
         if ({5} is null)
         {{
@@ -46,11 +46,11 @@ public class {4}Controller : ControllerBase
 
         await _{5}Service.Create({5});
 
-        return Created();
+        return CreatedAtAction(nameof(Create), {5});
     }}
 
     [HttpPut("{{id}}")]
-    public async Task<IActionResult> Update({6} id, [FromBody] {4}Dto {5})
+    public async Task<IActionResult> Update({6} id, [FromBody] {4}ForUpdateDto {5})
     {{
         if ({5} is null)
         {{

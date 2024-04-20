@@ -25,7 +25,7 @@ public class Update{3}CommandHandler : IRequestHandler<Update{3}Command, bool>
             return false;
         }}
 
-		_mapper.Map(request, entity);
+		_mapper.Map(request.{3}, entity);
 
 		_repository.Update(entity);
 		await _repository.SaveChanges();

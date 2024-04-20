@@ -10,6 +10,8 @@ public enum DirectoryContentType
 
     // Business logic
     DtoClass,
+    DtoForCreationClass,
+    DtoForUpdateClass,
     MappingProfile,
     ServiceClass,
     ServiceInterface,

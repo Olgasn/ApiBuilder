@@ -3,7 +3,10 @@
 public static class TemplatePaths
 {
     public const string EntityTemplatePath = "wwwroot\\templates\\domain\\EntityClassTemplate.txt";
+
     public const string DtoTemplatePath = "wwwroot\\templates\\core\\DtoClassTemplate.txt";
+    public const string DtoForCreationTemplatePath = "wwwroot\\templates\\core\\DtoForCreationTemplate.txt";
+    public const string DtoForUpdateTemplatePath = "wwwroot\\templates\\core\\DtoForUpdateTemplate.txt";
 
     public const string RepositoryInterfaceTemplatePath = "wwwroot\\templates\\domain\\RepositoryInterfaceTemplate.txt";
     public const string RepositoryTemplatePath = "wwwroot\\templates\\domain\\RepositoryTemplate.txt";
