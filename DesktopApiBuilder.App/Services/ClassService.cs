@@ -1,4 +1,5 @@
-﻿using DesktopApiBuilder.App.Data.Enums;
+﻿using DesktopApiBuilder.App.Data.Constants;
+using DesktopApiBuilder.App.Data.Enums;
 using DesktopApiBuilder.App.Data.Models;
 using DesktopApiBuilder.App.Data.Models.Configs;
 using DesktopApiBuilder.App.Data.ViewModels;
@@ -11,8 +12,8 @@ public static class ClassService
 {
     private const string EntityPropTemplate = "\r\n\tpublic {0} {1} {{ get; set; }}";
     private const string DbSetTemplate = "\r\n\tpublic DbSet<{0}> {1} {{ get; set; }}";
+    private const string IncludeNavPropTemplate = ".Include(e => e.{0})";
 
-    //private const string MappingItemTemplate = "\r\n\t\tCreateMap<{0}, {0}Dto>().ReverseMap();";
     private const string MappingItemTemplate = "\r\n\t\tCreateMap<{0}, {1}>();";
 
     private const string RepositoryRegTemplate = "\r\n\t\tservices.AddScoped<I{0}Repository, {0}Repository>();";
@@ -87,11 +88,11 @@ public static class ClassService
             case DirectoryContentType.EntityClass:
                 return GetEntityCreationTemplate(classSettings);
             case DirectoryContentType.DtoClass:
-                return GetEntityCreationTemplate(classSettings);
+                return GetDtoCreationTemplate(classSettings, includeNavProps: true);
             case DirectoryContentType.DtoForCreationClass:
-                return GetEntityCreationTemplate(classSettings, includeId: false);
+                return GetDtoCreationTemplate(classSettings, includeId: false);
             case DirectoryContentType.DtoForUpdateClass:
-                return GetEntityCreationTemplate(classSettings);
+                return GetDtoCreationTemplate(classSettings);
             case DirectoryContentType.RepositoryInterface:
                 return string.Format(
                     classSettings.Template ?? string.Empty, 
@@ -107,6 +108,7 @@ public static class ClassService
                     classSettings.Namespace,
                     classSettings.Entity?.Name,
                     classSettings.Entity?.PluralName,
+                    GetIncludesChain(classSettings.Entity?.Properties ?? []),
                     EnumHelper.GetIdTypeName(classSettings.IdType));
             case DirectoryContentType.ServiceInterface:
                 return string.Format(
@@ -295,17 +297,46 @@ public static class ClassService
         return string.Empty;
     }
 
-    private static string GetEntityCreationTemplate(ClassTemplateSettings classSettings, bool includeId = true)
+    private static string GetEntityCreationTemplate(ClassTemplateSettings classSettings)
     {
         var props = new StringBuilder();
         foreach (var prop in classSettings.Entity?.Properties ?? [])
         {
-            if (!includeId && prop.Name == "Id") continue;
+            props.Append(string.Format(EntityPropTemplate, prop.Type, prop.Name));
+        }
+
+        return string.Format(classSettings.Template ?? string.Empty, classSettings.Namespace, classSettings.Entity?.Name, props);
+    }
+
+    private static string GetDtoCreationTemplate(ClassTemplateSettings classSettings, bool includeId = true, bool includeNavProps = false)
+    {
+        var props = new StringBuilder();
+        foreach (var prop in classSettings.Entity?.Properties ?? [])
+        {
+            if ((!includeId && prop.Name == "Id") || (!includeNavProps && !DefaultEntityPropsTypes.Types.Contains(prop.Type)))
+                continue;
+
+            if (!DefaultEntityPropsTypes.Types.Contains(prop.Type))
+            {
+                props.Append(string.Format(EntityPropTemplate, $"{prop.Type}Dto", prop.Name));
+                continue;
+            }
 
             props.Append(string.Format(EntityPropTemplate, prop.Type, prop.Name));
         }
 
         return string.Format(classSettings.Template ?? string.Empty, classSettings.Namespace, classSettings.Entity?.Name, props);
+    }
+
+    private static string GetIncludesChain(List<EntityPropViewModel> props)
+    {
+        var result = new StringBuilder();
+        foreach (var prop in props.Where(p => !DefaultEntityPropsTypes.Types.Contains(p.Type)))
+        {
+            result.Append(string.Format(IncludeNavPropTemplate, prop.Name));
+        }
+
+        return result.ToString();
     }
 
     private static void CreateClassesRelatedToEntities(SolutionSettingsModel solutionSettings, List<EntityClassViewModel> entities, 

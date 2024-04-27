@@ -1,6 +1,8 @@
 ﻿@page "/domain"
 @using DesktopApiBuilder.App.Data.ViewModels
+@using DesktopApiBuilder.App.Data.Enums
 @inject NavigationManager Navigation
+@inject IDialogService DialogService
 
 <h3>Domain Definition</h3>
 
@@ -16,7 +18,7 @@
 
 <MudText Color="Color.Success" Class="mt-6">@_message</MudText>
 
-<MudTable Items="_entities" Breakpoint="Breakpoint.None">
+<MudTable Items="_entities" Class="mb-4" Breakpoint="Breakpoint.None">
     <HeaderContent>
         <MudTh>Entity name</MudTh>
         <MudTh></MudTh>
@@ -24,7 +26,10 @@
     <RowTemplate>
         <MudTd>@context.Name (@context.PluralName)</MudTd>
         <MudTd>
-            <MudButton OnClick="@(() => OpenEditEntityOverlay(context.Name))" Variant="Variant.Outlined" Disabled=@(_isLoading || _classesCreated)>Edit</MudButton>
+            <div class="d-flex flex-row">
+                <MudButton OnClick="@(() => OpenEditEntityOverlay(context.Name))" Variant="Variant.Outlined" Disabled=@(_isLoading || _classesCreated)>Edit</MudButton>
+                <MudButton OnClick="@(() => RemoveEntity(context))" Class="ml-4" Variant="Variant.Outlined" Color="Color.Error" Disabled=@(_isLoading || _classesCreated)>Delete</MudButton>
+            </div>
         </MudTd>
     </RowTemplate>
     <ChildRowContent>
@@ -53,18 +58,20 @@
             <div class="d-flex flex-row">
                 <MudTextField @bind-Value=item.Name Required RequiredError="Property name is required" Placeholder="Property name" Disabled=@(item.Name == "Id") />
                 <MudSelect @bind-Value=item.Type Required RequiredError="Property type is required" Placeholder="Property type" Disabled=@(item.Name == "Id")>
-                    @foreach (var t in DefaultEntityTypes.Types)
+                    @foreach (var t in _entityPropsTypes)
                     {
-                        <MudSelectItem T=string Value="t"/>
+                        <MudSelectItem T=string Value="t.Name"/>
                     }
                 </MudSelect>
                 <MudButton OnClick="@(() => RemovePropertyItem(item))" Variant="Variant.Outlined" Color=Color.Error Class="mt-4 ml-4" Disabled=@(item.Name == "Id")>R</MudButton>
             </div>
         }
 
-        <div class="d-flex flex-row">
-             <MudButton OnClick=AddEmptyProperty Variant="Variant.Outlined" Class="mt-4">Add property</MudButton>
-             <MudButton OnClick=CloseEntityOverlay Variant="Variant.Outlined" Class="mt-4 ml-4">Close</MudButton>
+        <MudText Typo="Typo.overline">*If you want to add the navigation property, you won't need to create TypeId property manually</MudText>
+
+        <div class="d-flex flex-row mt-4">
+             <MudButton OnClick=AddEmptyProperty Variant="Variant.Outlined">Add property</MudButton>
+             <MudButton OnClick=CloseEntityOverlay Variant="Variant.Outlined" Class="ml-4">Close</MudButton>
         </div>
 
         @if (_editEntity)
@@ -93,6 +100,11 @@
     private string _editingEntityName = string.Empty;
 
     private List<EntityClassViewModel> _entities = new();
+    private List<EntityPropTypeModel> _entityPropsTypes = DefaultEntityPropsTypes.Types.Select(t => new EntityPropTypeModel
+                                                          {
+                                                              Name = t,
+                                                              Type = EntityPropType.Default
+                                                          }).ToList();
 
     private void AddEmptyProperty()
     {
@@ -116,7 +128,7 @@
             return;
         }
 
-        var result = Mapper.EntityPropsToDict(_currentEntity.Properties);
+        var result = Mapper.EntityPropsToDict(_currentEntity.Properties, InMemoryUserSettings.IdType);
 
         if (!string.IsNullOrEmpty(result.ErrorMessage))
         {
@@ -133,6 +145,12 @@
                              Name = item.Key,
                              Type = item.Value
                          }).ToList()
+        });
+
+        _entityPropsTypes.Add(new EntityPropTypeModel
+        {
+            Name = _currentEntity.Name,
+            Type = EntityPropType.Custom
         });
 
         CloseEntityOverlay();
@@ -152,12 +170,25 @@
             return;
         }
 
-        var result = Mapper.EntityPropsToDict(curEntity.Properties);
+        var result = Mapper.EntityPropsToDict(curEntity.Properties, InMemoryUserSettings.IdType);
 
         if (!string.IsNullOrEmpty(result.ErrorMessage))
         {
             _entityErrorMessage = result.ErrorMessage;
             return;
+        }
+
+        foreach (var e in _entities)
+        {
+            var prop = e.Properties.FirstOrDefault(p => p.Name == entity.Name);
+            var idProp = e.Properties.FirstOrDefault(p => p.Name == $"{entity.Name}Id");
+
+            if (prop is not null && idProp is not null)
+            {
+                prop.Name = curEntity.Name ?? string.Empty;
+                prop.Type = curEntity.Name ?? string.Empty;
+                idProp.Name = $"{curEntity.Name}Id";
+            }
         }
 
         entity.Name = curEntity.Name;
@@ -169,6 +200,35 @@
                             }).ToList();
 
         CloseEntityOverlay();
+    }
+
+    private async Task RemoveEntity(EntityClassViewModel entity)
+    {
+        var options = new DialogOptions { CloseOnEscapeKey = true };
+        var parameters = new DialogParameters<ConfirmationDialog>();
+        parameters.Add(p => p.Text, $"Do you want to remove the \"{entity.Name}\" entity?");
+
+        var dialog = await DialogService.ShowAsync<ConfirmationDialog>("Confirmation dialog", parameters, options);
+        var result = await dialog.Result;
+
+        if (!result.Canceled)
+        {
+            _entities.Remove(entity);
+
+            foreach (var e in _entities)
+            {
+                var prop = e.Properties.FirstOrDefault(p => p.Name == entity.Name);
+                var idProp = e.Properties.FirstOrDefault(p => p.Name == $"{entity.Name}Id");
+
+                if (prop is not null && idProp is not null)
+                {
+                    e.Properties.Remove(prop);
+                    e.Properties.Remove(idProp);
+                }
+            }
+        }
+
+        StateHasChanged();
     }
 
     private void OpenEditEntityOverlay(string? entityName)

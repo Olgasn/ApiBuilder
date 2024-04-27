@@ -4,7 +4,7 @@ namespace DesktopApiBuilder.App.Helpers;
 
 public static class EnumHelper
 {
-    public static string GetIdTypeName(IdType idType) =>
+    public static string GetIdTypeName(IdType? idType) =>
         _ = idType switch
         {
             IdType.Int => "int",
