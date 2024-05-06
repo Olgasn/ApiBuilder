@@ -52,8 +52,7 @@
             ],
             "dependencies": {
                 "packages": [ 
-                    "Microsoft.EntityFrameworkCore",
-                    "Microsoft.EntityFrameworkCore.SqlServer", 
+                    "Microsoft.EntityFrameworkCore", 
                     "Microsoft.EntityFrameworkCore.Relational"
                  ],
                 "projectReferences": [ "Domain" ]

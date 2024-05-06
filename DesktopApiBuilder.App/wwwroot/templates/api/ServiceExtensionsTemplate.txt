@@ -19,11 +19,11 @@ public static class ServiceExtensions
     public static void ConfigureDbContext(this IServiceCollection services, IConfiguration configuration)
     {{
         services.AddDbContext<AppDbContext>(opts =>
-            opts.UseSqlServer(configuration.GetConnectionString("DbConnection"), b =>
+            opts.{4}(configuration.GetConnectionString("DbConnection"), b =>
                 b.MigrationsAssembly("{0}")));
     }}
 
     public static void ConfigureServices(this IServiceCollection services)
-    {{{4}
+    {{{5}
     }}
 }}

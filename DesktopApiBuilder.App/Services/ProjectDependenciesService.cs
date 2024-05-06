@@ -1,4 +1,5 @@
-﻿using DesktopApiBuilder.App.Data.Models;
+﻿using DesktopApiBuilder.App.Data.Constants;
+using DesktopApiBuilder.App.Data.Models;
 using DesktopApiBuilder.App.Data.Models.Configs;
 using DesktopApiBuilder.App.Helpers;
 
@@ -11,6 +12,9 @@ public static class ProjectDependenciesService
     // 2 - solution name
     // 3 - project name
     private const string GoToProjectPathCommandTemplate = "cd {0}/{1}/{2}.{3}";
+
+    private const string MsSqlServerPackage = "Microsoft.EntityFrameworkCore.SqlServer";
+    private const string PostgresPackage = "Npgsql.EntityFrameworkCore.PostgreSQL";
 
     public static void AddProjectReferences(SolutionSettingsModel solutionSettings)
     {
@@ -62,4 +66,31 @@ public static class ProjectDependenciesService
 
         ProcessManager.ExecuteCmdCommands([.. commands]);
     }
+
+    public static void AddSqlProviderPackage(SolutionSettingsModel solutionSettings)
+    {
+        List<string> commands = [];
+        var config = ConfigHelper.GetSolutionConfig(solutionSettings.ArchitectureType);
+        var migrationProject = config?.Projects?.FirstOrDefault(p => p.Name == config?.MigrationsProjectName);
+        var projectPath = ConfigHelper.GetProjectPath(config, migrationProject, solutionSettings.SolutionName);
+
+        commands.Add(string.Format(GoToProjectPathCommandTemplate,
+                solutionSettings.SolutionPath,
+                projectPath,
+                solutionSettings.SolutionName,
+                migrationProject?.Name));
+
+        commands.Add($"dotnet add package {GetSqlProviderPackage(solutionSettings.SqlProvider)}");
+
+        ProcessManager.ExecuteCmdCommands([.. commands]);
+    }
+
+    private static string GetSqlProviderPackage(SqlProviders sqlProvider) =>
+        _ = sqlProvider switch
+        {
+            SqlProviders.MSSqlServer => MsSqlServerPackage,
+            SqlProviders.Postgres => PostgresPackage,
+            SqlProviders.Other => throw new NotImplementedException(),
+            _ => throw new NotImplementedException(),
+        };
 }

@@ -1,4 +1,5 @@
-﻿using DesktopApiBuilder.App.Data.Enums;
+﻿using DesktopApiBuilder.App.Data.Constants;
+using DesktopApiBuilder.App.Data.Enums;
 using DesktopApiBuilder.App.Data.Models.Configs;
 using DesktopApiBuilder.App.Data.ViewModels;
 
@@ -6,6 +7,9 @@ namespace DesktopApiBuilder.App.Helpers;
 
 public static class ClassServiceHelper
 {
+    private const string UseSqlServerMethod = "UseSqlServer";
+    private const string UsePostgresMethod = "UseNpgsql";
+
     public static string GetFileName(EntityClassViewModel? entity, DirectoryContentType contentType) =>
         _ = contentType switch
         {
@@ -35,7 +39,7 @@ public static class ClassServiceHelper
             DirectoryContentType.CreateCommandHandler => $"Create{entity?.Name}CommandHandler",
             DirectoryContentType.UpdateCommandHandler => $"Update{entity?.Name}CommandHandler",
             DirectoryContentType.DeleteCommandHandler => $"Delete{entity?.Name}CommandHandler",
-            _ => throw new NotImplementedException(),
+            _ => throw new NotImplementedException()
         };
 
     public static string GetNamespace(string projectFullName, DirectoryConfig? directory)
@@ -182,4 +186,12 @@ public static class ClassServiceHelper
         multipleContentTypes
         ? GetNamespace($"{solutionName}.{projects?.FirstOrDefault(p => (p.Directories ?? []).Any(d => (d.ContentTypeList ?? []).Contains(contentTypeToCheckIfMultiple.ToString())))?.Name}", directory)
         : GetNamespace($"{solutionName}.{projects?.FirstOrDefault(p => (p.Directories ?? []).Any(d => d.ContentType == directory?.ContentType))?.Name}", directory);
+
+    public static string GetUseSqlProviderMethodName(SqlProviders sqlProvider) =>
+        _ = sqlProvider switch
+        {
+            SqlProviders.MSSqlServer => UseSqlServerMethod,
+            SqlProviders.Postgres => UsePostgresMethod,
+            _ => throw new NotImplementedException()
+        };
 }

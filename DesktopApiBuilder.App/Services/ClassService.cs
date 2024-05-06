@@ -190,6 +190,7 @@ public static class ClassService
                     classSettings.Usings[1],
                     classSettings.Usings[2],
                     classSettings.Namespace,
+                    classSettings.UseSqlProviderMethodName,
                     props);
             case DirectoryContentType.ServiceExtensionsWithServices:
                 var repositoryProps = new StringBuilder();
@@ -207,6 +208,7 @@ public static class ClassService
                     classSettings.Usings[3],
                     classSettings.Usings[4],
                     classSettings.Namespace,
+                    classSettings.UseSqlProviderMethodName,
                     repositoryProps,
                     serviceProps);
             case DirectoryContentType.ProgramClass:
@@ -360,7 +362,8 @@ public static class ClassService
                 ClassName = className,
                 Namespace = classNamespace,
                 Usings = ClassServiceHelper.GetUsings(contentType, solutionSettings.SolutionName, config?.Projects),
-                IdType = solutionSettings.IdType
+                IdType = solutionSettings.IdType,
+                UseSqlProviderMethodName = ClassServiceHelper.GetUseSqlProviderMethodName(solutionSettings.SqlProvider)
             };
 
             StreamWriter sw = new(filePath);

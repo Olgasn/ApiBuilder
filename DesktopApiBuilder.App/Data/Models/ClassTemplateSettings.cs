@@ -13,4 +13,5 @@ public class ClassTemplateSettings
     public string[] Usings { get; set; } = [];
     public DirectoryContentType ContentType { get; set; }
     public IdType IdType { get; set; }
+    public string? UseSqlProviderMethodName { get; set; }
 }

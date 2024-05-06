@@ -9,11 +9,10 @@ public static class SqlService
 {
     private const string AppSettingsTemplatePath = "wwwroot\\templates\\api\\AppSettingsTemplate.txt";
 
-    public static void SetupSqlConnection(SolutionSettingsModel solutionSettings, string sqlServerName, string dbName)
+    public static void SetupSqlConnection(SolutionSettingsModel solutionSettings, string sqlConnection)
     {
         try
         {
-            var sqlConnection = $"Server={sqlServerName};Database={dbName};Trusted_Connection=True;Encrypt=True;TrustServerCertificate=True";
             var fileContent = TemplateHelper.GetTemplateContent(AppSettingsTemplatePath);
 
             SolutionConfig? config = ConfigHelper.GetSolutionConfig(solutionSettings.ArchitectureType);
