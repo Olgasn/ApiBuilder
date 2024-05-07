@@ -1,8 +1,18 @@
 ﻿@page "/"
 
-@* <input type="file" id="directoryPicker" webkitdirectory directory onchange="handleDirectorySelection(event)"> *@
-<MudTextField @bind-Value=_solutionPath Required RequiredError="Solution path is required" Label="Solution Path"/>
-<MudTextField @bind-Value=_solutionName Required RequiredError="Solution name is required" Label="Solution Name"/>
+
+<MudGrid>
+    <MudItem xs="12">
+        <div style="display: flex; align-items: flex-end;">
+            <MudTextField @bind-Value="_solutionPath" Required RequiredError="Solution path is required" Label="Solution Path" style="margin-right: 10px;" />
+            <MudButton OnClick="ChooseFolder" Variant="Variant.Outlined" Class="mt-4">Choose folder</MudButton>
+        </div>
+    </MudItem>
+    <MudItem xs="12">
+        <MudTextField @bind-Value="_solutionName" Required RequiredError="Solution name is required" Label="Solution Name" style="margin-top: 10px;" />
+    </MudItem>
+</MudGrid>
+
 
 <MudButton OnClick="CreateSolution" Variant="Variant.Outlined" Class="mt-4" Disabled="!string.IsNullOrEmpty(_message)">Create solution</MudButton>
 
@@ -17,6 +27,13 @@
     private string? _solutionName;
     private string? _solutionPath = "C:/D/Projects/test";
     private string _message = string.Empty;
+
+    private async void ChooseFolder()
+    {
+        _solutionPath = await FolderPicker.PickFolder(_solutionPath);
+
+        StateHasChanged();
+    }
 
     private void CreateSolution()
     {
