@@ -35,7 +35,7 @@
         StateHasChanged();
     }
 
-    private void CreateSolution()
+    private async void CreateSolution()
     {
         if (string.IsNullOrEmpty(_solutionName) || string.IsNullOrEmpty(_solutionPath))
         {
@@ -45,12 +45,17 @@
         InMemoryUserSettings.SolutionName = _solutionName;
         InMemoryUserSettings.SolutionPath = _solutionPath;
 
-        SolutionService.CreateSolution(new SolutionSettingsModel 
+        var tokenSource = new CancellationTokenSource();
+        tokenSource.CancelAfter(60000);
+        var ct = tokenSource.Token;
+
+        await SolutionService.CreateSolution(new SolutionSettingsModel 
             {
                 SolutionName = _solutionName,
                 SolutionPath = _solutionPath
-            });
+            }, ct);
 
         _message = $"Solution \"{_solutionName}\" was succesfully created!";
+        StateHasChanged();
     }
 }

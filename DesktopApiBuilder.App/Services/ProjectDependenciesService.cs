@@ -16,7 +16,7 @@ public static class ProjectDependenciesService
     private const string MsSqlServerPackage = "Microsoft.EntityFrameworkCore.SqlServer";
     private const string PostgresPackage = "Npgsql.EntityFrameworkCore.PostgreSQL";
 
-    public static void AddProjectReferences(SolutionSettingsModel solutionSettings)
+    public static async Task AddProjectReferences(SolutionSettingsModel solutionSettings, CancellationToken ct)
     {
         SolutionConfig? config = ConfigHelper.GetSolutionConfig(solutionSettings.ArchitectureType);
 
@@ -64,10 +64,10 @@ public static class ProjectDependenciesService
             }
         }
 
-        ProcessManager.ExecuteCmdCommands([.. commands]);
+        await ProcessManager.ExecuteCmdCommands([.. commands], ct);
     }
 
-    public static void AddSqlProviderPackage(SolutionSettingsModel solutionSettings)
+    public static async Task AddSqlProviderPackage(SolutionSettingsModel solutionSettings, CancellationToken ct)
     {
         List<string> commands = [];
         var config = ConfigHelper.GetSolutionConfig(solutionSettings.ArchitectureType);
@@ -82,7 +82,7 @@ public static class ProjectDependenciesService
 
         commands.Add($"dotnet add package {GetSqlProviderPackage(solutionSettings.SqlProvider)}");
 
-        ProcessManager.ExecuteCmdCommands([.. commands]);
+        await ProcessManager.ExecuteCmdCommands([.. commands], ct);
     }
 
     private static string GetSqlProviderPackage(SqlProviders sqlProvider) =>

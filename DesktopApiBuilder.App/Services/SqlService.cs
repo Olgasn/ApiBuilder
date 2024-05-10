@@ -28,10 +28,11 @@ public static class SqlService
         catch (Exception ex)
         {
             Console.WriteLine(ex.Message);
+            throw;
         }
     }
 
-    public static void AddMigration(SolutionSettingsModel solutionSettings, string migrationName, bool applyMigration)
+    public static async Task AddMigration(SolutionSettingsModel solutionSettings, string migrationName, bool applyMigration, CancellationToken ct)
     {
         SolutionConfig? config = ConfigHelper.GetSolutionConfig(solutionSettings.ArchitectureType);
         var apiProject = config?.Projects?.FirstOrDefault(p => p.Type == ProjectTypes.AspNetWebApi);
@@ -45,7 +46,7 @@ public static class SqlService
 
         var commands = new List<string>()
         {
-            $"cd {solutionSettings.SolutionPath}",
+            $"cd /d {solutionSettings.SolutionPath}",
             $"dotnet ef migrations add {migrationName} --project {migrationsProjectName} --startup-project {startupProjectName}"
         };
 
@@ -54,6 +55,6 @@ public static class SqlService
             commands.Add($"dotnet ef database update --project {migrationsProjectName} --startup-project {startupProjectName}");
         }
 
-        ProcessManager.ExecuteCmdCommands([.. commands]);
+        await ProcessManager.ExecuteCmdCommands([.. commands], ct);
     }
 }

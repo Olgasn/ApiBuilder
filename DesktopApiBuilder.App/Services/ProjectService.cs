@@ -23,12 +23,12 @@ public static class ProjectService
     // 3 - project name
     private const string GoToProjectPathCommandTemplate = "cd /d {0}/{1}/{2}.{3}";
 
-    public static void CreateProjects(SolutionSettingsModel solutionSettings, CancellationToken ct)
+    public static async Task CreateProjects(SolutionSettingsModel solutionSettings, CancellationToken ct)
     {
         SolutionConfig? config = ConfigHelper.GetSolutionConfig(solutionSettings.ArchitectureType);
         List<string> commands = GenerateExecutionCommands(solutionSettings, config);
 
-        ProcessManager.ExecuteCmdCommands([.. commands]);
+        await ProcessManager.ExecuteCmdCommands([.. commands], ct);
 
         CheckIfDirectoriesExist(solutionSettings, config, ct);
     }

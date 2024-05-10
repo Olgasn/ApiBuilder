@@ -89,10 +89,17 @@
 
     private async Task SetConnectionString()
     {
-        if (string.IsNullOrEmpty(_connectionString))
+        if (string.IsNullOrWhiteSpace(_connectionString))
         {
             return;
         }
+
+        _isLoading = true;
+        StateHasChanged();
+
+        var tokenSource = new CancellationTokenSource();
+        tokenSource.CancelAfter(10000);
+        var ct = tokenSource.Token;
 
         SqlService.SetupSqlConnection(new SolutionSettingsModel()
         {
@@ -101,17 +108,12 @@
             ArchitectureType = InMemoryUserSettings.ArchitectureType
         }, _connectionString);
 
-        SqlService.AddMigration(new SolutionSettingsModel()
+        await SqlService.AddMigration(new SolutionSettingsModel()
         {
             SolutionName = InMemoryUserSettings.SolutionName,
             SolutionPath = InMemoryUserSettings.SolutionPath,
             ArchitectureType = InMemoryUserSettings.ArchitectureType
-        }, "Initial", _applyMigration);
-
-        _isLoading = true;
-        StateHasChanged();
-
-        await Task.Delay(10000);
+        }, "Initial", _applyMigration, ct);
 
         _isLoading = false;
         StateHasChanged();

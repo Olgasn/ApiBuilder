@@ -4,13 +4,13 @@ namespace DesktopApiBuilder.App.Services;
 
 public static class SolutionService
 {
-    public static void CreateSolution(SolutionSettingsModel solutionSettings)
+    public static async Task CreateSolution(SolutionSettingsModel solutionSettings, CancellationToken ct)
     {
-        ProcessManager.ExecuteCmdCommands([
+        await ProcessManager.ExecuteCmdCommands([
             $"cd /d {solutionSettings.SolutionPath}",
             $"mkdir {solutionSettings.SolutionName}",
             $"cd /d {solutionSettings.FullSolutionPath}",
             $"dotnet new sln --name {solutionSettings.SolutionName}"
-        ]);
+        ], ct);
     }
 }

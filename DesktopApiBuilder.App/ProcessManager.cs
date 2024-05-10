@@ -1,28 +1,27 @@
-﻿using System;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 
 namespace DesktopApiBuilder.App;
 
 public static class ProcessManager
 {
-    public static void ExecuteCmdCommands(string[] commands)
+    public static async Task ExecuteCmdCommands(string[] commands, CancellationToken ct)
     {
         Process cmd = new();
 
         cmd.StartInfo.FileName = "cmd.exe";
         cmd.StartInfo.RedirectStandardInput = true;
-        cmd.StartInfo.RedirectStandardOutput = true;
         cmd.StartInfo.CreateNoWindow = true;
         cmd.StartInfo.UseShellExecute = false;
 
         cmd.Start();
 
-        foreach (var command in commands) 
+        foreach (var command in commands)
         {
-            cmd.StandardInput.WriteLine(command);
+            await cmd.StandardInput.WriteLineAsync(command);
         }
 
-        cmd.StandardInput.Flush();
+        await cmd.StandardInput.FlushAsync(ct);
         cmd.StandardInput.Close();
+        await cmd.WaitForExitAsync(ct);
     }
 }

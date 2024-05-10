@@ -77,34 +77,28 @@
         try
         {
             var tokenSource = new CancellationTokenSource();
-            tokenSource.CancelAfter(12000);
+            tokenSource.CancelAfter(300000);
             var ct = tokenSource.Token;
 
-            await Task.Run(() =>
+            await ProjectService.CreateProjects(new SolutionSettingsModel()
             {
-                ProjectService.CreateProjects(new SolutionSettingsModel()
-                {
-                    SolutionName = InMemoryUserSettings.SolutionName,
-                    SolutionPath = InMemoryUserSettings.SolutionPath,
-                    ArchitectureType = InMemoryUserSettings.ArchitectureType
-                }, ct);
+                SolutionName = InMemoryUserSettings.SolutionName,
+                SolutionPath = InMemoryUserSettings.SolutionPath,
+                ArchitectureType = InMemoryUserSettings.ArchitectureType
             }, ct);
-
-            await Task.Run(() =>
+            
+            await ProjectDependenciesService.AddProjectReferences(new SolutionSettingsModel()
             {
-                ProjectDependenciesService.AddProjectReferences(new SolutionSettingsModel()
-                {
-                    SolutionName = InMemoryUserSettings.SolutionName,
-                    SolutionPath = InMemoryUserSettings.SolutionPath,
-                    ArchitectureType = InMemoryUserSettings.ArchitectureType
-                });
-                ProjectDependenciesService.AddSqlProviderPackage(new SolutionSettingsModel()
-                {
-                    SolutionName = InMemoryUserSettings.SolutionName,
-                    SolutionPath = InMemoryUserSettings.SolutionPath,
-                    ArchitectureType = InMemoryUserSettings.ArchitectureType,
-                    SqlProvider = InMemoryUserSettings.SqlProvider
-                });
+                SolutionName = InMemoryUserSettings.SolutionName,
+                SolutionPath = InMemoryUserSettings.SolutionPath,
+                ArchitectureType = InMemoryUserSettings.ArchitectureType
+            }, ct);
+            await ProjectDependenciesService.AddSqlProviderPackage(new SolutionSettingsModel()
+            {
+                SolutionName = InMemoryUserSettings.SolutionName,
+                SolutionPath = InMemoryUserSettings.SolutionPath,
+                ArchitectureType = InMemoryUserSettings.ArchitectureType,
+                SqlProvider = InMemoryUserSettings.SqlProvider
             }, ct);
 
             _message = $"Projects for solution \"{InMemoryUserSettings.SolutionName}\" were succesfully created!";
