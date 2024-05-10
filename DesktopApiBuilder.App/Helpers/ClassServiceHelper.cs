@@ -59,7 +59,7 @@ public static class ClassServiceHelper
         DirectoryConfig? serviceInterfacesDir;
         DirectoryConfig? repoDir;
         DirectoryConfig? queriesDir;
-        // TODO: replace with extension methods
+
         switch (contentType)
         {
             case DirectoryContentType.RepositoryInterface:
@@ -86,8 +86,8 @@ public static class ClassServiceHelper
                     GetSpecificUsing(solutionName, projects, serviceInterfacesDir)
                 ];
             case DirectoryContentType.ControllerWithMediatr:
-                queriesDir = directories?.FirstOrDefault(d => (d.ContentTypeList ?? []).Contains(DirectoryContentType.GetAllQuery.ToString()));
-                var commandsDir = directories?.FirstOrDefault(d => (d.ContentTypeList ?? []).Contains(DirectoryContentType.CreateCommand.ToString()));
+                queriesDir = directories.FindByContentType(DirectoryContentType.GetAllQuery, true);
+                var commandsDir = directories.FindByContentType(DirectoryContentType.CreateCommand, true);
                 return [
                     GetSpecificUsing(solutionName, projects, dtosDir, true, DirectoryContentType.DtoClass),
                     GetSpecificUsing(solutionName, projects, queriesDir, true, DirectoryContentType.GetAllQuery),
@@ -103,35 +103,32 @@ public static class ClassServiceHelper
             case DirectoryContentType.ServiceExtensions:
                 repoDir = directories.FindByContentType(DirectoryContentType.RepositoryClass);
                 return [
-                    // TODO: use root content types for checking
-                    $"{solutionName}.{projects?.FirstOrDefault(p => (p.Directories ?? []).Any(d => d.ContentType == DirectoryContentType.RepositoryClass.ToString()))?.Name}",
+                    GetGeneralProjectUsing(solutionName, projects, DirectoryContentType.RepositoryClass),
                     GetSpecificUsing(solutionName, projects, repoDir),
                     GetSpecificUsing(solutionName, projects, repoInterfacesDir)
                 ];
             case DirectoryContentType.ServiceExtensionsWithServices:
                 repoDir = directories.FindByContentType(DirectoryContentType.RepositoryClass);
                 serviceInterfacesDir = directories.FindByContentType(DirectoryContentType.ServiceInterface);
-                var serviceDir = directories?.FirstOrDefault(d => d.ContentType == DirectoryContentType.ServiceClass.ToString());
+                var serviceDir = directories.FindByContentType(DirectoryContentType.ServiceClass);
                 return [
-                    $"{solutionName}.{projects?.FirstOrDefault(p => (p.Directories ?? []).Any(d => d.ContentType == entitiesDir?.ContentType))?.Name}",
+                    GetGeneralProjectUsing(solutionName, projects, EnumHelper.GetContentTypeFromString(entitiesDir?.ContentType)),
                     GetSpecificUsing(solutionName, projects, repoDir),
                     GetSpecificUsing(solutionName, projects, repoInterfacesDir),
                     GetSpecificUsing(solutionName, projects, serviceDir),
                     GetSpecificUsing(solutionName, projects, serviceInterfacesDir)
                 ];
             case DirectoryContentType.ProgramClass:
-                // TODO: services extensions check
-                var extensionsWithServicesDir = directories?.FirstOrDefault(d => d.ContentType == DirectoryContentType.ServiceExtensionsWithServices.ToString());
+                var extensionsWithServicesDir = directories.FindByContentType(DirectoryContentType.ServiceExtensionsWithServices);
                 return [
                     GetSpecificUsing(solutionName, projects, extensionsWithServicesDir),
-                    $"{solutionName}.{projects?.FirstOrDefault(p => (p.Directories ?? []).Any(d => (d.ContentTypeList ?? []).Contains(DirectoryContentType.DtoClass.ToString())))?.Name}"
+                    GetGeneralProjectUsing(solutionName, projects, DirectoryContentType.DtoClass, true)
                 ];
             case DirectoryContentType.ProgramClassWithMediatr:
-                var extensionsDir = directories?.FirstOrDefault(d => d.ContentType == DirectoryContentType.ServiceExtensions.ToString());
-                queriesDir = directories?.FirstOrDefault(d => (d.ContentTypeList ?? []).Contains(DirectoryContentType.GetAllQuery.ToString()));
+                var extensionsDir = directories.FindByContentType(DirectoryContentType.ServiceExtensions);
+                queriesDir = directories.FindByContentType(DirectoryContentType.GetAllQuery, true);
                 return [
-                    // TODO: add method for it
-                    $"{solutionName}.{projects?.FirstOrDefault(p => (p.Directories ?? []).Any(d => (d.ContentTypeList ?? []).Contains(DirectoryContentType.DtoClass.ToString())))?.Name}",
+                    GetGeneralProjectUsing(solutionName, projects, DirectoryContentType.DtoClass, true),
                     GetSpecificUsing(solutionName, projects, extensionsDir),
                     GetSpecificUsing(solutionName, projects, queriesDir, true, DirectoryContentType.GetAllQuery),
                 ];
@@ -144,34 +141,34 @@ public static class ClassServiceHelper
             case DirectoryContentType.UpdateCommand:
                 return [GetSpecificUsing(solutionName, projects, dtosDir, true, DirectoryContentType.DtoClass)];
             case DirectoryContentType.GetAllQueryHandler:
-                var getAllQueryDir = directories?.FirstOrDefault(d => (d.ContentTypeList ?? []).Contains(DirectoryContentType.GetAllQuery.ToString()));
+                var getAllQueryDir = directories.FindByContentType(DirectoryContentType.GetAllQuery, true);
                 return [
                     GetSpecificUsing(solutionName, projects, dtosDir, true, DirectoryContentType.DtoClass),
                     GetSpecificUsing(solutionName, projects, repoInterfacesDir),
                     GetSpecificUsing(solutionName, projects, getAllQueryDir, true, DirectoryContentType.GetAllQuery)
                 ];
             case DirectoryContentType.GetByIdQueryHandler:
-                var getByIdQueryDir = directories?.FirstOrDefault(d => (d.ContentTypeList ?? []).Contains(DirectoryContentType.GetByIdQuery.ToString()));
+                var getByIdQueryDir = directories.FindByContentType(DirectoryContentType.GetByIdQuery, true);
                 return [
                     GetSpecificUsing(solutionName, projects, dtosDir, true, DirectoryContentType.DtoClass),
                     GetSpecificUsing(solutionName, projects, repoInterfacesDir),
                     GetSpecificUsing(solutionName, projects, getByIdQueryDir, true, DirectoryContentType.GetByIdQuery)
                 ];
             case DirectoryContentType.CreateCommandHandler:
-                var createCommandDir = directories?.FirstOrDefault(d => (d.ContentTypeList ?? []).Contains(DirectoryContentType.CreateCommand.ToString()));
+                var createCommandDir = directories.FindByContentType(DirectoryContentType.CreateCommand, true);
                 return [
                     GetSpecificUsing(solutionName, projects, entitiesDir),
                     GetSpecificUsing(solutionName, projects, repoInterfacesDir),
                     GetSpecificUsing(solutionName, projects, createCommandDir, true, DirectoryContentType.CreateCommand)
                 ];
             case DirectoryContentType.UpdateCommandHandler:
-                var updateCommandDir = directories?.FirstOrDefault(d => (d.ContentTypeList ?? []).Contains(DirectoryContentType.UpdateCommand.ToString()));
+                var updateCommandDir = directories.FindByContentType(DirectoryContentType.UpdateCommand, true);
                 return [
                     GetSpecificUsing(solutionName, projects, repoInterfacesDir),
                     GetSpecificUsing(solutionName, projects, updateCommandDir, true, DirectoryContentType.UpdateCommand)
                 ];
             case DirectoryContentType.DeleteCommandHandler:
-                var deleteCommandDir = directories?.FirstOrDefault(d => (d.ContentTypeList ?? []).Contains(DirectoryContentType.DeleteCommand.ToString()));
+                var deleteCommandDir = directories.FindByContentType(DirectoryContentType.DeleteCommand, true);
                 return [
                     GetSpecificUsing(solutionName, projects, repoInterfacesDir),
                     GetSpecificUsing(solutionName, projects, deleteCommandDir, true, DirectoryContentType.DeleteCommand)
@@ -186,6 +183,11 @@ public static class ClassServiceHelper
         multipleContentTypes
         ? GetNamespace($"{solutionName}.{projects?.FirstOrDefault(p => (p.Directories ?? []).Any(d => (d.ContentTypeList ?? []).Contains(contentTypeToCheckIfMultiple.ToString())))?.Name}", directory)
         : GetNamespace($"{solutionName}.{projects?.FirstOrDefault(p => (p.Directories ?? []).Any(d => d.ContentType == directory?.ContentType))?.Name}", directory);
+
+    public static string GetGeneralProjectUsing(string solutionName, IEnumerable<ProjectConfig>? projects, DirectoryContentType contentType, bool multipleContentTypes = false) =>
+        multipleContentTypes
+        ? $"{solutionName}.{projects?.FirstOrDefault(p => (p.Directories ?? []).Any(d => (d.ContentTypeList ?? []).Contains(contentType.ToString())))?.Name}"
+        : $"{solutionName}.{projects?.FirstOrDefault(p => (p.Directories ?? []).Any(d => d.ContentType == contentType.ToString()))?.Name}";
 
     public static string GetUseSqlProviderMethodName(SqlProviders sqlProvider) =>
         _ = sqlProvider switch

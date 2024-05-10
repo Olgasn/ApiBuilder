@@ -28,10 +28,12 @@ public static class ConfigHelper
 
     public static async Task<SolutionConfig?> GetCustomSolutionConfig(IBrowserFile? browserFile)
     {
+        if (browserFile is null) return null;
+
         try
         {
             var memoryStream = new MemoryStream();
-            await browserFile?.OpenReadStream().CopyToAsync(memoryStream);
+            await browserFile.OpenReadStream().CopyToAsync(memoryStream);
             string json = Encoding.UTF8.GetString(memoryStream.ToArray());
 
             return JsonSerializer.Deserialize<SolutionConfig>(json);
