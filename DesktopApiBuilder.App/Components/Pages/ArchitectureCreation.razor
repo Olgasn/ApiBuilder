@@ -74,37 +74,46 @@
         InMemoryUserSettings.IdType = _selectedIdType;
         InMemoryUserSettings.SqlProvider = _selectedSqlProvider;
 
-        var task = Task.Run(() => ProjectService.CreateProjects(new SolutionSettingsModel()
+        try
         {
-            SolutionName = InMemoryUserSettings.SolutionName,
-            SolutionPath = InMemoryUserSettings.SolutionPath,
-            ArchitectureType = InMemoryUserSettings.ArchitectureType
-        }));
+            var tokenSource = new CancellationTokenSource();
+            tokenSource.CancelAfter(12000);
+            var ct = tokenSource.Token;
 
-        var completedTask = await Task.WhenAny(task, Task.Delay(TimeSpan.FromMinutes(5)));
-
-        if (task == completedTask)
-        {
-            await Task.Run(() => ProjectDependenciesService.AddProjectReferences(new SolutionSettingsModel()
+            await Task.Run(() =>
+            {
+                ProjectService.CreateProjects(new SolutionSettingsModel()
                 {
                     SolutionName = InMemoryUserSettings.SolutionName,
                     SolutionPath = InMemoryUserSettings.SolutionPath,
                     ArchitectureType = InMemoryUserSettings.ArchitectureType
-                }));
-            ProjectDependenciesService.AddSqlProviderPackage(new SolutionSettingsModel()
+                }, ct);
+            }, ct);
+
+            await Task.Run(() =>
+            {
+                ProjectDependenciesService.AddProjectReferences(new SolutionSettingsModel()
+                {
+                    SolutionName = InMemoryUserSettings.SolutionName,
+                    SolutionPath = InMemoryUserSettings.SolutionPath,
+                    ArchitectureType = InMemoryUserSettings.ArchitectureType
+                });
+                ProjectDependenciesService.AddSqlProviderPackage(new SolutionSettingsModel()
                 {
                     SolutionName = InMemoryUserSettings.SolutionName,
                     SolutionPath = InMemoryUserSettings.SolutionPath,
                     ArchitectureType = InMemoryUserSettings.ArchitectureType,
                     SqlProvider = InMemoryUserSettings.SqlProvider
                 });
+            }, ct);
+
             _message = $"Projects for solution \"{InMemoryUserSettings.SolutionName}\" were succesfully created!";
         }
-        else
+        catch
         {
             _errorMessage = "Execution timeout: something went wrong!";
         }
-
+        
         _isLoading = false;
         StateHasChanged();
     }

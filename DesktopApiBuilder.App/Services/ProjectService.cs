@@ -21,23 +21,23 @@ public static class ProjectService
     // 1 - project path
     // 2 - solution name
     // 3 - project name
-    private const string GoToProjectPathCommandTemplate = "cd {0}/{1}/{2}.{3}";
+    private const string GoToProjectPathCommandTemplate = "cd /d {0}/{1}/{2}.{3}";
 
-    public static void CreateProjects(SolutionSettingsModel solutionSettings)
+    public static void CreateProjects(SolutionSettingsModel solutionSettings, CancellationToken ct)
     {
         SolutionConfig? config = ConfigHelper.GetSolutionConfig(solutionSettings.ArchitectureType);
         List<string> commands = GenerateExecutionCommands(solutionSettings, config);
 
         ProcessManager.ExecuteCmdCommands([.. commands]);
 
-        CheckIfDirectoriesExist(solutionSettings, config);
+        CheckIfDirectoriesExist(solutionSettings, config, ct);
     }
 
     private static List<string> GenerateExecutionCommands(SolutionSettingsModel solutionSettings, SolutionConfig? config)
     {
         List<string> commands = [];
 
-        commands.Add($"cd {solutionSettings.FullSolutionPath}");
+        commands.Add($"cd /d {solutionSettings.FullSolutionPath}");
 
         foreach (var folder in config?.SolutionFolders ?? [])
         {
@@ -61,12 +61,12 @@ public static class ProjectService
 
             if (!string.IsNullOrEmpty(solutionFolderName))
             {
-                commands.Add($"cd {solutionSettings.FullSolutionPath}/{solutionFolderName}");
+                commands.Add($"cd /d {solutionSettings.FullSolutionPath}/{solutionFolderName}");
                 solutionFolderName += "/";
             }
             else
             {
-                commands.Add($"cd {solutionSettings.FullSolutionPath}");
+                commands.Add($"cd /d {solutionSettings.FullSolutionPath}");
             }
 
             commands.Add(string.Format(ProjectCreationCommandTemplate,
@@ -74,7 +74,7 @@ public static class ProjectService
                 solutionSettings.SolutionName,
                 project.Name));
 
-            commands.Add($"cd {solutionSettings.FullSolutionPath}");
+            commands.Add($"cd /d {solutionSettings.FullSolutionPath}");
 
             commands.Add(string.Format(AddProjectToSolutionCommandTemplate,
                 solutionSettings.SolutionName,
@@ -126,14 +126,15 @@ public static class ProjectService
         return commands;
     }
 
-    private static void CheckIfDirectoriesExist(SolutionSettingsModel solutionSettings, SolutionConfig? config)
+    private static void CheckIfDirectoriesExist(SolutionSettingsModel solutionSettings, SolutionConfig? config, CancellationToken ct)
     {
         List<string> commonPaths = [];
 
         config?.Projects?.ToList()
             .ForEach(p => commonPaths.AddRange(
                 p?.Directories?.Where(d => string.IsNullOrEmpty(d?.ParentPath))
-                    .Select(d => {
+                    .Select(d =>
+                    {
                         var solutionFolderName = config?.SolutionFolders?
                             .FirstOrDefault(f => f.Id == p.SolutionFolderId)?.Name ?? string.Empty;
 
@@ -142,23 +143,13 @@ public static class ProjectService
                             solutionFolderName += "/";
                         }
 
-                        return $"{solutionSettings.FullSolutionPath}/{solutionFolderName}{solutionSettings.SolutionName}.{p?.Name}/{d?.Name}";
+                        return
+                            $"{solutionSettings.FullSolutionPath}/{solutionFolderName}{solutionSettings.SolutionName}.{p?.Name}/{d?.Name}";
                     }) ?? []));
 
-        while (true)
+        while (!commonPaths.All(Directory.Exists))
         {
-            bool allExist = true;
-
-            foreach (var path in commonPaths)
-            {
-                if (!Directory.Exists(path))
-                {
-                    allExist = false;
-                    break;
-                }
-            }
-
-            if (allExist) break;
+            ct.ThrowIfCancellationRequested();
         }
     }
 }

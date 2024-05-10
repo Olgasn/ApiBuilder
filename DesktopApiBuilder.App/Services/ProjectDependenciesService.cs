@@ -11,7 +11,7 @@ public static class ProjectDependenciesService
     // 1 - project path
     // 2 - solution name
     // 3 - project name
-    private const string GoToProjectPathCommandTemplate = "cd {0}/{1}/{2}.{3}";
+    private const string GoToProjectPathCommandTemplate = "cd /d {0}/{1}/{2}.{3}";
 
     private const string MsSqlServerPackage = "Microsoft.EntityFrameworkCore.SqlServer";
     private const string PostgresPackage = "Npgsql.EntityFrameworkCore.PostgreSQL";
@@ -37,7 +37,7 @@ public static class ProjectDependenciesService
                 commands.Add($"dotnet add package {package}");
             }
 
-            commands.Add($"cd {solutionSettings.FullSolutionPath}");
+            commands.Add($"cd /d {solutionSettings.FullSolutionPath}");
 
             foreach (var projectRef in project.Dependencies?.ProjectReferences ?? [])
             {
@@ -49,7 +49,7 @@ public static class ProjectDependenciesService
                 var relatedProjectSolutionPath = ConfigHelper.GetSolutionPathForProject(config, relatedProject);
                 var projectFullName = $"{solutionSettings.SolutionName}.{project?.Name}";
                 var relatedProjectFullName = $"{solutionSettings.SolutionName}.{relatedProject.Name}";
-                
+
                 if (!string.IsNullOrEmpty(projectSolutionPath))
                 {
                     projectSolutionPath += "/";
