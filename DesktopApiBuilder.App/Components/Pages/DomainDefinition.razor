@@ -1,6 +1,4 @@
 ﻿@page "/domain"
-@using DesktopApiBuilder.App.Data.ViewModels
-@using DesktopApiBuilder.App.Data.Enums
 @inject NavigationManager Navigation
 @inject IDialogService DialogService
 
@@ -260,6 +258,7 @@
             SolutionName = InMemoryUserSettings.SolutionName,
             SolutionPath = InMemoryUserSettings.SolutionPath,
             ArchitectureType = InMemoryUserSettings.ArchitectureType,
+            CustomSolutionConfig = InMemoryUserSettings.CustomSolutionConfig,
             IdType = InMemoryUserSettings.IdType,
             SqlProvider = InMemoryUserSettings.SqlProvider
         }, _entities);

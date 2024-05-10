@@ -1,6 +1,6 @@
 ﻿using DesktopApiBuilder.App.Data.Constants;
+using DesktopApiBuilder.App.Data.Enums;
 using DesktopApiBuilder.App.Data.Models;
-using DesktopApiBuilder.App.Data.Models.Configs;
 using DesktopApiBuilder.App.Helpers;
 
 namespace DesktopApiBuilder.App.Services;
@@ -15,7 +15,9 @@ public static class SqlService
         {
             var fileContent = TemplateHelper.GetTemplateContent(AppSettingsTemplatePath);
 
-            SolutionConfig? config = ConfigHelper.GetSolutionConfig(solutionSettings.ArchitectureType);
+            var config = solutionSettings.ArchitectureType == ArchitectureType.Custom
+                ? solutionSettings.CustomSolutionConfig
+                : ConfigHelper.GetSolutionConfig(solutionSettings.ArchitectureType);
             var apiProject = config?.Projects?.FirstOrDefault(p => p.Type == ProjectTypes.AspNetWebApi);
             var projectPath = ConfigHelper.GetProjectPath(config, apiProject, solutionSettings.SolutionName);
 
@@ -34,7 +36,9 @@ public static class SqlService
 
     public static async Task AddMigration(SolutionSettingsModel solutionSettings, string migrationName, bool applyMigration, CancellationToken ct)
     {
-        SolutionConfig? config = ConfigHelper.GetSolutionConfig(solutionSettings.ArchitectureType);
+        var config = solutionSettings.ArchitectureType == ArchitectureType.Custom
+            ? solutionSettings.CustomSolutionConfig
+            : ConfigHelper.GetSolutionConfig(solutionSettings.ArchitectureType);
         var apiProject = config?.Projects?.FirstOrDefault(p => p.Type == ProjectTypes.AspNetWebApi);
         var migrationProject = config?.Projects?.FirstOrDefault(p => p.Name == config?.MigrationsProjectName);
 

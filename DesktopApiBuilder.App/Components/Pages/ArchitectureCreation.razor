@@ -1,15 +1,37 @@
 ﻿@page "/architecture"
 @using DesktopApiBuilder.App.Services
-@using DesktopApiBuilder.App.Data.Enums
 
 <h3>Infrastructure settings</h3>
 
-<MudSelect @bind-Value=_selectedArc Label="Architecture Type" Class="mt-2">
-    @foreach (var item in _arcTypes)
+<div class="d-flex flex-row align-center mt-2">
+    <MudSelect @bind-Value=_selectedArc Label="Architecture Type">
+        @foreach (var item in _arcTypes)
+        {
+            <MudSelectItem Value="@item" />
+        }
+    </MudSelect>
+
+    @if (_selectedArc == ArchitectureType.Custom)
     {
-        <MudSelectItem Value="@item"/>
+        <MudTextField Value="_customConfigFile?.Name" Label="Config File Name" Disabled Class="mx-4" />
+        <MudFileUpload T="IBrowserFile" FilesChanged="UploadFile" Accept=".json">
+            <ButtonTemplate>
+                <MudButton HtmlTag="label"
+                           Variant="Variant.Outlined"
+                           StartIcon="@Icons.Material.Filled.UploadFile"
+                           Disabled="_isCreateButtonDisabled"
+                           for="@context.Id">
+                    Upload Config File
+                </MudButton>
+            </ButtonTemplate>
+        </MudFileUpload>
     }
-</MudSelect>
+</div>
+
+@if (_selectedArc == ArchitectureType.Custom)
+{
+    <MudLink Href="/custom-config-setup" Class="mt-1">Custom architecture setup</MudLink>
+}
 
 <MudSelect @bind-Value=_selectedIdType Label="Id Type" Class="mt-4">
     @foreach (var item in _idTypes)
@@ -44,13 +66,15 @@
 
 @code {
     // TODO: change it
-    private List<ArchitectureType> _arcTypes = new() { ArchitectureType.ThreeLayered, ArchitectureType.Clean };
-    private List<IdType> _idTypes = new() { IdType.Int, IdType.Guid };
+    private List<ArchitectureType> _arcTypes = [ArchitectureType.ThreeLayered, ArchitectureType.Clean, ArchitectureType.Custom];
+    private List<IdType> _idTypes = [IdType.Int, IdType.Guid];
     private List<SqlProviders> _sqlProviders = [SqlProviders.MSSqlServer, SqlProviders.Postgres]; // TODO: add SqlProviders.Other support
 
     private ArchitectureType _selectedArc;
     private IdType _selectedIdType;
     private SqlProviders _selectedSqlProvider = SqlProviders.MSSqlServer;
+
+    private IBrowserFile? _customConfigFile;
 
     private string _message = string.Empty;
     private string _errorMessage = string.Empty;
@@ -73,6 +97,7 @@
         InMemoryUserSettings.ArchitectureType = _selectedArc;
         InMemoryUserSettings.IdType = _selectedIdType;
         InMemoryUserSettings.SqlProvider = _selectedSqlProvider;
+        InMemoryUserSettings.CustomSolutionConfig = await ConfigHelper.GetCustomSolutionConfig(_customConfigFile);
 
         try
         {
@@ -84,20 +109,23 @@
             {
                 SolutionName = InMemoryUserSettings.SolutionName,
                 SolutionPath = InMemoryUserSettings.SolutionPath,
-                ArchitectureType = InMemoryUserSettings.ArchitectureType
+                ArchitectureType = InMemoryUserSettings.ArchitectureType,
+                CustomSolutionConfig = InMemoryUserSettings.CustomSolutionConfig
             }, ct);
             
             await ProjectDependenciesService.AddProjectReferences(new SolutionSettingsModel()
             {
                 SolutionName = InMemoryUserSettings.SolutionName,
                 SolutionPath = InMemoryUserSettings.SolutionPath,
-                ArchitectureType = InMemoryUserSettings.ArchitectureType
+                ArchitectureType = InMemoryUserSettings.ArchitectureType,
+                CustomSolutionConfig = InMemoryUserSettings.CustomSolutionConfig
             }, ct);
             await ProjectDependenciesService.AddSqlProviderPackage(new SolutionSettingsModel()
             {
                 SolutionName = InMemoryUserSettings.SolutionName,
                 SolutionPath = InMemoryUserSettings.SolutionPath,
                 ArchitectureType = InMemoryUserSettings.ArchitectureType,
+                CustomSolutionConfig = InMemoryUserSettings.CustomSolutionConfig,
                 SqlProvider = InMemoryUserSettings.SqlProvider
             }, ct);
 
@@ -110,5 +138,10 @@
         
         _isLoading = false;
         StateHasChanged();
+    }
+
+    private void UploadFile(IBrowserFile file)
+    {
+        _customConfigFile = file;
     }
 }

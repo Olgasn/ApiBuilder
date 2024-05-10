@@ -64,13 +64,12 @@
             "name": "Application", 
             "type": "classlib",
             "directories": [
-                { "name": "Requests", "parentPath": "" },
-                { "name": "RequestHandlers", "parentPath": "" },
                 { 
                     "name": "Dtos", 
                     "parentPath": "",
                     "contentTypeList": [ "DtoClass", "DtoForCreationClass", "DtoForUpdateClass" ]
                 },
+                { "name": "Requests", "parentPath": "" },
                 { 
                     "name": "Queries", 
                     "parentPath": "/Requests",
@@ -81,6 +80,7 @@
                     "parentPath": "/Requests",
                     "contentTypeList": [ "CreateCommand", "UpdateCommand", "DeleteCommand" ]
                 },
+                { "name": "RequestHandlers", "parentPath": "" },
                 { 
                     "name": "QueryHandlers", 
                     "parentPath": "/RequestHandlers",

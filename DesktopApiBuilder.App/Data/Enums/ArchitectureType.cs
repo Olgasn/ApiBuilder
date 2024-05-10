@@ -3,5 +3,6 @@
 public enum ArchitectureType
 {
     ThreeLayered,
-    Clean
+    Clean,
+    Custom
 }

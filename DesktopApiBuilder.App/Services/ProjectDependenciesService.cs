@@ -1,6 +1,6 @@
 ﻿using DesktopApiBuilder.App.Data.Constants;
+using DesktopApiBuilder.App.Data.Enums;
 using DesktopApiBuilder.App.Data.Models;
-using DesktopApiBuilder.App.Data.Models.Configs;
 using DesktopApiBuilder.App.Helpers;
 
 namespace DesktopApiBuilder.App.Services;
@@ -18,7 +18,9 @@ public static class ProjectDependenciesService
 
     public static async Task AddProjectReferences(SolutionSettingsModel solutionSettings, CancellationToken ct)
     {
-        SolutionConfig? config = ConfigHelper.GetSolutionConfig(solutionSettings.ArchitectureType);
+        var config = solutionSettings.ArchitectureType == ArchitectureType.Custom
+            ? solutionSettings.CustomSolutionConfig
+            : ConfigHelper.GetSolutionConfig(solutionSettings.ArchitectureType);
 
         List<string> commands = [];
 
@@ -70,7 +72,9 @@ public static class ProjectDependenciesService
     public static async Task AddSqlProviderPackage(SolutionSettingsModel solutionSettings, CancellationToken ct)
     {
         List<string> commands = [];
-        var config = ConfigHelper.GetSolutionConfig(solutionSettings.ArchitectureType);
+        var config = solutionSettings.ArchitectureType == ArchitectureType.Custom
+            ? solutionSettings.CustomSolutionConfig
+            : ConfigHelper.GetSolutionConfig(solutionSettings.ArchitectureType);
         var migrationProject = config?.Projects?.FirstOrDefault(p => p.Name == config?.MigrationsProjectName);
         var projectPath = ConfigHelper.GetProjectPath(config, migrationProject, solutionSettings.SolutionName);
 

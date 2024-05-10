@@ -1,5 +1,7 @@
 ﻿using DesktopApiBuilder.App.Data.Enums;
 using DesktopApiBuilder.App.Data.Models.Configs;
+using Microsoft.AspNetCore.Components.Forms;
+using System.Text;
 using System.Text.Json;
 
 namespace DesktopApiBuilder.App.Helpers;
@@ -21,6 +23,36 @@ public static class ConfigHelper
         {
             Console.WriteLine(ex.Message);
             return null;
+        }
+    }
+
+    public static async Task<SolutionConfig?> GetCustomSolutionConfig(IBrowserFile? browserFile)
+    {
+        try
+        {
+            var memoryStream = new MemoryStream();
+            await browserFile?.OpenReadStream().CopyToAsync(memoryStream);
+            string json = Encoding.UTF8.GetString(memoryStream.ToArray());
+
+            return JsonSerializer.Deserialize<SolutionConfig>(json);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            return null;
+        }
+    }
+
+    public static void SaveCustomSolutionConfig(string path, SolutionConfig? config)
+    {
+        try
+        {
+            var json = JsonSerializer.Serialize(config);
+            File.WriteAllText(path, json);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
         }
     }
 

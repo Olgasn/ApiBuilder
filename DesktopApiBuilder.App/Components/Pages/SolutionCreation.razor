@@ -1,15 +1,14 @@
 ﻿@page "/"
 
-
 <MudGrid>
     <MudItem xs="12">
         <div style="display: flex; align-items: flex-end;">
-            <MudTextField @bind-Value="_solutionPath" Required RequiredError="Solution path is required" Label="Solution Path" style="margin-right: 10px;" />
+            <MudTextField @bind-Value="_solutionPath" Required RequiredError="Solution path is required" Label="Solution Path" Class="mr-4" />
             <MudButton OnClick="ChooseFolder" Variant="Variant.Outlined" Class="mt-4">Choose folder</MudButton>
         </div>
     </MudItem>
     <MudItem xs="12">
-        <MudTextField @bind-Value="_solutionName" Required RequiredError="Solution name is required" Label="Solution Name" style="margin-top: 10px;" />
+        <MudTextField @bind-Value="_solutionName" Required RequiredError="Solution name is required" Label="Solution Name" />
     </MudItem>
 </MudGrid>
 
@@ -28,7 +27,7 @@
     private string? _solutionPath = "C:/D/Projects/test";
     private string _message = string.Empty;
 
-    private async void ChooseFolder()
+    private async Task ChooseFolder()
     {
         _solutionPath = await FolderPicker.PickFolder(_solutionPath);
 

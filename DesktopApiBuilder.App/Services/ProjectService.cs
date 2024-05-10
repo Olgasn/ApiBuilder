@@ -1,4 +1,5 @@
 ﻿using DesktopApiBuilder.App.Data.Constants;
+using DesktopApiBuilder.App.Data.Enums;
 using DesktopApiBuilder.App.Data.Models;
 using DesktopApiBuilder.App.Data.Models.Configs;
 using DesktopApiBuilder.App.Helpers;
@@ -25,7 +26,9 @@ public static class ProjectService
 
     public static async Task CreateProjects(SolutionSettingsModel solutionSettings, CancellationToken ct)
     {
-        SolutionConfig? config = ConfigHelper.GetSolutionConfig(solutionSettings.ArchitectureType);
+        var config = solutionSettings.ArchitectureType == ArchitectureType.Custom 
+            ? solutionSettings.CustomSolutionConfig
+            : ConfigHelper.GetSolutionConfig(solutionSettings.ArchitectureType);
         List<string> commands = GenerateExecutionCommands(solutionSettings, config);
 
         await ProcessManager.ExecuteCmdCommands([.. commands], ct);

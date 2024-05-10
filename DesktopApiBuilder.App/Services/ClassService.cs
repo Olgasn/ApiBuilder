@@ -21,7 +21,9 @@ public static class ClassService
 
     public static void CreateClasses(SolutionSettingsModel solutionSettings, List<EntityClassViewModel> entities)
     {
-        SolutionConfig? config = ConfigHelper.GetSolutionConfig(solutionSettings.ArchitectureType);
+        var config = solutionSettings.ArchitectureType == ArchitectureType.Custom
+            ? solutionSettings.CustomSolutionConfig
+            : ConfigHelper.GetSolutionConfig(solutionSettings.ArchitectureType);
 
         try
         {

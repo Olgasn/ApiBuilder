@@ -1,0 +1,104 @@
+﻿@page "/custom-config-setup"
+@using DesktopApiBuilder.App.Data.Models.Configs
+@inject NavigationManager Navigation
+@inject IDialogService DialogService
+
+<h3>Custom Architecture Setup</h3>
+
+<div class="d-flex flex-row align-center my-2">
+    <MudSelect @bind-Value=_selectedArc Label="Architecture Type">
+        @foreach (var item in _arcTypes)
+        {
+            <MudSelectItem Value="@item" />
+        }
+    </MudSelect>
+    <MudButton OnClick="GetRelatedConfig" Variant="Variant.Outlined">Setup</MudButton>
+</div>
+
+@foreach (var project in _projects)
+{
+    <MudPaper Class="pa-4 mt-4">
+        <MudTextField @bind-Value="project.NewName" Label=@($"{project.OldName} project name") />
+
+        @foreach (var directory in project.Directories)
+        {
+            <MudTextField Class=@($"mt-2 ml-{(string.IsNullOrEmpty(directory.ParentPath) ? "6" : "12")}") @bind-Value="directory.NewName" 
+                          Label=@($"{(string.IsNullOrEmpty(directory.ParentPath) ? string.Empty : $"{directory.ParentPath.Trim('/')}/")}{directory.OldName} directory name") />
+        }
+    </MudPaper>
+}
+
+<div class="d-flex flex-row align-center my-4">
+    <MudButton OnClick="SaveConfig" Variant="Variant.Outlined" Disabled=@(_config is null)>Save</MudButton>
+    <MudButton Href="/architecture" Variant="Variant.Outlined" Class="ml-4">Back to infrastructure setup</MudButton>
+</div>
+
+@code {
+    // TODO: change it
+    private List<ArchitectureType> _arcTypes = [ArchitectureType.ThreeLayered, ArchitectureType.Clean];
+    private ArchitectureType _selectedArc;
+    private List<ProjectConfigViewModel> _projects = [];
+
+    private SolutionConfig? _config;
+
+    private void GetRelatedConfig()
+    {
+        _config = ConfigHelper.GetSolutionConfig(_selectedArc);
+        _projects = _config?.Projects?.Select(p => new ProjectConfigViewModel 
+            { 
+                OldName = p.Name, 
+                NewName = p.Name,
+                Directories = p.Directories?.Select(d => new DirectoryConfigViewModel 
+                    { 
+                        OldName = d.Name, 
+                        NewName = d.Name,
+                        ParentPath = d.ParentPath
+                    }).ToList() ?? []
+            }).ToList() ?? [];
+    }
+
+    private async Task SaveConfig()
+    {
+        var selectedFolder = await FolderPicker.PickFolder();
+
+        foreach (var project in _config?.Projects ?? [])
+        {
+            var curProject = _projects.FirstOrDefault(p => (p.OldName ?? string.Empty).Equals(project.Name));
+            project.Name = curProject?.NewName;
+
+            foreach (var dependentProj in _config?.Projects?.Where(p => (p.Dependencies?.ProjectReferences ?? []).Any(pr => pr.Equals(curProject?.OldName))) ?? [])
+            {
+                var newRefList = dependentProj?.Dependencies?.ProjectReferences?.Where(pr => !pr.Equals(curProject?.OldName)).ToList();
+                newRefList?.Add(curProject?.NewName ?? string.Empty);
+
+                dependentProj!.Dependencies!.ProjectReferences = newRefList;
+            }
+
+            foreach (var dir in project.Directories ?? [])
+            {
+                var curDir = curProject?.Directories.FirstOrDefault(d => (d.OldName ?? string.Empty).Equals(dir.Name));
+                dir.Name = curDir?.NewName;
+
+                foreach (var childDir in project?.Directories?.Where(d => (d.ParentPath?.Trim('/') ?? string.Empty).Equals(curDir?.OldName)) ?? [])
+                {
+                    childDir.ParentPath = $"/{curDir?.NewName}";
+                }
+            }
+        }
+
+        var migrationProject = _projects.FirstOrDefault(p => (p.OldName ?? string.Empty).Equals(_config?.MigrationsProjectName));
+        _config!.MigrationsProjectName = migrationProject?.NewName;
+
+        var filename = $"config-{DateTime.Now.ToString("yyyy-MM-ddTHH-mm-ss")}.json";
+        ConfigHelper.SaveCustomSolutionConfig($"{selectedFolder}/{filename}", _config);
+
+        var options = new DialogOptions { CloseOnEscapeKey = true };
+        var parameters = new DialogParameters<ResultDialog>();
+        parameters.Add(p => p.Text, $"Config file \"{filename}\" was succesfully created in \"{selectedFolder}\".");
+
+        var dialog = await DialogService.ShowAsync<ResultDialog>("Success", parameters, options);
+        await dialog.Result;
+
+        Navigation.NavigateTo("/architecture");
+    }
+}
