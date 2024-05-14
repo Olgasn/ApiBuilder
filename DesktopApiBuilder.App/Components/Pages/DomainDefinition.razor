@@ -45,44 +45,46 @@
 </MudTable>
 
 <MudOverlay @bind-Visible=_isOverlayOpened DarkBackground>
-    <div style="background-color: white; padding: 40px; max-height: 500px; overflow-y: scroll;">
-        <div class="d-flex flex-row">
-            <MudTextField @bind-Value=_currentEntity.Name Required RequiredError="Entity name is required" Label="Entity name" />
-            <MudTextField @bind-Value=_currentEntity.PluralName Required RequiredError="Entity plural name is required" Label="Entity plural name" />
-        </div>
-
-        @foreach (var item in _currentEntity.Properties)
-        {
+    <MudForm Model="@_currentEntity" @bind-IsValid = "@_isValid">
+        <div style="background-color: white; padding: 40px; max-height: 500px; overflow-y: scroll;">
             <div class="d-flex flex-row">
-                <MudTextField @bind-Value=item.Name Required RequiredError="Property name is required" Placeholder="Property name" Disabled=@(item.Name == "Id") />
-                <MudSelect @bind-Value=item.Type Required RequiredError="Property type is required" Placeholder="Property type" Disabled=@(item.Name == "Id")>
-                    @foreach (var t in _entityPropsTypes)
-                    {
-                        <MudSelectItem T=string Value="t.Name"/>
-                    }
-                </MudSelect>
-                <MudButton OnClick="@(() => RemovePropertyItem(item))" Variant="Variant.Outlined" Color=Color.Error Class="mt-4 ml-4" Disabled=@(item.Name == "Id")>R</MudButton>
+                <MudTextField @bind-Value=_currentEntity.Name For="@(() => _currentEntity.Name)" Required Label="Entity name" Immediate/>
+                <MudTextField @bind-Value=_currentEntity.PluralName For="@(() => _currentEntity.PluralName)" Required Label="Entity plural name" Immediate/>
             </div>
-        }
 
-        <MudText Typo="Typo.overline">*If you want to add the navigation property, you won't need to create TypeId property manually</MudText>
+            @foreach (var item in _currentEntity.Properties)
+            {
+                <div class="d-flex flex-row">
+                    <MudTextField @bind-Value=item.Name For="@(() => item.Name)" Required RequiredError="Property name is required" Placeholder="Property name" Disabled=@(item.Name == "Id") Immediate/>
+                    <MudSelect @bind-Value=item.Type For="@(() => item.Type)" Required RequiredError="Property type is required" Placeholder="Property type" Disabled=@(item.Name == "Id") Immediate>
+                        @foreach (var t in _entityPropsTypes)
+                        {
+                            <MudSelectItem T=string Value="t.Name"/>
+                        }
+                    </MudSelect>
+                    <MudButton OnClick="@(() => RemovePropertyItem(item))" Variant="Variant.Outlined" Color=Color.Error Class="mt-4 ml-4" Disabled=@(item.Name == "Id")>R</MudButton>
+                </div>
+            }
 
-        <div class="d-flex flex-row mt-4">
-             <MudButton OnClick=AddEmptyProperty Variant="Variant.Outlined">Add property</MudButton>
-             <MudButton OnClick=CloseEntityOverlay Variant="Variant.Outlined" Class="ml-4">Close</MudButton>
+            <MudText Typo="Typo.overline">*If you want to add the navigation property, you won't need to create TypeId property manually</MudText>
+
+            <div class="d-flex flex-row mt-4">
+                <MudButton OnClick=AddEmptyProperty Variant="Variant.Outlined">Add property</MudButton>
+                <MudButton OnClick=CloseEntityOverlay Variant="Variant.Outlined" Class="ml-4">Close</MudButton>
+            </div>
+
+            @if (_editEntity)
+            {
+                <MudButton OnClick=EditEntity Variant="Variant.Outlined" Class="mt-4" Disabled="@(!_isValid)">Edit entity</MudButton>
+            }
+            else
+            {
+                <MudButton OnClick=AddEntity Variant="Variant.Outlined" Class="mt-4" Disabled="@(!_isValid)">Add entity</MudButton>
+            }
+
+            <MudText Color="Color.Error" Class="mt-4">@_entityErrorMessage</MudText>
         </div>
-
-        @if (_editEntity)
-        {
-            <MudButton OnClick=EditEntity Variant="Variant.Outlined" Class="mt-4">Edit entity</MudButton>
-        }
-        else
-        {
-            <MudButton OnClick=AddEntity Variant="Variant.Outlined" Class="mt-4">Add entity</MudButton>
-        }
-
-        <MudText Color="Color.Error" Class="mt-4">@_entityErrorMessage</MudText>
-    </div>
+    </MudForm>
 </MudOverlay>
 
 @code {
@@ -96,6 +98,8 @@
 
     private EntityClassViewModel _currentEntity = GetResetedEntity();
     private string _editingEntityName = string.Empty;
+
+    private bool _isValid;
 
     private List<EntityClassViewModel> _entities = new();
     private List<EntityPropTypeModel> _entityPropsTypes = DefaultEntityPropsTypes.Types.Select(t => new EntityPropTypeModel
