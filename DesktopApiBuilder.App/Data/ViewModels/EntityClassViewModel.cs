@@ -1,18 +1,22 @@
 ﻿using DesktopApiBuilder.App.Helpers;
+using DesktopApiBuilder.App.Resources.Languages;
+using Microsoft.AspNetCore.Components;
+using Microsoft.Extensions.Localization;
 using System.ComponentModel.DataAnnotations;
+
 
 namespace DesktopApiBuilder.App.Data.ViewModels;
 
 public class EntityClassViewModel : ICloneable
 {
-    [Required(ErrorMessage = "Field is required")]
-    [RegularExpression(@"^[a-zA-Z0-9_]+$", ErrorMessage = "Cannot use special symbols")]
-    [CustomValidation(typeof(ValidationHelper), "ValidateForKeyword")]
+    [Required(ErrorMessageResourceType = typeof(Localization), ErrorMessageResourceName = "FieldIsRequiredErrorAttribute")]
+    [RegularExpression(@"^[a-zA-Z0-9_]+$", ErrorMessageResourceType = typeof(Localization), ErrorMessageResourceName = "SpecialSymbolsErrorAttribute")]
+    [CustomValidation(typeof(ValidationHelper), "ValidateForKeyword", ErrorMessageResourceType = typeof(Localization), ErrorMessageResourceName = "CsharpErrorAttribute")]
     public string? Name { get; set; }
 
-    [Required(ErrorMessage = "Field is required")]
-    [RegularExpression(@"^[a-zA-Z0-9_]+$", ErrorMessage = "Cannot use special symbols")]
-    [CustomValidation(typeof(ValidationHelper), "ValidateForKeyword")]
+    [Required(ErrorMessageResourceType = typeof(Localization), ErrorMessageResourceName = "FieldIsRequiredErrorAttribute")]
+    [RegularExpression(@"^[a-zA-Z0-9_]+$", ErrorMessageResourceType = typeof(Localization), ErrorMessageResourceName = "SpecialSymbolsErrorAttribute")]
+    [CustomValidation(typeof(ValidationHelper), "ValidateForKeyword", ErrorMessageResourceType = typeof(Localization), ErrorMessageResourceName = "CsharpErrorAttribute")]
     public string? PluralName { get; set; }
     public List<EntityPropViewModel> Properties { get; set; }
 

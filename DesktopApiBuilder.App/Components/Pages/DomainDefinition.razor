@@ -1,13 +1,16 @@
 ﻿@page "/domain"
 @inject NavigationManager Navigation
 @inject IDialogService DialogService
+@inject IStringLocalizer<Localization> Localizer
 
-<h3>Domain Definition</h3>
+<h3>@Localizer["DomainDefinitionPageTitle"]</h3>
 
 <div class="d-flex flex-row mt-4 align-center">
-    <MudButton OnClick="@(() => _isOverlayOpened = true)" Variant="Variant.Outlined" Disabled=@(_isLoading || _classesCreated)>Add entity class</MudButton>
-    <MudButton OnClick="CreateClasses" Variant="Variant.Outlined" Class="ml-4" Disabled=@(_isLoading || _classesCreated)>Create classes</MudButton>
-    <MudButton Href="/sql" Variant="Variant.Outlined" Class="ml-4" Disabled=@(_isLoading || !_classesCreated)>Next</MudButton>
+    <MudButton OnClick="@(() => _isOverlayOpened = true)" Variant="Variant.Outlined" Disabled=@(_isLoading || _classesCreated)>
+        @Localizer["AddEntityClassBtn"]</MudButton>
+    <MudButton OnClick="CreateClasses" Variant="Variant.Outlined" Class="ml-4" Disabled=@(_isLoading || _classesCreated)>
+        @Localizer["CreateClassesBtn"]</MudButton>
+    <MudButton Href="/sql" Variant="Variant.Outlined" Class="ml-4" Disabled=@(_isLoading || !_classesCreated)>@Localizer["NextBtn"]</MudButton>
     @if (_isLoading)
     {
         <MudProgressCircular Color="Color.Default" Indeterminate Class="ml-4" Size="Size.Small" />
@@ -18,23 +21,25 @@
 
 <MudTable Items="_entities" Class="mb-4" Breakpoint="Breakpoint.None">
     <HeaderContent>
-        <MudTh>Entity name</MudTh>
+        <MudTh>
+            @Localizer["EntityNameTableLable"]</MudTh>
         <MudTh></MudTh>
     </HeaderContent>
     <RowTemplate>
         <MudTd>@context.Name (@context.PluralName)</MudTd>
         <MudTd>
             <div class="d-flex flex-row">
-                <MudButton OnClick="@(() => OpenEditEntityOverlay(context.Name))" Variant="Variant.Outlined" Disabled=@(_isLoading || _classesCreated)>Edit</MudButton>
-                <MudButton OnClick="@(() => RemoveEntity(context))" Class="ml-4" Variant="Variant.Outlined" Color="Color.Error" Disabled=@(_isLoading || _classesCreated)>Delete</MudButton>
+                <MudButton OnClick="@(() => OpenEditEntityOverlay(context.Name))" Variant="Variant.Outlined" Disabled=@(_isLoading || _classesCreated)>@Localizer["EditBtn"]</MudButton>
+                <MudButton OnClick="@(() => RemoveEntity(context))" Class="ml-4" Variant="Variant.Outlined" Color="Color.Error" Disabled=@(_isLoading || _classesCreated)>@Localizer["DeleteBtn"]</MudButton>
             </div>
         </MudTd>
     </RowTemplate>
     <ChildRowContent>
         <MudTable Items="@context.Properties" Breakpoint="Breakpoint.None" Context="propsContext" Dense>
             <HeaderContent>
-                <MudTh>Property name</MudTh>
-                <MudTh>Property type</MudTh>
+                <MudTh>
+                    @Localizer["PropertyNameTableLable"]</MudTh>
+                <MudTh>@Localizer["PropertyTypeTableLable"]</MudTh>
             </HeaderContent>
             <RowTemplate>
                 <MudTd>@propsContext.Name</MudTd>
@@ -48,15 +53,15 @@
     <MudForm Model="@_currentEntity" @bind-IsValid = "@_isValid">
         <div style="background-color: white; padding: 40px; max-height: 500px; overflow-y: scroll;">
             <div class="d-flex flex-row">
-                <MudTextField @bind-Value=_currentEntity.Name For="@(() => _currentEntity.Name)" Required Label="Entity name" Immediate/>
-                <MudTextField @bind-Value=_currentEntity.PluralName For="@(() => _currentEntity.PluralName)" Required Label="Entity plural name" Immediate/>
+                <MudTextField @bind-Value=_currentEntity.Name For="@(() => _currentEntity.Name)" Required Label=@Localizer["EntityNameTableLable"] Immediate />
+                <MudTextField @bind-Value=_currentEntity.PluralName For="@(() => _currentEntity.PluralName)" Required Label=@Localizer["EntityPluralNameLabel"] Immediate/>
             </div>
 
             @foreach (var item in _currentEntity.Properties)
             {
                 <div class="d-flex flex-row">
-                    <MudTextField @bind-Value=item.Name For="@(() => item.Name)" Required RequiredError="Property name is required" Placeholder="Property name" Disabled=@(item.Name == "Id") Immediate/>
-                    <MudSelect @bind-Value=item.Type For="@(() => item.Type)" Required RequiredError="Property type is required" Placeholder="Property type" Disabled=@(item.Name == "Id") Immediate>
+                    <MudTextField @bind-Value=item.Name For="@(() => item.Name)" Required RequiredError=@Localizer["PropertyNameRequiredError"] Placeholder=@Localizer["PropertyNameTableLable"] Disabled=@(item.Name == "Id") Immediate />
+                <MudSelect @bind-Value=item.Type For="@(() => item.Type)" Required RequiredError=@Localizer["PropertyTypeRequiredError"] Placeholder=@Localizer["PropertyTypeTableLable"] Disabled=@(item.Name == "Id") Immediate>
                         @foreach (var t in _entityPropsTypes)
                         {
                             <MudSelectItem T=string Value="t.Name"/>
@@ -66,20 +71,20 @@
                 </div>
             }
 
-            <MudText Typo="Typo.overline">*If you want to add the navigation property, you won't need to create TypeId property manually</MudText>
+            <MudText Typo="Typo.overline">@Localizer["TypeIdTipLable"]</MudText>
 
             <div class="d-flex flex-row mt-4">
-                <MudButton OnClick=AddEmptyProperty Variant="Variant.Outlined">Add property</MudButton>
-                <MudButton OnClick=CloseEntityOverlay Variant="Variant.Outlined" Class="ml-4">Close</MudButton>
+                <MudButton OnClick=AddEmptyProperty Variant="Variant.Outlined">@Localizer["AddPropertyBtn"]</MudButton>
+                <MudButton OnClick=CloseEntityOverlay Variant="Variant.Outlined" Class="ml-4">@Localizer["CloseBtn"]</MudButton>
             </div>
 
             @if (_editEntity)
             {
-                <MudButton OnClick=EditEntity Variant="Variant.Outlined" Class="mt-4" Disabled="@(!_isValid)">Edit entity</MudButton>
+                <MudButton OnClick=EditEntity Variant="Variant.Outlined" Class="mt-4" Disabled="@(!_isValid)">@Localizer["EditEntityBtn"]</MudButton>
             }
             else
             {
-                <MudButton OnClick=AddEntity Variant="Variant.Outlined" Class="mt-4" Disabled="@(!_isValid)">Add entity</MudButton>
+                <MudButton OnClick=AddEntity Variant="Variant.Outlined" Class="mt-4" Disabled="@(!_isValid)">@Localizer["AddEntityBtn"]</MudButton>
             }
 
             <MudText Color="Color.Error" Class="mt-4">@_entityErrorMessage</MudText>
@@ -126,7 +131,7 @@
     {
         if (_entities.Any(e => (e.Name ?? string.Empty).Equals(_currentEntity.Name)))
         {
-            _entityErrorMessage = $"Entity with name \"{_currentEntity.Name}\" is already exists.";
+            _entityErrorMessage = Localizer["EntityError", 0];
             return;
         }
 
@@ -168,7 +173,7 @@
         if (_entities.Where(e => !(e.Name ?? string.Empty).Equals(entity.Name))
                      .Any(e => (e.Name ?? string.Empty).Equals(curEntity.Name)))
         {
-            _entityErrorMessage = $"Entity with name \"{_currentEntity.Name}\" is already exists.";
+            _entityErrorMessage = Localizer["EntityError", 0];
             return;
         }
 
@@ -276,7 +281,7 @@
         StateHasChanged();
 
         _classesCreated = true;
-        _message = $"Classes for solution \"{InMemoryUserSettings.SolutionName}\" were succesfully created!";
+        _message = Localizer["ClassesCreatedMessage", InMemoryUserSettings.SolutionName];
     }
 
     private static EntityClassViewModel GetResetedEntity()

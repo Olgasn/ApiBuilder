@@ -1,0 +1,18 @@
+﻿@using System.Globalization
+
+@code {
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+
+        if (firstRender)
+        {
+            Thread.CurrentThread.CurrentCulture = LocalizationService.GetCurrentCulture();
+            Thread.CurrentThread.CurrentUICulture = LocalizationService.GetCurrentCulture();
+            CultureInfo.DefaultThreadCurrentCulture = LocalizationService.GetCurrentCulture();
+            CultureInfo.DefaultThreadCurrentUICulture = LocalizationService.GetCurrentCulture();
+
+            StateHasChanged();
+        }
+    }
+}

@@ -1,0 +1,321 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AddEntityBtn" xml:space="preserve">
+    <value>Добавить сущность</value>
+  </data>
+  <data name="AddEntityClassBtn" xml:space="preserve">
+    <value>Добавить класс сущности</value>
+  </data>
+  <data name="AddPropertyBtn" xml:space="preserve">
+    <value>Добавить свойство</value>
+  </data>
+  <data name="ApplyMigrationLabel" xml:space="preserve">
+    <value>Применить миграции автоматически</value>
+  </data>
+  <data name="ArchitectureType.Clean" xml:space="preserve">
+    <value>Чистая</value>
+  </data>
+  <data name="ArchitectureType.Custom" xml:space="preserve">
+    <value>Настраиваемая</value>
+  </data>
+  <data name="ArchitectureType.ThreeLayered" xml:space="preserve">
+    <value>Трехуровневая</value>
+  </data>
+  <data name="ArchitectureTypeLabel" xml:space="preserve">
+    <value>Тип архитектуры</value>
+  </data>
+  <data name="BackToInfraBtn" xml:space="preserve">
+    <value>Вернуться к настройке инфраструктуры</value>
+  </data>
+  <data name="CancelBtn" xml:space="preserve">
+    <value>Отмена</value>
+  </data>
+  <data name="ChooseFolderBtn" xml:space="preserve">
+    <value>Выбрать Папку</value>
+  </data>
+  <data name="ClassesCreatedMessage" xml:space="preserve">
+    <value>Классы для решения "{0}" были успешно созданы!</value>
+  </data>
+  <data name="CloseBtn" xml:space="preserve">
+    <value>Закрыть</value>
+  </data>
+  <data name="ConfigFileNameLabel" xml:space="preserve">
+    <value>Название файла конфигурации</value>
+  </data>
+  <data name="ConnectionStringIsRequiredError" xml:space="preserve">
+    <value>Строка подключения обязательна</value>
+  </data>
+  <data name="ConnectionStringLabel" xml:space="preserve">
+    <value>Строка подключения</value>
+  </data>
+  <data name="CreateClassesBtn" xml:space="preserve">
+    <value>Создать классы</value>
+  </data>
+  <data name="CreateProjectsBtn" xml:space="preserve">
+    <value>Создать проекты</value>
+  </data>
+  <data name="CreateSolutionBtn" xml:space="preserve">
+    <value>Создать Решение</value>
+  </data>
+  <data name="CsharpErrorAttribute" xml:space="preserve">
+    <value>Нельзя использовать ключевые слова C#</value>
+  </data>
+  <data name="CustomArchitectureSetupLink" xml:space="preserve">
+    <value>Перейти к настройкам архитектуры</value>
+  </data>
+  <data name="CustomArchitectureSetupPageTitle" xml:space="preserve">
+    <value>Установка настраиваемой инфраструктуры</value>
+  </data>
+  <data name="DatabaseNameLabel" xml:space="preserve">
+    <value>Имя базы данных (начальное значение: {0}Db)</value>
+  </data>
+  <data name="DeleteBtn" xml:space="preserve">
+    <value>Удалить</value>
+  </data>
+  <data name="DirectoryPathLabel" xml:space="preserve">
+    <value>{0}/{1} путь к папке</value>
+  </data>
+  <data name="DomainDefinitionPageTitle" xml:space="preserve">
+    <value>Определение домена</value>
+  </data>
+  <data name="EditBtn" xml:space="preserve">
+    <value>Изменить</value>
+  </data>
+  <data name="EditEntityBtn" xml:space="preserve">
+    <value>Изменить сущность</value>
+  </data>
+  <data name="EntityError" xml:space="preserve">
+    <value>Сущность с именем "{0}" уже сущуствует.</value>
+  </data>
+  <data name="EntityNameTableLable" xml:space="preserve">
+    <value>Имя сущности</value>
+  </data>
+  <data name="EntityPluralNameLabel" xml:space="preserve">
+    <value>Множественное имя сущностей</value>
+  </data>
+  <data name="ExecutionTimeoutErrorMessage" xml:space="preserve">
+    <value>Ошибка выполнения: что-то пошло не так!</value>
+  </data>
+  <data name="FieldIsRequiredErrorAttribute" xml:space="preserve">
+    <value>Обязательное поле</value>
+  </data>
+  <data name="FinalPageMessage" xml:space="preserve">
+    <value>Ваше решение готово к использованию</value>
+  </data>
+  <data name="HostLabel" xml:space="preserve">
+    <value>Хост</value>
+  </data>
+  <data name="IdTypeLabel" xml:space="preserve">
+    <value>Тип ID</value>
+  </data>
+  <data name="InfrastructureSettingsPageTitle" xml:space="preserve">
+    <value>Настройки инфраструктуры</value>
+  </data>
+  <data name="NextBtn" xml:space="preserve">
+    <value>Далее</value>
+  </data>
+  <data name="OkBtn" xml:space="preserve">
+    <value>Ок</value>
+  </data>
+  <data name="OldProjectNameLabel" xml:space="preserve">
+    <value>{0} имя проекта</value>
+  </data>
+  <data name="PasswordLabel" xml:space="preserve">
+    <value>Пароль</value>
+  </data>
+  <data name="PasswordOptionalLabel" xml:space="preserve">
+    <value>Пароль (опционально)</value>
+  </data>
+  <data name="PortLabel" xml:space="preserve">
+    <value>Порт</value>
+  </data>
+  <data name="ProjectsCreatedMessage" xml:space="preserve">
+    <value>Проекты для решения "{0}" были успешно созданы!</value>
+  </data>
+  <data name="PropertyNameRequiredError" xml:space="preserve">
+    <value>Имя свойства обязательно</value>
+  </data>
+  <data name="PropertyNameTableLable" xml:space="preserve">
+    <value>Название свойства</value>
+  </data>
+  <data name="PropertyTypeRequiredError" xml:space="preserve">
+    <value>Тип свойства обязательно</value>
+  </data>
+  <data name="PropertyTypeTableLable" xml:space="preserve">
+    <value>Тип свойства</value>
+  </data>
+  <data name="SaveBtn" xml:space="preserve">
+    <value>Сохранить</value>
+  </data>
+  <data name="SetupBtn" xml:space="preserve">
+    <value>Настроить</value>
+  </data>
+  <data name="SetupDbBtn" xml:space="preserve">
+    <value>Настроить подключение к базе данных + добавить начальную миграцию</value>
+  </data>
+  <data name="SolurionNameRequiredErrorMessage" xml:space="preserve">
+    <value>Требуется указать название решения</value>
+  </data>
+  <data name="SolutionCreatedMessage" xml:space="preserve">
+    <value>Решение "{0}" было успешно создано!</value>
+  </data>
+  <data name="SolutionNameLabel" xml:space="preserve">
+    <value>Название решения</value>
+  </data>
+  <data name="SolutionPathInputLabel" xml:space="preserve">
+    <value>Папка решения</value>
+  </data>
+  <data name="SolutionPathRequiredErrorMessage" xml:space="preserve">
+    <value>Требуется указать путь к папке решения</value>
+  </data>
+  <data name="SpecialSymbolsErrorAttribute" xml:space="preserve">
+    <value>Нельзя использовать специальные символы</value>
+  </data>
+  <data name="SQLProviderMessage" xml:space="preserve">
+    <value>SQL провайдер</value>
+  </data>
+  <data name="SqlProviders.MSSqlServer" xml:space="preserve">
+    <value>MS SQL Server</value>
+  </data>
+  <data name="SqlProviders.Other" xml:space="preserve">
+    <value>Другой</value>
+  </data>
+  <data name="SqlProviders.Postgres" xml:space="preserve">
+    <value>Postgres</value>
+  </data>
+  <data name="SQLServerNameLabel" xml:space="preserve">
+    <value>Имя сервера SQL</value>
+  </data>
+  <data name="SuggestedConnectionStringLabel" xml:space="preserve">
+    <value>Предложеная строка подключения</value>
+  </data>
+  <data name="TypeIdTipLable" xml:space="preserve">
+    <value>*Если вы хотите добавить навигационное свойство, то вам не нужно создавать свойство TypeId вручную</value>
+  </data>
+  <data name="UploadConfigFileBtn" xml:space="preserve">
+    <value>Загрузить конфигурационный файл</value>
+  </data>
+  <data name="UsernameLabel" xml:space="preserve">
+    <value>Имя пользователя</value>
+  </data>
+  <data name="UsernameOptionalLabel" xml:space="preserve">
+    <value>Имя пользователя (опционально)</value>
+  </data>
+</root>

@@ -2,35 +2,37 @@
 @using DesktopApiBuilder.App.Data.Models.Configs
 @inject NavigationManager Navigation
 @inject IDialogService DialogService
+@inject IStringLocalizer<Localization> Localizer
 
-<h3>Custom Architecture Setup</h3>
+<h3>@Localizer["CustomArchitectureSetupPageTitle"]</h3>
 
 <div class="d-flex flex-row align-center my-2">
-    <MudSelect @bind-Value=_selectedArc Label="Architecture Type">
+    <MudSelect @bind-Value=_selectedArc Label=@Localizer["ArchitectureTypeLabel"]>
         @foreach (var item in _arcTypes)
         {
-            <MudSelectItem Value="@item" />
+            <MudSelectItem Value=@Localizer[$"ArchitectureType.{item}"] />
         }
     </MudSelect>
-    <MudButton OnClick="GetRelatedConfig" Variant="Variant.Outlined">Setup</MudButton>
+    <MudButton OnClick="GetRelatedConfig" Variant="Variant.Outlined">@Localizer["SetupBtn"]</MudButton>
 </div>
 
 @foreach (var project in _projects)
 {
     <MudPaper Class="pa-4 mt-4">
-        <MudTextField @bind-Value="project.NewName" Label=@($"{project.OldName} project name") />
+        <MudTextField @bind-Value="project.NewName" Label=@Localizer["OldProjectNameLabel", project.OldName] />
 
         @foreach (var directory in project.Directories)
         {
-            <MudTextField Class=@($"mt-2 ml-{(string.IsNullOrEmpty(directory.ParentPath) ? "6" : "12")}") @bind-Value="directory.NewName" 
-                          Label=@($"{(string.IsNullOrEmpty(directory.ParentPath) ? string.Empty : $"{directory.ParentPath.Trim('/')}/")}{directory.OldName} directory name") />
+            <MudTextField Class=@($"mt-2 ml-{(string.IsNullOrEmpty(directory.ParentPath) ? "6" : "12")}") @bind-Value="directory.NewName"           
+            Label=@Localizer["DirectoryPathLabel", (string.IsNullOrEmpty(directory.ParentPath) ? string.Empty : directory.ParentPath.Trim('/')), directory.OldName] />
         }
     </MudPaper>
 }
 
 <div class="d-flex flex-row align-center my-4">
-    <MudButton OnClick="SaveConfig" Variant="Variant.Outlined" Disabled=@(_config is null)>Save</MudButton>
-    <MudButton Href="/architecture" Variant="Variant.Outlined" Class="ml-4">Back to infrastructure setup</MudButton>
+    <MudButton OnClick="SaveConfig" Variant="Variant.Outlined" Disabled=@(_config is null)>
+        @Localizer["SaveBtn"]</MudButton>
+    <MudButton Href="/architecture" Variant="Variant.Outlined" Class="ml-4">@Localizer["BackToInfraBtn"]</MudButton>
 </div>
 
 @code {

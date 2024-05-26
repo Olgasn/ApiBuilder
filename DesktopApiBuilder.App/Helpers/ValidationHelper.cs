@@ -91,7 +91,7 @@ public static class ValidationHelper
 
         if (csharpKeywords.Contains(value.ToLower()))
         {
-            return new ValidationResult("Cannot use C# keyword!");
+            return new ValidationResult(string.Empty);
         }
 
         return ValidationResult.Success;

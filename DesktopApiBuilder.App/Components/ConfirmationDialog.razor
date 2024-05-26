@@ -1,7 +1,9 @@
-﻿<MudDialog>
+﻿@inject IStringLocalizer<Localization> Localizer
+
+<MudDialog>
     <DialogContent>@Text</DialogContent>
     <DialogActions>
-        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton OnClick="Cancel">@Localizer["CancelBtn"]</MudButton>
         <MudButton Color="Color.Primary" OnClick="Submit">Ok</MudButton>
     </DialogActions>
 </MudDialog>

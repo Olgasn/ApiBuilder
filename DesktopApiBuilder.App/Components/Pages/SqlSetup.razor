@@ -1,49 +1,50 @@
 ﻿@page "/sql"
 @inject NavigationManager Navigation
+@inject IStringLocalizer<Localization> Localizer
 
 @if (InMemoryUserSettings.SqlProvider == SqlProviders.MSSqlServer)
 {
     <div class="d-flex flex-row align-center">
-        <MudTextField Class="mt-2 mr-1" @bind-Value=_sqlSettings.ServerName Label="SQL server name" Immediate TextChanged="OnServerNameChanged" />
-        <MudTextField Class="mt-2 ml-1" @bind-Value=_sqlSettings.DbName Label=@($"Database name (default value: {InMemoryUserSettings.SolutionName}Db)") Immediate TextChanged="OnDdNameChanged" />
+        <MudTextField Class="mt-2 mr-1" @bind-Value=_sqlSettings.ServerName Label=@Localizer["SQLServerNameLabel"] Immediate TextChanged="OnServerNameChanged" />
+        <MudTextField Class="mt-2 ml-1" @bind-Value=_sqlSettings.DbName Label=@Localizer["DatabaseNameLabel", InMemoryUserSettings.SolutionName] Immediate TextChanged="OnDdNameChanged" />
     </div>
     <div class="d-flex flex-row align-center">
-        <MudTextField Class="mt-2 mr-1" @bind-Value=_sqlSettings.Username Label="Username (optional)" Immediate TextChanged="OnUsernameChanged" />
-        <MudTextField Class="mt-2 ml-1" @bind-Value=_sqlSettings.Password Label="Password (optional)" Immediate TextChanged="OnPasswordChanged" />
+        <MudTextField Class="mt-2 mr-1" @bind-Value=_sqlSettings.Username Label=@Localizer["UsernameOptionalLabel"] Immediate TextChanged="OnUsernameChanged" />
+        <MudTextField Class="mt-2 ml-1" @bind-Value=_sqlSettings.Password Label=@Localizer["PasswordOptionalLabel"] Immediate TextChanged="OnPasswordChanged" />
     </div>
     <div class="d-flex flex-row align-center">
-        <MudTextField Class="mt-4" @bind-Value=_connectionString Disabled=@(!_editSqlConnection) Required RequiredError="Connection string is required" Label="Suggested connection string" />
-        <MudButton OnClick=@(() => _editSqlConnection = true) Variant="Variant.Outlined" Disabled=_editSqlConnection>Edit</MudButton>
+        <MudTextField Class="mt-4" @bind-Value=_connectionString Disabled=@(!_editSqlConnection) Required RequiredError=@Localizer["ConnectionStringIsRequiredError"] Label=@Localizer["SuggestedConnectionStringLabel"] />
+        <MudButton OnClick=@(() => _editSqlConnection = true) Variant="Variant.Outlined" Disabled=_editSqlConnection>@Localizer["EditBtn"]</MudButton>
     </div>
 }
 
 @if (InMemoryUserSettings.SqlProvider == SqlProviders.Postgres)
 {
     <div class="d-flex flex-row align-center">
-        <MudTextField Class="mt-2 mr-1" @bind-Value=_sqlSettings.Host Label="Host" Immediate TextChanged="OnHostChanged" />
-        <MudTextField Class="mt-2 mx-1" @bind-Value=_sqlSettings.Port Label="Port" Immediate TextChanged="OnPortChanged" />
-        <MudTextField Class="mt-2 ml-1" @bind-Value=_sqlSettings.DbName Label=@($"Database name (default value: {InMemoryUserSettings.SolutionName}Db)") Immediate TextChanged="OnDdNameChanged" />
+        <MudTextField Class="mt-2 mr-1" @bind-Value=_sqlSettings.Host Label=@Localizer["HostLabel"] Immediate TextChanged="OnHostChanged" />
+        <MudTextField Class="mt-2 mx-1" @bind-Value=_sqlSettings.Port Label=@Localizer["PortLabel"] Immediate TextChanged="OnPortChanged" />
+        <MudTextField Class="mt-2 ml-1" @bind-Value=_sqlSettings.DbName Label=@Localizer["DatabaseNameLabel", InMemoryUserSettings.SolutionName] Immediate TextChanged="OnDdNameChanged" />
     </div>
     <div class="d-flex flex-row align-center">
-        <MudTextField Class="mt-2 mr-1" @bind-Value=_sqlSettings.Username Label="Username" Immediate TextChanged="OnUsernameChanged" />
-        <MudTextField Class="mt-2 ml-1" @bind-Value=_sqlSettings.Password Label="Password" Immediate TextChanged="OnPasswordChanged" />
+        <MudTextField Class="mt-2 mr-1" @bind-Value=_sqlSettings.Username Label=@Localizer["UsernameLabel"] Immediate TextChanged="OnUsernameChanged" />
+        <MudTextField Class="mt-2 ml-1" @bind-Value=_sqlSettings.Password Label=@Localizer["PasswordLabel"] Immediate TextChanged="OnPasswordChanged" />
     </div>
     <div class="d-flex flex-row align-center">
-        <MudTextField Class="mt-4" @bind-Value=_connectionString Disabled=@(!_editSqlConnection) Required RequiredError="Connection string is required" Label="Suggested connection string" />
-        <MudButton OnClick=@(() => _editSqlConnection = true) Variant="Variant.Outlined" Disabled=@(_editSqlConnection || _isLoading)>Edit</MudButton>
+        <MudTextField Class="mt-4" @bind-Value=_connectionString Disabled=@(!_editSqlConnection) Required RequiredError=@Localizer["ConnectionStringIsRequiredError"] Label=@Localizer["SuggestedConnectionStringLabel"] />
+        <MudButton OnClick=@(() => _editSqlConnection = true) Variant="Variant.Outlined" Disabled=@(_editSqlConnection || _isLoading)>@Localizer["EditBtn"]</MudButton>
     </div>
 }
 
 @if (InMemoryUserSettings.SqlProvider == SqlProviders.Other)
 {
-    <MudTextField Class="mt-4" @bind-Value=_connectionString Required RequiredError="Connection string is required" Label="Connection string" />
+    <MudTextField Class="mt-4" @bind-Value=_connectionString Required RequiredError=@Localizer["ConnectionStringIsRequiredError"] Label=@Localizer["ConnectionStringLabel"] />
 }
 
-<MudCheckBox @bind-Value=_applyMigration Label="Apply migration automatically"/>
+<MudCheckBox @bind-Value=_applyMigration Label=@Localizer["ApplyMigrationLabel"] />
 
 <div class="d-flex flex-row mt-4 align-center">
     <MudButton OnClick="SetConnectionString" Variant="Variant.Outlined" Disabled=@(string.IsNullOrEmpty(_connectionString) || _isLoading)>
-        Setup DB connection + Add initial migration
+        @Localizer["SetupDbBtn"]
     </MudButton>
     @if (_isLoading)
     {
@@ -125,7 +126,7 @@
         }
         catch (Exception ex)
         {
-            _errorMessage = "Execution timeout: something went wrong!";
+            _errorMessage = @Localizer["ExecutionTimeoutErrorMessage"];
         }
 
         _isLoading = false;

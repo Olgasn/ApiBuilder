@@ -1,6 +1,8 @@
 ﻿@page "/final"
+@inject IStringLocalizer<Localization> Localizer
 
-<h3>Your solution is ready to use</h3>
+<h3>
+    @Localizer["FinalPageMessage"]</h3>
 
 @code {
 

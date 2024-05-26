@@ -23,6 +23,8 @@ public static class MauiProgram
 		builder.Logging.AddDebug();
 #endif
 
+        builder.Services.AddLocalization();
+
         return builder.Build();
     }
 }

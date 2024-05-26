@@ -1,19 +1,21 @@
 ﻿@page "/architecture"
 @using DesktopApiBuilder.App.Services
+@inherits BaseComponent
+@inject IStringLocalizer<Localization> Localizer
 
-<h3>Infrastructure settings</h3>
+<h3>@Localizer["InfrastructureSettingsPageTitle"]</h3>
 
 <div class="d-flex flex-row align-center mt-2">
-    <MudSelect @bind-Value=_selectedArc Label="Architecture Type">
+    <MudSelect @bind-Value=_selectedArc Label=@Localizer["ArchitectureTypeLabel"]>
         @foreach (var item in _arcTypes)
         {
-            <MudSelectItem Value="@item" />
+            <MudSelectItem Value="@item">@Localizer[$"ArchitectureType.{item}"]</MudSelectItem>
         }
     </MudSelect>
 
     @if (_selectedArc == ArchitectureType.Custom)
     {
-        <MudTextField Value="_customConfigFile?.Name" Label="Config File Name" Disabled Class="mx-4" />
+        <MudTextField Value="_customConfigFile?.Name" Label=@Localizer["ConfigFileNameLabel"] Disabled Class="mx-4" />
         <MudFileUpload T="IBrowserFile" FilesChanged="UploadFile" Accept=".json">
             <ButtonTemplate>
                 <MudButton HtmlTag="label"
@@ -21,7 +23,7 @@
                            StartIcon="@Icons.Material.Filled.UploadFile"
                            Disabled="_isCreateButtonDisabled"
                            for="@context.Id">
-                    Upload Config File
+                    @Localizer["UploadConfigFileBtn"]
                 </MudButton>
             </ButtonTemplate>
         </MudFileUpload>
@@ -30,25 +32,26 @@
 
 @if (_selectedArc == ArchitectureType.Custom)
 {
-    <MudLink Href="/custom-config-setup" Class="mt-1">Custom architecture setup</MudLink>
+    <MudLink Href="/custom-config-setup" Class="mt-1">@Localizer["CustomArchitectureSetupLink"]</MudLink>
 }
 
-<MudSelect @bind-Value=_selectedIdType Label="Id Type" Class="mt-4">
+<MudSelect @bind-Value=_selectedIdType Label=@Localizer["IdTypeLabel"] Class="mt-4">
     @foreach (var item in _idTypes)
     {
         <MudSelectItem Value="@item" />
     }
 </MudSelect>
 
-<MudSelect @bind-Value=_selectedSqlProvider Label="SQL Provider" Class="mt-4">
+<MudSelect @bind-Value=_selectedSqlProvider Label=@Localizer["SQLProviderMessage"] Class="mt-4">
     @foreach (var item in _sqlProviders)
     {
-        <MudSelectItem Value="@item" />
+        <MudSelectItem Value="@item">@Localizer[$"SqlProviders.{item}"]</MudSelectItem>
     }
 </MudSelect>
 
 <div class="d-flex flex-row mt-4 align-center">
-    <MudButton OnClick="CreateProjects" Variant="Variant.Outlined" Disabled="_isCreateButtonDisabled">Create projects</MudButton>
+    <MudButton OnClick="CreateProjects" Variant="Variant.Outlined" Disabled="_isCreateButtonDisabled">
+        @Localizer["CreateProjectsBtn"]</MudButton>
 
     @if (_isLoading)
     {
@@ -61,7 +64,8 @@
 
 @if (!string.IsNullOrEmpty(_message))
 {
-    <MudButton Href="/domain" Variant="Variant.Outlined" Class="mt-4">Next</MudButton>
+    <MudButton Href="/domain" Variant="Variant.Outlined" Class="mt-4">
+        @Localizer["NextBtn"]</MudButton>
 }
 
 @code {
@@ -112,7 +116,7 @@
                 ArchitectureType = InMemoryUserSettings.ArchitectureType,
                 CustomSolutionConfig = InMemoryUserSettings.CustomSolutionConfig
             }, ct);
-            
+
             await ProjectDependenciesService.AddProjectReferences(new SolutionSettingsModel()
             {
                 SolutionName = InMemoryUserSettings.SolutionName,
@@ -129,11 +133,11 @@
                 SqlProvider = InMemoryUserSettings.SqlProvider
             }, ct);
 
-            _message = $"Projects for solution \"{InMemoryUserSettings.SolutionName}\" were succesfully created!";
+            _message = Localizer["ProjectsCreatedMessage", InMemoryUserSettings.SolutionName];
         }
         catch
         {
-            _errorMessage = "Execution timeout: something went wrong!";
+            _errorMessage = Localizer["ExecutionTimeoutErrorMessage"];
         }
         
         _isLoading = false;

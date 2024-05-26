@@ -1,7 +1,9 @@
-﻿<MudDialog>
+﻿@inject IStringLocalizer<Localization> Localizer
+
+<MudDialog>
     <DialogContent>@Text</DialogContent>
     <DialogActions>
-        <MudButton OnClick="Close">Ok</MudButton>
+        <MudButton OnClick="Close">@Localizer["OkBtn"]</MudButton>
     </DialogActions>
 </MudDialog>
 
