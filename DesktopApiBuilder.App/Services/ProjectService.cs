@@ -121,6 +121,14 @@ public static class ProjectService
                         solutionSettings.SolutionName,
                         $"{project.Name}{dir.ParentPath}"));
                 }
+                else
+                {
+                    commands.Add(string.Format(GoToProjectPathCommandTemplate,
+                        solutionSettings.SolutionPath,
+                        projectPath,
+                        solutionSettings.SolutionName,
+                        project.Name));
+                }
 
                 commands.Add($"mkdir {dir.Name}");
             }

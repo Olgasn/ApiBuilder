@@ -159,6 +159,12 @@
   <data name="ConfigFileNameLabel" xml:space="preserve">
     <value>Название файла конфигурации</value>
   </data>
+  <data name="ConfigFileText" xml:space="preserve">
+    <value>Конфигурационный файл "{0}"успешно сохранен в "{1}".</value>
+  </data>
+  <data name="ConfigFileTitleText" xml:space="preserve">
+    <value>Успех</value>
+  </data>
   <data name="ConnectionStringIsRequiredError" xml:space="preserve">
     <value>Строка подключения обязательна</value>
   </data>

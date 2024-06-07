@@ -10,7 +10,7 @@
     <MudSelect @bind-Value=_selectedArc Label=@Localizer["ArchitectureTypeLabel"]>
         @foreach (var item in _arcTypes)
         {
-            <MudSelectItem Value=@Localizer[$"ArchitectureType.{item}"] />
+            <MudSelectItem Value="@item">@Localizer[$"ArchitectureType.{item}"]</MudSelectItem>
         }
     </MudSelect>
     <MudButton OnClick="GetRelatedConfig" Variant="Variant.Outlined">@Localizer["SetupBtn"]</MudButton>
@@ -63,44 +63,47 @@
     {
         var selectedFolder = await FolderPicker.PickFolder();
 
-        foreach (var project in _config?.Projects ?? [])
+        if (!string.IsNullOrWhiteSpace(selectedFolder))
         {
-            var curProject = _projects.FirstOrDefault(p => (p.OldName ?? string.Empty).Equals(project.Name));
-            project.Name = curProject?.NewName;
-
-            foreach (var dependentProj in _config?.Projects?.Where(p => (p.Dependencies?.ProjectReferences ?? []).Any(pr => pr.Equals(curProject?.OldName))) ?? [])
+            foreach (var project in _config?.Projects ?? [])
             {
-                var newRefList = dependentProj?.Dependencies?.ProjectReferences?.Where(pr => !pr.Equals(curProject?.OldName)).ToList();
-                newRefList?.Add(curProject?.NewName ?? string.Empty);
+                var curProject = _projects.FirstOrDefault(p => (p.OldName ?? string.Empty).Equals(project.Name));
+                project.Name = curProject?.NewName;
 
-                dependentProj!.Dependencies!.ProjectReferences = newRefList;
-            }
-
-            foreach (var dir in project.Directories ?? [])
-            {
-                var curDir = curProject?.Directories.FirstOrDefault(d => (d.OldName ?? string.Empty).Equals(dir.Name));
-                dir.Name = curDir?.NewName;
-
-                foreach (var childDir in project?.Directories?.Where(d => (d.ParentPath?.Trim('/') ?? string.Empty).Equals(curDir?.OldName)) ?? [])
+                foreach (var dependentProj in _config?.Projects?.Where(p => (p.Dependencies?.ProjectReferences ?? []).Any(pr => pr.Equals(curProject?.OldName))) ?? [])
                 {
-                    childDir.ParentPath = $"/{curDir?.NewName}";
+                    var newRefList = dependentProj?.Dependencies?.ProjectReferences?.Where(pr => !pr.Equals(curProject?.OldName)).ToList();
+                    newRefList?.Add(curProject?.NewName ?? string.Empty);
+
+                    dependentProj!.Dependencies!.ProjectReferences = newRefList;
+                }
+
+                foreach (var dir in project.Directories ?? [])
+                {
+                    var curDir = curProject?.Directories.FirstOrDefault(d => (d.OldName ?? string.Empty).Equals(dir.Name));
+                    dir.Name = curDir?.NewName;
+
+                    foreach (var childDir in project?.Directories?.Where(d => (d.ParentPath?.Trim('/') ?? string.Empty).Equals(curDir?.OldName)) ?? [])
+                    {
+                        childDir.ParentPath = $"/{curDir?.NewName}";
+                    }
                 }
             }
+
+            var migrationProject = _projects.FirstOrDefault(p => (p.OldName ?? string.Empty).Equals(_config?.MigrationsProjectName));
+            _config!.MigrationsProjectName = migrationProject?.NewName;
+
+            var filename = $"config-{DateTime.Now.ToString("yyyy-MM-ddTHH-mm-ss")}.json";
+            ConfigHelper.SaveCustomSolutionConfig($"{selectedFolder}/{filename}", _config);
+
+            var options = new DialogOptions { CloseOnEscapeKey = true };
+            var parameters = new DialogParameters<ResultDialog>();
+            parameters.Add(p => p.Text, Localizer["ConfigFileText", filename, selectedFolder]);
+
+            var dialog = await DialogService.ShowAsync<ResultDialog>(Localizer["ConfigFileTitleText"], parameters, options);
+            await dialog.Result;
+
+            Navigation.NavigateTo("/architecture");
         }
-
-        var migrationProject = _projects.FirstOrDefault(p => (p.OldName ?? string.Empty).Equals(_config?.MigrationsProjectName));
-        _config!.MigrationsProjectName = migrationProject?.NewName;
-
-        var filename = $"config-{DateTime.Now.ToString("yyyy-MM-ddTHH-mm-ss")}.json";
-        ConfigHelper.SaveCustomSolutionConfig($"{selectedFolder}/{filename}", _config);
-
-        var options = new DialogOptions { CloseOnEscapeKey = true };
-        var parameters = new DialogParameters<ResultDialog>();
-        parameters.Add(p => p.Text, $"Config file \"{filename}\" was succesfully created in \"{selectedFolder}\".");
-
-        var dialog = await DialogService.ShowAsync<ResultDialog>("Success", parameters, options);
-        await dialog.Result;
-
-        Navigation.NavigateTo("/architecture");
     }
 }

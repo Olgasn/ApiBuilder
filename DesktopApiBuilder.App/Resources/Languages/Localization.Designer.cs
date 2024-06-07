@@ -187,6 +187,24 @@ namespace DesktopApiBuilder.App.Resources.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Config file &quot;{0}&quot; was succesfully created in &quot;{1}&quot;..
+        /// </summary>
+        internal static string ConfigFileText {
+            get {
+                return ResourceManager.GetString("ConfigFileText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Success.
+        /// </summary>
+        internal static string ConfigFileTitleText {
+            get {
+                return ResourceManager.GetString("ConfigFileTitleText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Connection string is required.
         /// </summary>
         internal static string ConnectionStringIsRequiredError {

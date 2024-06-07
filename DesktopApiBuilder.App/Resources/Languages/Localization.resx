@@ -159,6 +159,12 @@
   <data name="ConfigFileNameLabel" xml:space="preserve">
     <value>Config File Name</value>
   </data>
+  <data name="ConfigFileText" xml:space="preserve">
+    <value>Config file "{0}" was succesfully created in "{1}".</value>
+  </data>
+  <data name="ConfigFileTitleText" xml:space="preserve">
+    <value>Success</value>
+  </data>
   <data name="ConnectionStringIsRequiredError" xml:space="preserve">
     <value>Connection string is required</value>
   </data>
