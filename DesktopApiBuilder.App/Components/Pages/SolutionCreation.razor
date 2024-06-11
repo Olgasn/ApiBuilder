@@ -2,17 +2,14 @@
 @inherits BaseComponent
 @inject IStringLocalizer<Localization> Localizer
 
-<MudGrid>
-    <MudItem xs="12">
-        <div style="display: flex; align-items: flex-end;">
-            <MudTextField @bind-Value="_solutionPath" Required RequiredError=@Localizer["SolutionPathRequiredErrorMessage"] Label=@Localizer["SolutionPathInputLabel"] Class="mr-4" />
-            <MudButton OnClick="ChooseFolder" Variant="Variant.Outlined" Class="mt-4">@Localizer["ChooseFolderBtn"]</MudButton>
-        </div>
-    </MudItem>
-    <MudItem xs="12">
-        <MudTextField @bind-Value="_solutionName" Required RequiredError=@Localizer["SolurionNameRequiredErrorMessage"] Label=@Localizer["SolutionNameLabel"] />
-    </MudItem>
-</MudGrid>
+<h3 class="mt-4">@Localizer["SolutionCreationPageTitle"]</h3>
+
+<div class="d-flex flex-row align-center mt-4">
+    <MudTextField @bind-Value="_solutionPath" Required RequiredError=@Localizer["SolutionPathRequiredErrorMessage"] Label=@Localizer["SolutionPathInputLabel"] Class="mr-4" />
+    <MudButton OnClick="ChooseFolder" Variant="Variant.Outlined" Class="mt-4">@Localizer["ChooseFolderBtn"]</MudButton>
+</div>
+
+<MudTextField @bind-Value="_solutionName" Required RequiredError=@Localizer["SolurionNameRequiredErrorMessage"] Label=@Localizer["SolutionNameLabel"] />
 
 <MudButton OnClick="CreateSolution" Variant="Variant.Outlined" Class="mt-4" Disabled="!string.IsNullOrEmpty(_message)">@Localizer["CreateSolutionBtn"]</MudButton>
 
@@ -25,7 +22,7 @@
 
 @code {
     private string? _solutionName;
-    private string? _solutionPath = "D:/Angel/test";
+    private string? _solutionPath = string.Empty;
     private string _message = string.Empty;
 
     private async Task ChooseFolder()

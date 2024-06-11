@@ -156,6 +156,9 @@
   <data name="CloseBtn" xml:space="preserve">
     <value>Закрыть</value>
   </data>
+  <data name="ConfigFileCreatedMessage" xml:space="preserve">
+    <value>Конфигурационный файл "{0}" был успешно создан в "{1}".</value>
+  </data>
   <data name="ConfigFileNameLabel" xml:space="preserve">
     <value>Название файла конфигурации</value>
   </data>
@@ -164,6 +167,9 @@
   </data>
   <data name="ConfigFileTitleText" xml:space="preserve">
     <value>Успех</value>
+  </data>
+  <data name="ConfirmationDialogTitle" xml:space="preserve">
+    <value>Подтвердите действие</value>
   </data>
   <data name="ConnectionStringIsRequiredError" xml:space="preserve">
     <value>Строка подключения обязательна</value>
@@ -190,7 +196,7 @@
     <value>Установка настраиваемой инфраструктуры</value>
   </data>
   <data name="DatabaseNameLabel" xml:space="preserve">
-    <value>Имя базы данных (начальное значение: {0}Db)</value>
+    <value>Имя базы данных (стандартное значение: {0}Db)</value>
   </data>
   <data name="DeleteBtn" xml:space="preserve">
     <value>Удалить</value>
@@ -200,6 +206,9 @@
   </data>
   <data name="DomainDefinitionPageTitle" xml:space="preserve">
     <value>Определение домена</value>
+  </data>
+  <data name="DoYouWantToRemoveEntityMessage" xml:space="preserve">
+    <value>Вы действительно хотите удалить сущность "{0}"?</value>
   </data>
   <data name="EditBtn" xml:space="preserve">
     <value>Изменить</value>
@@ -214,7 +223,7 @@
     <value>Имя сущности</value>
   </data>
   <data name="EntityPluralNameLabel" xml:space="preserve">
-    <value>Множественное имя сущностей</value>
+    <value>Имя сущности во множественном числе</value>
   </data>
   <data name="ExecutionTimeoutErrorMessage" xml:space="preserve">
     <value>Ошибка выполнения: что-то пошло не так!</value>
@@ -267,6 +276,9 @@
   <data name="PropertyTypeTableLable" xml:space="preserve">
     <value>Тип свойства</value>
   </data>
+  <data name="ResultDialogSuccessTitle" xml:space="preserve">
+    <value>Успех</value>
+  </data>
   <data name="SaveBtn" xml:space="preserve">
     <value>Сохранить</value>
   </data>
@@ -281,6 +293,9 @@
   </data>
   <data name="SolutionCreatedMessage" xml:space="preserve">
     <value>Решение "{0}" было успешно создано!</value>
+  </data>
+  <data name="SolutionCreationPageTitle" xml:space="preserve">
+    <value>Настройки решения</value>
   </data>
   <data name="SolutionNameLabel" xml:space="preserve">
     <value>Название решения</value>
@@ -308,6 +323,9 @@
   </data>
   <data name="SQLServerNameLabel" xml:space="preserve">
     <value>Имя сервера SQL</value>
+  </data>
+  <data name="SqlSetupPageTitle" xml:space="preserve">
+    <value>Настройки SQL</value>
   </data>
   <data name="SuggestedConnectionStringLabel" xml:space="preserve">
     <value>Предложеная строка подключения</value>

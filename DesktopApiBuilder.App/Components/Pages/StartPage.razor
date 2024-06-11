@@ -1,12 +1,12 @@
 ﻿@page "/"
 @inject NavigationManager Navigation
 
-<h3>
-    Choose UI language / Выберите язык интерфейса
-</h3>
+<div class="d-flex flex-column align-center justify-center py-8">
+    <h3>Choose UI language / Выберите язык интерфейса</h3>
 
-<MudButton Variant="Variant.Outlined" OnClick=@(() => SelectLanguage("en-US"))>English</MudButton>
-<MudButton Variant="Variant.Outlined" OnClick=@(() => SelectLanguage("ru-RU"))>Русский</MudButton>
+    <MudButton Class="mt-4" Variant="Variant.Outlined" OnClick=@(() => SelectLanguage("en-US"))>English</MudButton>
+    <MudButton Class="mt-4" Variant="Variant.Outlined" OnClick=@(() => SelectLanguage("ru-RU"))>Русский</MudButton>
+</div>
 
 @code {
     private void SelectLanguage(string culture)

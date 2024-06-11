@@ -3,7 +3,7 @@
 @inherits BaseComponent
 @inject IStringLocalizer<Localization> Localizer
 
-<h3>@Localizer["InfrastructureSettingsPageTitle"]</h3>
+<h3 class="mt-4">@Localizer["InfrastructureSettingsPageTitle"]</h3>
 
 <div class="d-flex flex-row align-center mt-2">
     <MudSelect @bind-Value=_selectedArc Label=@Localizer["ArchitectureTypeLabel"]>
@@ -69,7 +69,6 @@
 }
 
 @code {
-    // TODO: change it
     private List<ArchitectureType> _arcTypes = [ArchitectureType.ThreeLayered, ArchitectureType.Clean, ArchitectureType.Custom];
     private List<IdType> _idTypes = [IdType.Int, IdType.Guid];
     private List<SqlProviders> _sqlProviders = [SqlProviders.MSSqlServer, SqlProviders.Postgres]; // TODO: add SqlProviders.Other support

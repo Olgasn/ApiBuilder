@@ -4,7 +4,7 @@
 @inject IDialogService DialogService
 @inject IStringLocalizer<Localization> Localizer
 
-<h3>@Localizer["CustomArchitectureSetupPageTitle"]</h3>
+<h3 class="mt-4">@Localizer["CustomArchitectureSetupPageTitle"]</h3>
 
 <div class="d-flex flex-row align-center my-2">
     <MudSelect @bind-Value=_selectedArc Label=@Localizer["ArchitectureTypeLabel"]>
@@ -36,7 +36,6 @@
 </div>
 
 @code {
-    // TODO: change it
     private List<ArchitectureType> _arcTypes = [ArchitectureType.ThreeLayered, ArchitectureType.Clean];
     private ArchitectureType _selectedArc;
     private List<ProjectConfigViewModel> _projects = [];
@@ -96,12 +95,12 @@
             var filename = $"config-{DateTime.Now.ToString("yyyy-MM-ddTHH-mm-ss")}.json";
             ConfigHelper.SaveCustomSolutionConfig($"{selectedFolder}/{filename}", _config);
 
-            var options = new DialogOptions { CloseOnEscapeKey = true };
-            var parameters = new DialogParameters<ResultDialog>();
-            parameters.Add(p => p.Text, Localizer["ConfigFileText", filename, selectedFolder]);
+        var options = new DialogOptions { CloseOnEscapeKey = true };
+        var parameters = new DialogParameters<ResultDialog>();
+        parameters.Add(p => p.Text, Localizer["ConfigFileCreatedMessage", filename, selectedFolder]);
 
-            var dialog = await DialogService.ShowAsync<ResultDialog>(Localizer["ConfigFileTitleText"], parameters, options);
-            await dialog.Result;
+        var dialog = await DialogService.ShowAsync<ResultDialog>(Localizer["ResultDialogSuccessTitle"], parameters, options);
+        await dialog.Result;
 
             Navigation.NavigateTo("/architecture");
         }

@@ -156,6 +156,9 @@
   <data name="CloseBtn" xml:space="preserve">
     <value>Close</value>
   </data>
+  <data name="ConfigFileCreatedMessage" xml:space="preserve">
+    <value>Config file "{0}" was succesfully created in "{1}".</value>
+  </data>
   <data name="ConfigFileNameLabel" xml:space="preserve">
     <value>Config File Name</value>
   </data>
@@ -164,6 +167,9 @@
   </data>
   <data name="ConfigFileTitleText" xml:space="preserve">
     <value>Success</value>
+  </data>
+  <data name="ConfirmationDialogTitle" xml:space="preserve">
+    <value>Confirmation dialog</value>
   </data>
   <data name="ConnectionStringIsRequiredError" xml:space="preserve">
     <value>Connection string is required</value>
@@ -200,6 +206,9 @@
   </data>
   <data name="DomainDefinitionPageTitle" xml:space="preserve">
     <value>Domain Definition</value>
+  </data>
+  <data name="DoYouWantToRemoveEntityMessage" xml:space="preserve">
+    <value>Do you want to remove the "{0}" entity?</value>
   </data>
   <data name="EditBtn" xml:space="preserve">
     <value>Edit</value>
@@ -267,6 +276,9 @@
   <data name="PropertyTypeTableLable" xml:space="preserve">
     <value>Property type</value>
   </data>
+  <data name="ResultDialogSuccessTitle" xml:space="preserve">
+    <value>Success</value>
+  </data>
   <data name="SaveBtn" xml:space="preserve">
     <value>Save</value>
   </data>
@@ -281,6 +293,9 @@
   </data>
   <data name="SolutionCreatedMessage" xml:space="preserve">
     <value>Solution "{0}" was successfully created!</value>
+  </data>
+  <data name="SolutionCreationPageTitle" xml:space="preserve">
+    <value>Solution setup</value>
   </data>
   <data name="SolutionNameLabel" xml:space="preserve">
     <value>Solution Name</value>
@@ -308,6 +323,9 @@
   </data>
   <data name="SQLServerNameLabel" xml:space="preserve">
     <value>SQL server name</value>
+  </data>
+  <data name="SqlSetupPageTitle" xml:space="preserve">
+    <value>SQL setup</value>
   </data>
   <data name="SuggestedConnectionStringLabel" xml:space="preserve">
     <value>Suggested connection string</value>

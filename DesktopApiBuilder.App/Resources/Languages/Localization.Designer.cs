@@ -178,6 +178,15 @@ namespace DesktopApiBuilder.App.Resources.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Config file &quot;{0}&quot; was succesfully created in &quot;{1}&quot;..
+        /// </summary>
+        internal static string ConfigFileCreatedMessage {
+            get {
+                return ResourceManager.GetString("ConfigFileCreatedMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Config File Name.
         /// </summary>
         internal static string ConfigFileNameLabel {
@@ -201,6 +210,15 @@ namespace DesktopApiBuilder.App.Resources.Languages {
         internal static string ConfigFileTitleText {
             get {
                 return ResourceManager.GetString("ConfigFileTitleText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Confirmation dialog.
+        /// </summary>
+        internal static string ConfirmationDialogTitle {
+            get {
+                return ResourceManager.GetString("ConfirmationDialogTitle", resourceCulture);
             }
         }
         
@@ -309,6 +327,15 @@ namespace DesktopApiBuilder.App.Resources.Languages {
         internal static string DomainDefinitionPageTitle {
             get {
                 return ResourceManager.GetString("DomainDefinitionPageTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Do you want to remove the &quot;{0}&quot; entity?.
+        /// </summary>
+        internal static string DoYouWantToRemoveEntityMessage {
+            get {
+                return ResourceManager.GetString("DoYouWantToRemoveEntityMessage", resourceCulture);
             }
         }
         
@@ -511,6 +538,15 @@ namespace DesktopApiBuilder.App.Resources.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Success.
+        /// </summary>
+        internal static string ResultDialogSuccessTitle {
+            get {
+                return ResourceManager.GetString("ResultDialogSuccessTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Save.
         /// </summary>
         internal static string SaveBtn {
@@ -552,6 +588,15 @@ namespace DesktopApiBuilder.App.Resources.Languages {
         internal static string SolutionCreatedMessage {
             get {
                 return ResourceManager.GetString("SolutionCreatedMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Solution setup.
+        /// </summary>
+        internal static string SolutionCreationPageTitle {
+            get {
+                return ResourceManager.GetString("SolutionCreationPageTitle", resourceCulture);
             }
         }
         
@@ -633,6 +678,15 @@ namespace DesktopApiBuilder.App.Resources.Languages {
         internal static string SQLServerNameLabel {
             get {
                 return ResourceManager.GetString("SQLServerNameLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to SQL setup.
+        /// </summary>
+        internal static string SqlSetupPageTitle {
+            get {
+                return ResourceManager.GetString("SqlSetupPageTitle", resourceCulture);
             }
         }
         

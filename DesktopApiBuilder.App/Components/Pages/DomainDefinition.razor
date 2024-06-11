@@ -3,13 +3,11 @@
 @inject IDialogService DialogService
 @inject IStringLocalizer<Localization> Localizer
 
-<h3>@Localizer["DomainDefinitionPageTitle"]</h3>
+<h3 class="mt-4">@Localizer["DomainDefinitionPageTitle"]</h3>
 
 <div class="d-flex flex-row mt-4 align-center">
-    <MudButton OnClick="@(() => _isOverlayOpened = true)" Variant="Variant.Outlined" Disabled=@(_isLoading || _classesCreated)>
-        @Localizer["AddEntityClassBtn"]</MudButton>
-    <MudButton OnClick="CreateClasses" Variant="Variant.Outlined" Class="ml-4" Disabled=@(_isLoading || _classesCreated)>
-        @Localizer["CreateClassesBtn"]</MudButton>
+    <MudButton OnClick="@(() => _isOverlayOpened = true)" Variant="Variant.Outlined" Disabled=@(_isLoading || _classesCreated)>@Localizer["AddEntityClassBtn"]</MudButton>
+    <MudButton OnClick="CreateClasses" Variant="Variant.Outlined" Class="ml-4" Disabled=@(_isLoading || _classesCreated)>@Localizer["CreateClassesBtn"]</MudButton>
     <MudButton Href="/sql" Variant="Variant.Outlined" Class="ml-4" Disabled=@(_isLoading || !_classesCreated)>@Localizer["NextBtn"]</MudButton>
     @if (_isLoading)
     {
@@ -21,8 +19,7 @@
 
 <MudTable Items="_entities" Class="mb-4" Breakpoint="Breakpoint.None">
     <HeaderContent>
-        <MudTh>
-            @Localizer["EntityNameTableLable"]</MudTh>
+        <MudTh>@Localizer["EntityNameTableLable"]</MudTh>
         <MudTh></MudTh>
     </HeaderContent>
     <RowTemplate>
@@ -37,8 +34,7 @@
     <ChildRowContent>
         <MudTable Items="@context.Properties" Breakpoint="Breakpoint.None" Context="propsContext" Dense>
             <HeaderContent>
-                <MudTh>
-                    @Localizer["PropertyNameTableLable"]</MudTh>
+                <MudTh>@Localizer["PropertyNameTableLable"]</MudTh>
                 <MudTh>@Localizer["PropertyTypeTableLable"]</MudTh>
             </HeaderContent>
             <RowTemplate>
@@ -61,13 +57,13 @@
             {
                 <div class="d-flex flex-row">
                     <MudTextField @bind-Value=item.Name For="@(() => item.Name)" Required RequiredError=@Localizer["PropertyNameRequiredError"] Placeholder=@Localizer["PropertyNameTableLable"] Disabled=@(item.Name == "Id") Immediate />
-                <MudSelect @bind-Value=item.Type For="@(() => item.Type)" Required RequiredError=@Localizer["PropertyTypeRequiredError"] Placeholder=@Localizer["PropertyTypeTableLable"] Disabled=@(item.Name == "Id") Immediate>
+                    <MudSelect @bind-Value=item.Type For="@(() => item.Type)" Required RequiredError=@Localizer["PropertyTypeRequiredError"] Placeholder=@Localizer["PropertyTypeTableLable"] Disabled=@(item.Name == "Id") Immediate>
                         @foreach (var t in _entityPropsTypes)
                         {
                             <MudSelectItem T=string Value="t.Name"/>
                         }
                     </MudSelect>
-                    <MudButton OnClick="@(() => RemovePropertyItem(item))" Variant="Variant.Outlined" Color=Color.Error Class="mt-4 ml-4" Disabled=@(item.Name == "Id")>R</MudButton>
+                    <MudIconButton OnClick="@(() => RemovePropertyItem(item))" Icon=@Icons.Material.Filled.DeleteOutline Variant="Variant.Outlined" Color=Color.Error Class="mt-4 ml-4" Disabled=@(item.Name == "Id") />
                 </div>
             }
 
@@ -213,9 +209,9 @@
     {
         var options = new DialogOptions { CloseOnEscapeKey = true };
         var parameters = new DialogParameters<ConfirmationDialog>();
-        parameters.Add(p => p.Text, $"Do you want to remove the \"{entity.Name}\" entity?");
+        parameters.Add(p => p.Text, Localizer["DoYouWantToRemoveEntityMessage", entity.Name ?? string.Empty]);
 
-        var dialog = await DialogService.ShowAsync<ConfirmationDialog>("Confirmation dialog", parameters, options);
+        var dialog = await DialogService.ShowAsync<ConfirmationDialog>(Localizer["ConfirmationDialogTitle"], parameters, options);
         var result = await dialog.Result;
 
         if (!result.Canceled)
