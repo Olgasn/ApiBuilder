@@ -1,0 +1,236 @@
+﻿using FluentAssertions;
+using MediatR;
+using Microsoft.AspNetCore.Mvc;
+using Moq;
+using System.Net;
+using {0};
+using {1};
+using {2};
+using {3};
+
+namespace {4};
+
+public class {5}ControllerTests
+{{
+    private readonly Mock<IMediator> _mediatorMock;
+    private readonly {5}Controller _controller;
+
+    public {5}ControllerTests()
+    {{
+        _mediatorMock = new Mock<IMediator>();
+        _controller = new {5}Controller(_mediatorMock.Object);
+    }}
+
+    [Fact]
+    public async Task Get_ReturnsListOf{6}()
+    {{
+        // Arrange
+        var {7} = new List<{5}Dto> {{ new(), new() }};
+
+        _mediatorMock
+            .Setup(m => m.Send(new Get{6}Query(), CancellationToken.None))
+            .ReturnsAsync({7});
+
+        // Act
+        var result = await _controller.Get();
+
+        // Assert
+        result.Should().NotBeNull();
+        result.Should().BeOfType(typeof(OkObjectResult));
+
+        var okResult = result as OkObjectResult;
+        okResult?.StatusCode.Should().Be((int)HttpStatusCode.OK);
+
+        var value = okResult?.Value as List<{5}Dto>;
+        value.Should().HaveCount(2);
+        value.Should().BeEquivalentTo({7});
+
+        _mediatorMock.Verify(m => m.Send(new Get{6}Query(), CancellationToken.None), Times.Once);
+    }}
+
+    [Fact]
+    public async Task GetById_Existing{5}Id_Returns{5}()
+    {{
+        // Arrange
+        {8}
+        var {9} = new {5}Dto {{ Id = {9}Id }};
+
+        _mediatorMock
+            .Setup(m => m.Send(new Get{5}ByIdQuery({9}Id), CancellationToken.None))
+            .ReturnsAsync({9});
+
+        // Act
+        var result = await _controller.GetById({9}Id);
+
+        // Assert
+        result.Should().NotBeNull();
+        result.Should().BeOfType(typeof(OkObjectResult));
+
+        var okResult = result as OkObjectResult;
+        okResult?.StatusCode.Should().Be((int)HttpStatusCode.OK);
+        (okResult?.Value as {5}Dto).Should().BeEquivalentTo({9});
+
+        _mediatorMock.Verify(m => m.Send(new Get{5}ByIdQuery({9}Id), CancellationToken.None), Times.Once);
+    }}
+
+    [Fact]
+    public async Task GetById_NotExisting{5}Id_ReturnsNotFoundResult()
+    {{
+        // Arrange
+        {8}
+        var {9} = new {5}Dto {{ Id = {9}Id }};
+
+        _mediatorMock
+            .Setup(m => m.Send(new Get{5}ByIdQuery({9}Id), CancellationToken.None))
+            .ReturnsAsync(({5}Dto?)null);
+
+        // Act
+        var result = await _controller.GetById({9}Id);
+
+        // Assert
+        result.Should().NotBeNull();
+        result.Should().BeOfType(typeof(NotFoundObjectResult));
+        (result as NotFoundObjectResult)?.StatusCode.Should().Be((int)HttpStatusCode.NotFound);
+
+        _mediatorMock.Verify(m => m.Send(new Get{5}ByIdQuery({9}Id), CancellationToken.None), Times.Once);
+    }}
+
+    [Fact]
+    public async Task Create_{5}_Returns{5}()
+    {{
+        // Arrange
+        var {9} = new {5}ForCreationDto();
+
+        _mediatorMock.Setup(m => m.Send(new Create{5}Command({9}), CancellationToken.None));
+
+        // Act
+        var result = await _controller.Create({9});
+
+        // Assert
+        result.Should().NotBeNull();
+        result.Should().BeOfType(typeof(CreatedAtActionResult));
+
+        var createdResult = result as CreatedAtActionResult;
+        createdResult?.StatusCode.Should().Be((int)HttpStatusCode.Created);
+        (createdResult?.Value as {5}ForCreationDto).Should().BeEquivalentTo({9});
+
+        _mediatorMock.Verify(m => m.Send(new Create{5}Command({9}), CancellationToken.None), Times.Once);
+    }}
+
+    [Fact]
+    public async Task Create_NullValue_ReturnsBadRequest()
+    {{
+        // Arrange and Act
+        var result = await _controller.Create(null);
+
+        // Assert
+        result.Should().NotBeNull();
+        result.Should().BeOfType(typeof(BadRequestObjectResult));
+        (result as BadRequestObjectResult)?.StatusCode.Should().Be((int)HttpStatusCode.BadRequest);
+
+        _mediatorMock.Verify(m => m.Send(new Create{5}Command(It.IsAny<{5}ForCreationDto>()), CancellationToken.None), Times.Never);
+    }}
+
+    [Fact]
+    public async Task Update_Existing{5}_ReturnsNoContentResult()
+    {{
+        // Arrange
+        {8}
+        var {9} = new {5}ForUpdateDto {{ Id = {9}Id }};
+
+        _mediatorMock
+            .Setup(m => m.Send(new Update{5}Command({9}), CancellationToken.None))
+            .ReturnsAsync(true);
+
+        // Act
+        var result = await _controller.Update({9}Id, {9});
+
+        // Assert
+        result.Should().NotBeNull();
+        result.Should().BeOfType(typeof(NoContentResult));
+        (result as NoContentResult)?.StatusCode.Should().Be((int)HttpStatusCode.NoContent);
+
+        _mediatorMock.Verify(m => m.Send(new Update{5}Command({9}), CancellationToken.None), Times.Once);
+    }}
+
+    [Fact]
+    public async Task Update_NotExisting{5}_ReturnsNotFoundResult()
+    {{
+        // Arrange
+        {8}
+        var {9} = new {5}ForUpdateDto {{ Id = {9}Id }};
+
+        _mediatorMock
+            .Setup(m => m.Send(new Update{5}Command({9}), CancellationToken.None))
+            .ReturnsAsync(false);
+
+        // Act
+        var result = await _controller.Update({9}Id, {9});
+
+        // Assert
+        result.Should().NotBeNull();
+        result.Should().BeOfType(typeof(NotFoundObjectResult));
+        (result as NotFoundObjectResult)?.StatusCode.Should().Be((int)HttpStatusCode.NotFound);
+
+        _mediatorMock.Verify(m => m.Send(new Update{5}Command({9}), CancellationToken.None), Times.Once);
+    }}
+
+    [Fact]
+    public async Task Update_NullValue_ReturnsBadRequest()
+    {{
+        // Arrange
+        {8}
+
+        // Act
+        var result = await _controller.Update({9}Id, null);
+
+        // Assert
+        result.Should().NotBeNull();
+        result.Should().BeOfType(typeof(BadRequestObjectResult));
+        (result as BadRequestObjectResult)?.StatusCode.Should().Be((int)HttpStatusCode.BadRequest);
+
+        _mediatorMock.Verify(m => m.Send(new Update{5}Command(It.IsAny<{5}ForUpdateDto>()), CancellationToken.None), Times.Never);
+    }}
+
+    [Fact]
+    public async Task Delete_Existing{5}Id_ReturnsNoContentResult()
+    {{
+        // Arrange
+        {8}
+
+        _mediatorMock
+            .Setup(m => m.Send(new Delete{5}Command({9}Id), CancellationToken.None))
+            .ReturnsAsync(true);
+
+        // Act
+        var result = await _controller.Delete({9}Id);
+
+        // Assert
+        result.Should().NotBeNull();
+        result.Should().BeOfType(typeof(NoContentResult));
+        (result as NoContentResult)?.StatusCode.Should().Be((int)HttpStatusCode.NoContent);
+
+        _mediatorMock.Verify(m => m.Send(new Delete{5}Command({9}Id), CancellationToken.None), Times.Once);
+    }}
+
+    [Fact]
+    public async Task Delete_NotExisting{5}Id_ReturnsNotFoundResult()
+    {{
+        // Arrange
+        {8}
+
+        _mediatorMock
+            .Setup(m => m.Send(new Delete{5}Command({9}Id), CancellationToken.None))
+            .ReturnsAsync(false);
+
+        // Act
+        var result = await _controller.Delete({9}Id);
+
+        // Assert
+        result.Should().NotBeNull();
+        result.Should().BeOfType(typeof(NotFoundObjectResult));
+        (result as NotFoundObjectResult)?.StatusCode.Should().Be((int)HttpStatusCode.NotFound);
+
+        _mediatorMock.Verify(m => m.Send(new Delete{5}Command({9}Id), CancellationToken.None), Times.Once);
+    }}
+}}

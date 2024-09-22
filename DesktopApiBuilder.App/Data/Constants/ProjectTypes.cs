@@ -4,4 +4,5 @@ public static class ProjectTypes
 {
     public const string AspNetWebApi = "webapi";
     public const string ClassLibrary = "classlib";
+    public const string XUnitTests = "xunit";
 }

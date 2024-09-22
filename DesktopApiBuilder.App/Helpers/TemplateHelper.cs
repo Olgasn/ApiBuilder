@@ -5,9 +5,11 @@ namespace DesktopApiBuilder.App.Helpers;
 
 public static class TemplateHelper
 {
+    private const string BaseDirectoryPathPart = "bin\\Debug\\net8.0-windows10.0.19041.0\\win10-x64\\AppX\\";
+
     public static string GetTemplateContent(string templateFilePath)
     {
-        string absoluteTemplatesPath = AppDomain.CurrentDomain.BaseDirectory.Replace("bin\\Debug\\net8.0-windows10.0.19041.0\\win10-x64\\AppX\\", templateFilePath);
+        var absoluteTemplatesPath = AppDomain.CurrentDomain.BaseDirectory.Replace(BaseDirectoryPathPart, templateFilePath);
 
         try
         {
@@ -26,8 +28,7 @@ public static class TemplateHelper
 
     public static string GetTemplateContent(DirectoryContentType contentType)
     {
-        string absoluteTemplatesPath = AppDomain.CurrentDomain.BaseDirectory.Replace(
-            "bin\\Debug\\net8.0-windows10.0.19041.0\\win10-x64\\AppX\\", GetTemplatePath(contentType));
+        var absoluteTemplatesPath = AppDomain.CurrentDomain.BaseDirectory.Replace(BaseDirectoryPathPart, GetTemplatePath(contentType));
 
         try
         {
@@ -73,6 +74,9 @@ public static class TemplateHelper
             DirectoryContentType.CreateCommandHandler => TemplatePaths.CreateCommandHandlerTemplatePath,
             DirectoryContentType.UpdateCommandHandler => TemplatePaths.UpdateCommandHandlerTemplatePath,
             DirectoryContentType.DeleteCommandHandler => TemplatePaths.DeleteCommandHandlerTemplatePath,
+            DirectoryContentType.ControllersTests => TemplatePaths.ControllersTestsTemplate,
+            DirectoryContentType.ControllersTestsWithMediatr => TemplatePaths.ControllersTestsWithMediatrTemplate,
+            DirectoryContentType.ServicesTests => TemplatePaths.ServicesTests,
             _ => throw new NotImplementedException(),
         };
 }

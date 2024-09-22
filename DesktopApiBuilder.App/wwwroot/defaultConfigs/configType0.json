@@ -78,6 +78,29 @@
                 ]
             },
             "rootContentTypes": [ "DbContext" ]
+        },
+        {
+            "name": "Tests",
+            "type": "xunit",
+            "directories": [
+                {
+                    "name": "ControllersTests",
+                    "parentPath": "",
+                    "contentType": "ControllersTests"
+                },
+                {
+                    "name": "ServicesTests",
+                    "parentPath": "",
+                    "contentType": "ServicesTests"
+                }
+            ],
+            "dependencies": {
+                "packages": [ 
+                    "Moq",
+                    "FluentAssertions"
+                ],
+                "projectReferences": [ "Web" ]
+            }
         }
     ],
     "migrationsProjectName": "Infrastructure"
