@@ -1,0 +1,234 @@
+﻿using FluentAssertions;
+using Microsoft.AspNetCore.Mvc;
+using Moq;
+using System.Net;
+using {0};
+using {1};
+using {2};
+
+namespace {3};
+
+public class {4}ControllerTests
+{{
+    private readonly Mock<I{4}Service> _serviceMock;
+    private readonly {4}Controller _controller;
+
+    public {4}ControllerTests()
+    {{
+        _serviceMock = new Mock<I{4}Service>();
+        _controller = new {4}Controller(_serviceMock.Object);
+    }}
+
+    [Fact]
+    public async Task Get_ReturnsListOf{5}()
+    {{
+        // Arrange
+        var {6} = new List<{4}Dto> {{ new(), new() }};
+
+        _serviceMock
+            .Setup(s => s.Get())
+            .ReturnsAsync({6});
+
+        // Act
+        var result = await _controller.Get();
+
+        // Assert
+        result.Should().NotBeNull();
+        result.Should().BeOfType(typeof(OkObjectResult));
+
+        var okResult = result as OkObjectResult;
+        okResult?.StatusCode.Should().Be((int)HttpStatusCode.OK);
+
+        var value = okResult?.Value as List<{4}Dto>;
+        value.Should().HaveCount(2);
+        value.Should().BeEquivalentTo({6});
+
+        _serviceMock.Verify(s => s.Get(), Times.Once);
+    }}
+
+    [Fact]
+    public async Task GetById_Existing{4}Id_Returns{4}()
+    {{
+        // Arrange
+        {7}
+        var {8} = new {4}Dto {{ Id = {8}Id }};
+
+        _serviceMock
+            .Setup(s => s.GetById({8}Id))
+            .ReturnsAsync({8});
+
+        // Act
+        var result = await _controller.GetById({8}Id);
+
+        // Assert
+        result.Should().NotBeNull();
+        result.Should().BeOfType(typeof(OkObjectResult));
+
+        var okResult = result as OkObjectResult;
+        okResult?.StatusCode.Should().Be((int)HttpStatusCode.OK);
+        (okResult?.Value as {4}Dto).Should().BeEquivalentTo({8});
+
+        _serviceMock.Verify(s => s.GetById({8}Id), Times.Once);
+    }}
+
+    [Fact]
+    public async Task GetById_NotExisting{4}Id_ReturnsNotFoundResult()
+    {{
+        // Arrange
+        {7}
+        var {8} = new {4}Dto {{ Id = {8}Id }};
+
+        _serviceMock
+            .Setup(s => s.GetById({8}Id))
+            .ReturnsAsync(({4}Dto?)null);
+
+        // Act
+        var result = await _controller.GetById({8}Id);
+
+        // Assert
+        result.Should().NotBeNull();
+        result.Should().BeOfType(typeof(NotFoundObjectResult));
+        (result as NotFoundObjectResult)?.StatusCode.Should().Be((int)HttpStatusCode.NotFound);
+
+        _serviceMock.Verify(s => s.GetById({8}Id), Times.Once);
+    }}
+
+    [Fact]
+    public async Task Create_{4}_Returns{4}()
+    {{
+        // Arrange
+        var {8} = new {4}ForCreationDto();
+
+        _serviceMock.Setup(s => s.Create({8}));
+
+        // Act
+        var result = await _controller.Create({8});
+
+        // Assert
+        result.Should().NotBeNull();
+        result.Should().BeOfType(typeof(CreatedAtActionResult));
+
+        var createdResult = result as CreatedAtActionResult;
+        createdResult?.StatusCode.Should().Be((int)HttpStatusCode.Created);
+        (createdResult?.Value as {4}ForCreationDto).Should().BeEquivalentTo({8});
+
+        _serviceMock.Verify(s => s.Create({8}), Times.Once);
+    }}
+
+    [Fact]
+    public async Task Create_NullValue_ReturnsBadRequest()
+    {{
+        // Arrange and Act
+        var result = await _controller.Create(null);
+
+        // Assert
+        result.Should().NotBeNull();
+        result.Should().BeOfType(typeof(BadRequestObjectResult));
+        (result as BadRequestObjectResult)?.StatusCode.Should().Be((int)HttpStatusCode.BadRequest);
+
+        _serviceMock.Verify(s => s.Create(It.IsAny<{4}ForCreationDto>()), Times.Never);
+    }}
+
+    [Fact]
+    public async Task Update_Existing{4}_ReturnsNoContentResult()
+    {{
+        // Arrange
+        {7}
+        var {8} = new {4}ForUpdateDto {{ Id = {8}Id }};
+
+        _serviceMock
+            .Setup(s => s.Update({8}Id, {8}))
+            .ReturnsAsync(true);
+
+        // Act
+        var result = await _controller.Update({8}Id, {8});
+
+        // Assert
+        result.Should().NotBeNull();
+        result.Should().BeOfType(typeof(NoContentResult));
+        (result as NoContentResult)?.StatusCode.Should().Be((int)HttpStatusCode.NoContent);
+
+        _serviceMock.Verify(s => s.Update({8}Id, {8}), Times.Once);
+    }}
+
+    [Fact]
+    public async Task Update_NotExisting{4}_ReturnsNotFoundResult()
+    {{
+        // Arrange
+        {7}
+        var {8} = new {4}ForUpdateDto {{ Id = {8}Id }};
+
+        _serviceMock
+            .Setup(s => s.Update({8}Id, {8}))
+            .ReturnsAsync(false);
+
+        // Act
+        var result = await _controller.Update({8}Id, {8});
+
+        // Assert
+        result.Should().NotBeNull();
+        result.Should().BeOfType(typeof(NotFoundObjectResult));
+        (result as NotFoundObjectResult)?.StatusCode.Should().Be((int)HttpStatusCode.NotFound);
+
+        _serviceMock.Verify(s => s.Update({8}Id, {8}), Times.Once);
+    }}
+
+    [Fact]
+    public async Task Update_NullValue_ReturnsBadRequest()
+    {{
+        // Arrange
+        {7}
+
+        // Act
+        var result = await _controller.Update({8}Id, null);
+
+        // Assert
+        result.Should().NotBeNull();
+        result.Should().BeOfType(typeof(BadRequestObjectResult));
+        (result as BadRequestObjectResult)?.StatusCode.Should().Be((int)HttpStatusCode.BadRequest);
+
+        _serviceMock.Verify(s => s.Update({8}Id, It.IsAny<{4}ForUpdateDto>()), Times.Never);
+    }}
+
+    [Fact]
+    public async Task Delete_Existing{4}Id_ReturnsNoContentResult()
+    {{
+        // Arrange
+        {7}
+
+        _serviceMock
+            .Setup(s => s.Delete({8}Id))
+            .ReturnsAsync(true);
+
+        // Act
+        var result = await _controller.Delete({8}Id);
+
+        // Assert
+        result.Should().NotBeNull();
+        result.Should().BeOfType(typeof(NoContentResult));
+        (result as NoContentResult)?.StatusCode.Should().Be((int)HttpStatusCode.NoContent);
+
+        _serviceMock.Verify(s => s.Delete({8}Id), Times.Once);
+    }}
+
+    [Fact]
+    public async Task Delete_NotExisting{4}Id_ReturnsNotFoundResult()
+    {{
+        // Arrange
+        {7}
+
+        _serviceMock
+            .Setup(s => s.Delete({8}Id))
+            .ReturnsAsync(false);
+
+        // Act
+        var result = await _controller.Delete({8}Id);
+
+        // Assert
+        result.Should().NotBeNull();
+        result.Should().BeOfType(typeof(NotFoundObjectResult));
+        (result as NotFoundObjectResult)?.StatusCode.Should().Be((int)HttpStatusCode.NotFound);
+
+        _serviceMock.Verify(s => s.Delete({8}Id), Times.Once);
+    }}
+}}

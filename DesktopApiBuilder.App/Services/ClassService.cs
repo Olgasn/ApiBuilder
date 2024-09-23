@@ -84,6 +84,10 @@ public static class ClassService
     private static string GetFormattedString(ClassTemplateSettings classSettings)
     {
         var props = new StringBuilder();
+        var lowercaseEntityName = $"{classSettings.Entity?.Name?[..1].ToLower()}{classSettings.Entity?.Name?[1..]}";
+        var lowercaseEntityPluralName = $"{classSettings.Entity?.PluralName?[..1].ToLower()}{classSettings.Entity?.PluralName?[1..]}";
+
+        string entityIdTestField;
 
         switch (classSettings.ContentType)
         {
@@ -135,9 +139,9 @@ public static class ClassService
                     classSettings.Usings[0],
                     classSettings.Usings[1],
                     classSettings.Namespace,
-                    $"{classSettings.Entity?.PluralName?[..1].ToLower()}{classSettings.Entity?.PluralName?[1..]}", 
+                    lowercaseEntityPluralName, 
                     classSettings.Entity?.Name,
-                    $"{classSettings.Entity?.Name?[..1].ToLower()}{classSettings.Entity?.Name?[1..]}",
+                    lowercaseEntityName,
                     EnumHelper.GetIdTypeName(classSettings.IdType));
             case DirectoryContentType.ControllerWithMediatr:
                 return string.Format(
@@ -146,11 +150,11 @@ public static class ClassService
                     classSettings.Usings[1],
                     classSettings.Usings[2],
                     classSettings.Namespace,
-                    $"{classSettings.Entity?.PluralName?[..1].ToLower()}{classSettings.Entity?.PluralName?[1..]}",
+                    lowercaseEntityPluralName,
                     classSettings.Entity?.Name,
                     classSettings.Entity?.PluralName,
                     EnumHelper.GetIdTypeName(classSettings.IdType),
-                    $"{classSettings.Entity?.Name?[..1].ToLower()}{classSettings.Entity?.Name?[1..]}");
+                    lowercaseEntityName);
             case DirectoryContentType.DbContext:
                 foreach (var entity in classSettings.Entities ?? [])
                 {
@@ -296,6 +300,53 @@ public static class ClassService
                     classSettings.Usings[1],
                     classSettings.Namespace,
                     classSettings.Entity?.Name);
+            case DirectoryContentType.ControllersTests:
+                entityIdTestField = classSettings.IdType is IdType.Int
+                    ? $"const int {lowercaseEntityName}Id = 1;"
+                    : $"var {lowercaseEntityName}Id = Guid.NewGuid();";
+                return string.Format(
+                    classSettings.Template ?? string.Empty,
+                    classSettings.Usings[0],
+                    classSettings.Usings[1],
+                    classSettings.Usings[2], 
+                    classSettings.Namespace,
+                    classSettings.Entity.Name,
+                    classSettings.Entity.PluralName,
+                    lowercaseEntityPluralName,
+                    entityIdTestField,
+                    lowercaseEntityName);
+            case DirectoryContentType.ControllersTestsWithMediatr:
+                entityIdTestField = classSettings.IdType is IdType.Int
+                    ? $"const int {lowercaseEntityName}Id = 1;"
+                    : $"var {lowercaseEntityName}Id = Guid.NewGuid();";
+                return string.Format(
+                    classSettings.Template ?? string.Empty,
+                    classSettings.Usings[0],
+                    classSettings.Usings[1],
+                    classSettings.Usings[2],
+                    classSettings.Usings[3],
+                    classSettings.Namespace,
+                    classSettings.Entity.Name,
+                    classSettings.Entity.PluralName,
+                    lowercaseEntityPluralName,
+                    entityIdTestField,
+                    lowercaseEntityName);
+            case DirectoryContentType.ServicesTests:
+                entityIdTestField = classSettings.IdType is IdType.Int
+                    ? $"const int {lowercaseEntityName}Id = 1;"
+                    : $"var {lowercaseEntityName}Id = Guid.NewGuid();";
+                return string.Format(
+                    classSettings.Template ?? string.Empty,
+                    classSettings.Usings[0],
+                    classSettings.Usings[1],
+                    classSettings.Usings[2],
+                    classSettings.Usings[3],
+                    classSettings.Namespace,
+                    classSettings.Entity.Name,
+                    classSettings.Entity.PluralName,
+                    lowercaseEntityPluralName,
+                    entityIdTestField,
+                    lowercaseEntityName);
         }
 
         return string.Empty;
@@ -315,11 +366,8 @@ public static class ClassService
     private static string GetDtoCreationTemplate(ClassTemplateSettings classSettings, bool includeId = true, bool includeNavProps = false)
     {
         var props = new StringBuilder();
-        foreach (var prop in classSettings.Entity?.Properties ?? [])
+        foreach (var prop in (classSettings.Entity?.Properties ?? []).Where(prop => (includeId || prop.Name != "Id") && (includeNavProps || DefaultEntityPropsTypes.Types.Contains(prop.Type))))
         {
-            if ((!includeId && prop.Name == "Id") || (!includeNavProps && !DefaultEntityPropsTypes.Types.Contains(prop.Type)))
-                continue;
-
             if (!DefaultEntityPropsTypes.Types.Contains(prop.Type))
             {
                 props.Append(string.Format(EntityPropTemplate, $"{prop.Type}Dto", prop.Name));

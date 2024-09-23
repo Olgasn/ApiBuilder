@@ -36,5 +36,10 @@ public enum DirectoryContentType
     UpdateCommandHandler,
     DeleteCommandHandler,
 
+    // Tests
+    ControllersTests,
+    ControllersTestsWithMediatr,
+    ServicesTests,
+
     Undefined
 }

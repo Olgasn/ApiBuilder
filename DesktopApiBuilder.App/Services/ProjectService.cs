@@ -29,7 +29,7 @@ public static class ProjectService
         var config = solutionSettings.ArchitectureType == ArchitectureType.Custom 
             ? solutionSettings.CustomSolutionConfig
             : ConfigHelper.GetSolutionConfig(solutionSettings.ArchitectureType);
-        List<string> commands = GenerateExecutionCommands(solutionSettings, config);
+        var commands = GenerateExecutionCommands(solutionSettings, config);
 
         await ProcessManager.ExecuteCmdCommands([.. commands], ct);
 
@@ -38,15 +38,12 @@ public static class ProjectService
 
     private static List<string> GenerateExecutionCommands(SolutionSettingsModel solutionSettings, SolutionConfig? config)
     {
-        List<string> commands = [];
+        List<string> commands =
+        [
+            $"cd /d {solutionSettings.FullSolutionPath}"
+        ];
 
-        commands.Add($"cd /d {solutionSettings.FullSolutionPath}");
-
-        foreach (var folder in config?.SolutionFolders ?? [])
-        {
-            commands.Add($"mkdir {folder.Name}");
-        }
-
+        commands.AddRange(from folder in config?.SolutionFolders ?? [] select $"mkdir {folder.Name}");
         commands.AddRange(GenerateProjectsCreationCommands(solutionSettings, config));
         commands.AddRange(GenerateProjectDirectoriesCreationCommands(solutionSettings, config));
 
@@ -102,13 +99,17 @@ public static class ProjectService
                 solutionSettings.SolutionName,
                 project.Name));
 
-            if (project.Type == ProjectTypes.ClassLibrary)
+            switch (project.Type)
             {
-                commands.Add("del \"Class1.cs\"");
-            }
-            else if (project.Type == ProjectTypes.AspNetWebApi)
-            {
-                commands.Add($"del \"{solutionSettings.SolutionName}.{project.Name}.http\"");
+                case ProjectTypes.ClassLibrary:
+                    commands.Add("del \"Class1.cs\"");
+                    break;
+                case ProjectTypes.AspNetWebApi:
+                    commands.Add($"del \"{solutionSettings.SolutionName}.{project.Name}.http\"");
+                    break;
+                case ProjectTypes.XUnitTests:
+                    commands.Add("del \"UnitTest1.cs\"");
+                    break;
             }
 
             foreach (var dir in project.Directories ?? [])
@@ -143,7 +144,7 @@ public static class ProjectService
 
         config?.Projects?.ToList()
             .ForEach(p => commonPaths.AddRange(
-                p?.Directories?.Where(d => string.IsNullOrEmpty(d?.ParentPath))
+                p.Directories?.Where(d => string.IsNullOrEmpty(d.ParentPath))
                     .Select(d =>
                     {
                         var solutionFolderName = config?.SolutionFolders?
@@ -155,7 +156,7 @@ public static class ProjectService
                         }
 
                         return
-                            $"{solutionSettings.FullSolutionPath}/{solutionFolderName}{solutionSettings.SolutionName}.{p?.Name}/{d?.Name}";
+                            $"{solutionSettings.FullSolutionPath}/{solutionFolderName}{solutionSettings.SolutionName}.{p.Name}/{d.Name}";
                     }) ?? []));
 
         while (!commonPaths.All(Directory.Exists))

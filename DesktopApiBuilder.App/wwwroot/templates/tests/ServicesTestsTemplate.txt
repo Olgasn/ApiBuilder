@@ -1,0 +1,193 @@
+﻿using AutoMapper;
+using FluentAssertions;
+using Moq;
+using {0};
+using {1};
+using {2};
+using {3};
+
+namespace {4};
+
+public class {5}ServiceTests
+{{
+    private readonly Mock<I{5}Repository> _repositoryMock;
+    private readonly Mock<IMapper> _mapperMock;
+    private readonly {5}Service _service;
+
+    public {5}ServiceTests()
+    {{
+        _repositoryMock = new Mock<I{5}Repository>();
+        _mapperMock = new Mock<IMapper>();
+        _service = new {5}Service(_repositoryMock.Object, _mapperMock.Object);
+    }}
+
+    [Fact]
+    public async Task Get_ReturnsListOf{6}()
+    {{
+        // Arrange
+        var {7} = new List<{5}> {{ new(), new() }};
+        var {9}Dtos = new List<{5}Dto> {{ new(), new() }};
+
+        _repositoryMock
+            .Setup(r => r.Get(false))
+            .ReturnsAsync({7});
+
+        _mapperMock
+            .Setup(m => m.Map<IEnumerable<{5}Dto>>({7}))
+            .Returns({9}Dtos);
+
+        // Act
+        var result = await _service.Get();
+
+        // Assert
+        result.Should().NotBeNull();
+        result.Should().HaveCount(2);
+        result.Should().BeEquivalentTo({9}Dtos);
+
+        _repositoryMock.Verify(r => r.Get(false), Times.Once);
+        _mapperMock.Verify(m => m.Map<IEnumerable<{5}Dto>>({7}), Times.Once);
+    }}
+
+    [Fact]
+    public async Task GetById_{5}Id_Returns{5}()
+    {{
+        // Arrange
+        {8}
+        var {9} = new {5} {{ Id = {9}Id }};
+        var {9}Dto = new {5}Dto {{ Id = {9}Id }};
+
+        _repositoryMock
+            .Setup(r => r.GetById({9}Id, false))
+            .ReturnsAsync({9});
+
+        _mapperMock
+            .Setup(m => m.Map<{5}Dto>({9}))
+            .Returns({9}Dto);
+
+        // Act
+        var result = await _service.GetById({9}Id);
+
+        // Assert
+        result.Should().NotBeNull();
+        result.Should().BeEquivalentTo({9}Dto);
+
+        _repositoryMock.Verify(r => r.GetById({9}Id, false), Times.Once);
+        _mapperMock.Verify(m => m.Map<{5}Dto>({9}), Times.Once);
+    }}
+
+    [Fact]
+    public async Task Create_{5}()
+    {{
+        // Arrange
+        var {9} = new {5}();
+        var {9}ForCreation = new {5}ForCreationDto();
+
+        _mapperMock
+            .Setup(m => m.Map<{5}>({9}ForCreation))
+            .Returns({9});
+
+        _repositoryMock.Setup(r => r.Create({9}));
+        _repositoryMock.Setup(r => r.SaveChanges());
+        
+        // Act
+        await _service.Create({9}ForCreation);
+
+        // Assert
+        _mapperMock.Verify(m => m.Map<{5}>({9}ForCreation), Times.Once);
+        _repositoryMock.Verify(r => r.Create({9}), Times.Once);
+        _repositoryMock.Verify(r => r.SaveChanges(), Times.Once);
+    }}
+
+    [Fact]
+    public async Task Update_Existing{5}_ReturnsTrue()
+    {{
+        // Arrange
+        {8}
+        var {9} = new {5} {{ Id = {9}Id }};
+        var {9}ForUpdate = new {5}ForUpdateDto {{ Id = {9}Id }};
+
+        _repositoryMock
+            .Setup(r => r.GetById({9}Id, true))
+            .ReturnsAsync({9});
+
+        _mapperMock.Setup(m => m.Map({9}ForUpdate, {9}));
+
+        _repositoryMock.Setup(r => r.Update({9}));
+        _repositoryMock.Setup(r => r.SaveChanges());
+
+        // Act
+        var result = await _service.Update({9}Id, {9}ForUpdate);
+
+        // Assert
+        result.Should().Be(true);
+
+        _repositoryMock.Verify(r => r.GetById({9}Id, true), Times.Once);
+        _mapperMock.Verify(m => m.Map({9}ForUpdate, {9}), Times.Once);
+        _repositoryMock.Verify(r => r.Update({9}), Times.Once);
+        _repositoryMock.Verify(r => r.SaveChanges(), Times.Once);
+    }}
+
+    [Fact]
+    public async Task Update_NotExisting{5}_ReturnsFalse()
+    {{
+        // Arrange
+        {8}
+        var {9}ForUpdate = new {5}ForUpdateDto {{ Id = {9}Id }};
+
+        _repositoryMock
+            .Setup(r => r.GetById({9}Id, true))
+            .ReturnsAsync(({5}?)null);
+
+        // Act
+        var result = await _service.Update({9}Id, {9}ForUpdate);
+
+        // Assert
+        result.Should().Be(false);
+
+        _repositoryMock.Verify(r => r.GetById({9}Id, true), Times.Once);
+    }}
+
+    [Fact]
+    public async Task Delete_Existing{5}_ReturnsTrue()
+    {{
+        // Arrange
+        {8}
+        var {9} = new {5} {{ Id = {9}Id }};
+
+        _repositoryMock
+            .Setup(r => r.GetById({9}Id, false))
+            .ReturnsAsync({9});
+
+        _repositoryMock.Setup(r => r.Delete({9}));
+        _repositoryMock.Setup(r => r.SaveChanges());
+
+        // Act
+        var result = await _service.Delete({9}Id);
+
+        // Assert
+        result.Should().Be(true);
+
+        _repositoryMock.Verify(r => r.GetById({9}Id, false), Times.Once);
+        _repositoryMock.Verify(r => r.Delete({9}), Times.Once);
+        _repositoryMock.Verify(r => r.SaveChanges(), Times.Once);
+    }}
+
+    [Fact]
+    public async Task Delete_NotExisting{5}_ReturnsFalse()
+    {{
+        // Arrange
+        {8}
+
+        _repositoryMock
+            .Setup(r => r.GetById({9}Id, false))
+            .ReturnsAsync(({5}?)null);
+
+        // Act
+        var result = await _service.Delete({9}Id);
+
+        // Assert
+        result.Should().Be(false);
+
+        _repositoryMock.Verify(r => r.GetById({9}Id, false), Times.Once);
+    }}
+}}

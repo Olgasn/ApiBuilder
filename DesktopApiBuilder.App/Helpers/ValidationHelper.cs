@@ -4,9 +4,9 @@ namespace DesktopApiBuilder.App.Helpers;
 
 public static class ValidationHelper
 {
-    public static ValidationResult ValidateForKeyword(string value)
+    public static ValidationResult? ValidateForKeyword(string value)
     {
-        var csharpKeywords = new List<string>()
+        var csharpKeywords = new List<string>
             {
                 "abstract",
                 "as",
@@ -89,11 +89,6 @@ public static class ValidationHelper
                 "while"
             };
 
-        if (csharpKeywords.Contains(value.ToLower()))
-        {
-            return new ValidationResult(string.Empty);
-        }
-
-        return ValidationResult.Success;
+        return csharpKeywords.Contains(value.ToLower()) ? new ValidationResult(string.Empty) : ValidationResult.Success;
     }
 }

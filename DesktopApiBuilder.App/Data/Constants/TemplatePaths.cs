@@ -38,4 +38,8 @@ public static class TemplatePaths
     public const string CreateCommandHandlerTemplatePath = "wwwroot\\templates\\cqrs\\CreateCommandHandlerTemplate.txt";
     public const string UpdateCommandHandlerTemplatePath = "wwwroot\\templates\\cqrs\\UpdateCommandHandlerTemplate.txt";
     public const string DeleteCommandHandlerTemplatePath = "wwwroot\\templates\\cqrs\\DeleteCommandHandlerTemplate.txt";
+
+    public const string ControllersTestsTemplate = "wwwroot\\templates\\tests\\ControllersTestsTemplate.txt";
+    public const string ControllersTestsWithMediatrTemplate = "wwwroot\\templates\\tests\\ControllersTestsWithMediatrTemplate.txt";
+    public const string ServicesTests = "wwwroot\\templates\\tests\\ServicesTestsTemplate.txt";
 }

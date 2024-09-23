@@ -39,7 +39,7 @@ public class {5}Controller : ControllerBase
     }}
 
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] {5}ForCreationDto {8})
+    public async Task<IActionResult> Create([FromBody] {5}ForCreationDto? {8})
     {{
         if ({8} is null)
         {{
@@ -52,7 +52,7 @@ public class {5}Controller : ControllerBase
     }}
 
     [HttpPut("{{id}}")]
-    public async Task<IActionResult> Update({7} id, [FromBody] {5}ForUpdateDto {8})
+    public async Task<IActionResult> Update({7} id, [FromBody] {5}ForUpdateDto? {8})
     {{
         if ({8} is null)
         {{

@@ -39,6 +39,9 @@ public static class ClassServiceHelper
             DirectoryContentType.CreateCommandHandler => $"Create{entity?.Name}CommandHandler",
             DirectoryContentType.UpdateCommandHandler => $"Update{entity?.Name}CommandHandler",
             DirectoryContentType.DeleteCommandHandler => $"Delete{entity?.Name}CommandHandler",
+            DirectoryContentType.ControllersTests => $"{entity?.Name}ControllerTests",
+            DirectoryContentType.ControllersTestsWithMediatr => $"{entity?.Name}ControllerTests",
+            DirectoryContentType.ServicesTests => $"{entity?.Name}ServicesTests",
             _ => throw new NotImplementedException()
         };
 
@@ -55,10 +58,12 @@ public static class ClassServiceHelper
 
         var entitiesDir = directories.FindByContentType(DirectoryContentType.EntityClass);
         var dtosDir = directories?.FindByContentType(DirectoryContentType.DtoClass, true);
-        var repoInterfacesDir = directories?.FirstOrDefault(d => d.ContentType == DirectoryContentType.RepositoryInterface.ToString());
+        var repoInterfacesDir = directories?.FindByContentType(DirectoryContentType.RepositoryInterface);
         DirectoryConfig? serviceInterfacesDir;
         DirectoryConfig? repoDir;
+        DirectoryConfig? servicesDir;
         DirectoryConfig? queriesDir;
+        DirectoryConfig? commandsDir;
 
         switch (contentType)
         {
@@ -87,7 +92,7 @@ public static class ClassServiceHelper
                 ];
             case DirectoryContentType.ControllerWithMediatr:
                 queriesDir = directories.FindByContentType(DirectoryContentType.GetAllQuery, true);
-                var commandsDir = directories.FindByContentType(DirectoryContentType.CreateCommand, true);
+                commandsDir = directories.FindByContentType(DirectoryContentType.CreateCommand, true);
                 return [
                     GetSpecificUsing(solutionName, projects, dtosDir, true, DirectoryContentType.DtoClass),
                     GetSpecificUsing(solutionName, projects, queriesDir, true, DirectoryContentType.GetAllQuery),
@@ -110,12 +115,12 @@ public static class ClassServiceHelper
             case DirectoryContentType.ServiceExtensionsWithServices:
                 repoDir = directories.FindByContentType(DirectoryContentType.RepositoryClass);
                 serviceInterfacesDir = directories.FindByContentType(DirectoryContentType.ServiceInterface);
-                var serviceDir = directories.FindByContentType(DirectoryContentType.ServiceClass);
+                servicesDir = directories.FindByContentType(DirectoryContentType.ServiceClass);
                 return [
                     GetGeneralProjectUsing(solutionName, projects, EnumHelper.GetContentTypeFromString(entitiesDir?.ContentType)),
                     GetSpecificUsing(solutionName, projects, repoDir),
                     GetSpecificUsing(solutionName, projects, repoInterfacesDir),
-                    GetSpecificUsing(solutionName, projects, serviceDir),
+                    GetSpecificUsing(solutionName, projects, servicesDir),
                     GetSpecificUsing(solutionName, projects, serviceInterfacesDir)
                 ];
             case DirectoryContentType.ProgramClass:
@@ -130,7 +135,7 @@ public static class ClassServiceHelper
                 return [
                     GetGeneralProjectUsing(solutionName, projects, DirectoryContentType.DtoClass, true),
                     GetSpecificUsing(solutionName, projects, extensionsDir),
-                    GetSpecificUsing(solutionName, projects, queriesDir, true, DirectoryContentType.GetAllQuery),
+                    GetSpecificUsing(solutionName, projects, queriesDir, true, DirectoryContentType.GetAllQuery)
                 ];
             case DirectoryContentType.GetAllQuery:
                 return [GetSpecificUsing(solutionName, projects, dtosDir, true, DirectoryContentType.DtoClass)];
@@ -172,6 +177,32 @@ public static class ClassServiceHelper
                 return [
                     GetSpecificUsing(solutionName, projects, repoInterfacesDir),
                     GetSpecificUsing(solutionName, projects, deleteCommandDir, true, DirectoryContentType.DeleteCommand)
+                ];
+            case DirectoryContentType.ControllersTests:
+                var controllersDir = directories.FindByContentType(DirectoryContentType.Controller);
+                serviceInterfacesDir = directories.FindByContentType(DirectoryContentType.ServiceInterface);
+                return [
+                    GetSpecificUsing(solutionName, projects, dtosDir, true, DirectoryContentType.DtoClass),
+                    GetSpecificUsing(solutionName, projects, serviceInterfacesDir),
+                    GetSpecificUsing(solutionName, projects, controllersDir)
+                ];
+            case DirectoryContentType.ControllersTestsWithMediatr:
+                var controllersWithMediatrDir = directories.FindByContentType(DirectoryContentType.ControllerWithMediatr);
+                queriesDir = directories.FindByContentType(DirectoryContentType.GetAllQuery, true);
+                commandsDir = directories.FindByContentType(DirectoryContentType.CreateCommand, true);
+                return [
+                    GetSpecificUsing(solutionName, projects, dtosDir, true, DirectoryContentType.DtoClass),
+                    GetSpecificUsing(solutionName, projects, queriesDir, true, DirectoryContentType.GetAllQuery),
+                    GetSpecificUsing(solutionName, projects, commandsDir, true, DirectoryContentType.CreateCommand),
+                    GetSpecificUsing(solutionName, projects, controllersWithMediatrDir)
+                ];
+            case DirectoryContentType.ServicesTests:
+                servicesDir = directories.FindByContentType(DirectoryContentType.ServiceClass);
+                return [
+                    GetSpecificUsing(solutionName, projects, dtosDir, true, DirectoryContentType.DtoClass),
+                    GetSpecificUsing(solutionName, projects, servicesDir),
+                    GetSpecificUsing(solutionName, projects, entitiesDir),
+                    GetSpecificUsing(solutionName, projects, repoInterfacesDir)
                 ];
         }
 

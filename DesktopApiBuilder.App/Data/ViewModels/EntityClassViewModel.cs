@@ -1,7 +1,5 @@
 ﻿using DesktopApiBuilder.App.Helpers;
 using DesktopApiBuilder.App.Resources.Languages;
-using Microsoft.AspNetCore.Components;
-using Microsoft.Extensions.Localization;
 using System.ComponentModel.DataAnnotations;
 
 
